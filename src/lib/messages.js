@@ -9,6 +9,7 @@ export const MSG = Object.freeze({
   WISHLIST_QUEUE: 'wishlist-queue',  // remember an operation for later (a failure)
   WISHLIST_DONE: 'wishlist-done',
   MARK_OPENED: 'mark-opened',
+  COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
 });
 
@@ -22,6 +23,8 @@ export function parseMessage(raw) {
   switch (raw.type) {
     case MSG.REFRESH:
       return { type: raw.type, force: raw.force === true, mode: raw.mode === 'surprise' ? 'surprise' : 'best' };
+    case MSG.COLOR_SCHEME:
+      return { type: raw.type, dark: raw.dark === true };
     case MSG.OPEN_MAIN:
       return { type: raw.type };
     case MSG.FEEDBACK:

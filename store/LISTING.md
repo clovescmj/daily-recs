@@ -51,6 +51,7 @@ Show a daily list of new album recommendations on the user's own Bandcamp profil
 **Permission justifications**
 - `storage`: keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs likes and dislikes through the user's Google account.
 - `alarms`: checks once every few hours whether a new day has started, to prepare the day's list in the background, and schedules a retry when Bandcamp asks to slow down.
+- `offscreen`: opens a hidden page that only checks whether the browser is in dark or light mode, so the toolbar icon can use the symbol that is visible on the user's toolbar (the service worker cannot check this itself). It reads and sends no other data.
 - `contextMenus`: adds the right-click menu on the toolbar icon (Open Daily Recs, Feedback, Report a bug, About).
 - `scripting`: when the user clicks the heart, runs Bandcamp's own "add to wishlist" function in the user's Bandcamp tab, so the wishlist changes exactly as if they had clicked Bandcamp's button.
 - Host access `https://*.bandcamp.com/*`: reads the user's collection and wishlist, and the "you may also like" section and tags of album pages (these live on artists' subdomains). Nothing else is accessed.

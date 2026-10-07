@@ -1,17 +1,25 @@
 {
   "manifest_version": 3,
   "name": "Daily Recs for Bandcamp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Fresh Bandcamp recommendations every day, based on your own collection. Never shows what you already own.",
-  "minimum_chrome_version": "102",
+  "minimum_chrome_version": "109",
   "icons": {
-    "16": "icons/icon-16.png",
-    "32": "icons/icon-32.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
+    "16": "icons/app-16.png",
+    "32": "icons/app-32.png",
+    "48": "icons/app-48.png",
+    "128": "icons/app-128.png"
   },
-  "permissions": ["alarms", "contextMenus", "scripting", "storage"],
-  "host_permissions": ["https://*.bandcamp.com/*"],
+  "permissions": [
+    "alarms",
+    "contextMenus",
+    "offscreen",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.bandcamp.com/*"
+  ],
   "background": {
     "service_worker": "src/background/service-worker.js",
     "type": "module"
@@ -19,22 +27,35 @@
   "action": {
     "default_title": "Daily Recs",
     "default_icon": {
-      "16": "icons/icon-16.png",
-      "32": "icons/icon-32.png"
+      "16": "icons/dark/icon-16.png",
+      "32": "icons/dark/icon-32.png"
     }
   },
   "content_scripts": [
     {
-      "matches": ["https://bandcamp.com/*"],
-      "js": ["src/player/bandcamp-player.js", "src/content/profile-tab.js"],
-      "css": ["src/player/bandcamp-player.css", "src/content/profile-tab.css"],
+      "matches": [
+        "https://bandcamp.com/*"
+      ],
+      "js": [
+        "src/player/bandcamp-player.js",
+        "src/content/profile-tab.js"
+      ],
+      "css": [
+        "src/player/bandcamp-player.css",
+        "src/content/profile-tab.css"
+      ],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["src/pages/recs/recs.html", "src/assets/*"],
-      "matches": ["https://bandcamp.com/*"]
+      "resources": [
+        "src/pages/recs/recs.html",
+        "src/assets/*"
+      ],
+      "matches": [
+        "https://bandcamp.com/*"
+      ]
     }
   ]
 }

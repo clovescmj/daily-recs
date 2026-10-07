@@ -7,6 +7,7 @@
 import { registerMenu } from './menu.js';
 import { registerMessageHandler } from './messages.js';
 import { RETRY_ALARM, enqueue, retryAfterRateLimit, runRefresh, syncNow, updateBadge } from './jobs.js';
+import { restoreToolbarIcon, startColorSchemeWatcher } from './icon.js';
 import { continueAfterLogin, forgetLoginTab, openMainPage } from './navigation.js';
 import { clearStaleStatus } from './storage.js';
 
@@ -18,6 +19,8 @@ registerMenu();
 
 // Queued first, so it runs before any work that arrives while the worker is waking up.
 enqueue(clearStaleStatus).then(updateBadge);
+restoreToolbarIcon();
+startColorSchemeWatcher();
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create(DAILY_ALARM, { delayInMinutes: 1, periodInMinutes: ALARM_PERIOD_MINUTES });

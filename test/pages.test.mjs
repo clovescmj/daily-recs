@@ -65,6 +65,7 @@ test('the page only sends messages the service worker accepts', () => {
     { type: 'wishlist-done', id: '1' },
     { type: 'mark-opened', id: '1' },
     { type: 'open-main' },
+    { type: 'color-scheme', dark: true },
   ]) assert.ok(parseMessage(raw), JSON.stringify(raw));
 });
 

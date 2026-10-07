@@ -3,6 +3,7 @@
 import { MSG, parseMessage } from '../lib/messages.js';
 import { wishlistOpInPage } from './wishlist-in-page.js';
 import * as defaultJobs from './jobs.js';
+import { setColorScheme } from './icon.js';
 import { openMainPage } from './navigation.js';
 
 const PROFILE_ORIGIN_PREFIX = 'https://bandcamp.com/';
@@ -12,7 +13,7 @@ const PROFILE_ORIGIN_PREFIX = 'https://bandcamp.com/';
  *   extensionId / extensionUrl: identity of this extension (`chrome.runtime.id`, `chrome.runtime.getURL('')`)
  *   runInPage(tabId, op):       executes the wishlist operation inside that Bandcamp tab
  */
-export function createMessageHandler({ extensionId, extensionUrl, runInPage, jobs = defaultJobs, openMain = openMainPage }) {
+export function createMessageHandler({ extensionId, extensionUrl, runInPage, jobs = defaultJobs, openMain = openMainPage, setScheme = setColorScheme }) {
   const fromExtensionPage = (sender) => sender?.id === extensionId && typeof sender.url === 'string' && sender.url.startsWith(extensionUrl);
   const fromProfileTab = (sender) => sender?.id === extensionId && sender.tab?.id != null
     && typeof sender.url === 'string' && sender.url.startsWith(PROFILE_ORIGIN_PREFIX);
@@ -21,7 +22,9 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
     const message = parseMessage(raw);
     if (!message) return { ok: false, error: 'invalid message' };
     // Only the content script (on bandcamp.com) may ask to run code in a Bandcamp tab; everything else comes from our pages.
-    const allowed = message.type === MSG.WISHLIST_OP ? fromProfileTab(sender) : fromExtensionPage(sender);
+    const allowed = message.type === MSG.WISHLIST_OP ? fromProfileTab(sender)
+      : message.type === MSG.COLOR_SCHEME ? fromProfileTab(sender) || fromExtensionPage(sender)
+      : fromExtensionPage(sender);
     if (!allowed) return { ok: false, error: 'sender not allowed' };
 
     switch (message.type) {
@@ -30,6 +33,7 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
       case MSG.WISHLIST_QUEUE: await jobs.runWishlistQueue(message); break;
       case MSG.WISHLIST_DONE: await jobs.runWishlistDone(message.id); break;
       case MSG.OPEN_MAIN: await openMain(); break;
+      case MSG.COLOR_SCHEME: await setScheme(message.dark); break;
       case MSG.MARK_OPENED: await jobs.runMarkOpened(message.id); break;
       case MSG.WISHLIST_OP: return runInPage(sender.tab.id, message);
       default: return { ok: false, error: 'unknown message' };

@@ -32,7 +32,8 @@ describe('message handler', () => {
   const calls = [];
   const jobs = new Proxy({}, { get: (_, name) => async (...args) => { calls.push([name, ...args]); } });
   const runInPage = async (tabId, op) => ({ ok: true, tabId, op });
-  const handle = createMessageHandler({ extensionId: EXT_ID, extensionUrl: EXT_URL, runInPage, jobs });
+  const schemes = [];
+  const handle = createMessageHandler({ extensionId: EXT_ID, extensionUrl: EXT_URL, runInPage, jobs, setScheme: async (dark) => { schemes.push(dark); } });
 
   const fromPage = { id: EXT_ID, url: `${EXT_URL}src/pages/recs/recs.html`, tab: { id: 7 } };
   const fromProfile = { id: EXT_ID, url: 'https://bandcamp.com/someone', tab: { id: 7 } };
@@ -44,6 +45,15 @@ describe('message handler', () => {
     assert.deepEqual(await handle({ type: MSG.MARK_OPENED, id: '10' }, fromPage), { ok: true });
     assert.deepEqual(calls.map((c) => c[0]), ['runFeedback', 'runMarkOpened']);
     assert.deepEqual(calls[0][1], { type: 'feedback', id: '10', kind: 'like' });
+  });
+
+  test('the colour scheme (for the toolbar icon) is accepted from our pages and from the profile tab, only as a boolean', async () => {
+    schemes.length = 0;
+    assert.deepEqual(await handle({ type: MSG.COLOR_SCHEME, dark: true }, fromProfile), { ok: true });
+    assert.deepEqual(await handle({ type: MSG.COLOR_SCHEME, dark: 'yes' }, fromPage), { ok: true });
+    assert.deepEqual(schemes, [true, false]);
+    const stranger = { id: 'someone-else', url: 'https://bandcamp.com/x', tab: { id: 1 } };
+    assert.deepEqual(await handle({ type: MSG.COLOR_SCHEME, dark: true }, stranger), { ok: false, error: 'sender not allowed' });
   });
 
   test('refuses requests from other extensions or from web pages', async () => {

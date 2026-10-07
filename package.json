@@ -1,13 +1,15 @@
 {
   "name": "bandcamp-daily-recs",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Chrome extension: fresh Bandcamp recommendations every day, based on your own collection.",
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "check": "for f in $(find src -name '*.js'); do node --check \"$f\" || exit 1; done",
-    "package": "rm -f ../bandcamp-daily-recs.zip && zip -r ../bandcamp-daily-recs.zip manifest.json icons src -x '*.DS_Store'"
+    "package": "mkdir -p dist && V=$(node -p \"require('./manifest.json').version\") && rm -f dist/daily-recs-$V.zip && zip -qr dist/daily-recs-$V.zip manifest.json icons src -x '*.DS_Store' && echo dist/daily-recs-$V.zip"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
