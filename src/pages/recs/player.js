@@ -6,9 +6,9 @@ import { loadState, send } from './data.js';
 import { session } from './session.js';
 import { postToHost } from './host-bridge.js';
 import { MSG } from '../../lib/messages.js';
+import { createShuffler } from './shuffle.js';
 
 const TRACKS_TTL_MS = 20 * 60 * 1000;      // stream URLs expire, so cached track lists only live a few minutes
-const SHUFFLE_RECENT = 5;                   // don't shuffle back to one of the last N albums
 const SHUFFLE_TRIES = 6;
 const EMIT_MIN_INTERVAL_MS = 200;
 const VOLUME_KEY = 'dr-vol';
@@ -24,6 +24,7 @@ const player = {
   message: '',          // error text for the bar
   history: [],          // shuffle history, for "previous"
 };
+const shuffler = createShuffler();      // remembers which tracks the shuffle already played
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
@@ -81,9 +82,10 @@ export async function playAlbum(id) {
   try {
     const tracks = await fetchTracks(album);
     if (!tracks.length) throw new Error('no streamable tracks');
-    player.current = { id, tracks, index: 0 };
+    const first = startingTrack(tracks);
+    player.current = { id, tracks, index: first };
     send({ type: MSG.MARK_OPENED, id });
-    playTrack(0);
+    playTrack(first);
   } catch (error) {
     player.busy = false;
     player.message = `Couldn't play (${error.message}). Open it on Bandcamp.`;
@@ -91,21 +93,25 @@ export async function playAlbum(id) {
   }
 }
 
+/** Where an album starts: the track the artist highlights on Bandcamp, or the first one when none is set. */
+const startingTrack = (tracks) => Math.max(0, tracks.findIndex((track) => track.featured));
+
 async function playRandomTrack() {
   player.busy = true;
   player.message = '';
   emit(true);
   const state = await loadState();
-  const recent = new Set(player.history.slice(-SHUFFLE_RECENT).map((h) => h.id));
-  let candidates = visibleCardIds().filter((id) => !recent.has(id));
-  if (!candidates.length) candidates = visibleCardIds();
-  for (let tries = 0; tries < SHUFFLE_TRIES && candidates.length; tries++) {
-    const id = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
+  for (let tries = 0; tries < SHUFFLE_TRIES; tries++) {
+    const ids = visibleCardIds();
+    const id = shuffler.pickAlbum(ids);
+    if (id === null) break;
     try {
       const album = state.pool[id];
       const tracks = await fetchTracks(album);
-      if (!tracks.length) continue;
-      const index = Math.floor(Math.random() * tracks.length);
+      shuffler.setTrackCount(id, tracks.length);
+      const index = shuffler.pickTrack(id, tracks.length);
+      if (index === null) continue; // that album was already played completely (our guess of its size was off)
+      shuffler.markPlayed(id, index);
       player.current = { id, tracks, index };
       player.history.push({ id, i: index });
       setAlbum(album);
@@ -184,6 +190,8 @@ export function toggleShuffle() {
   // Something is playing (or paused): keep the current track and only shuffle from here on. It goes into the
   // history so "previous" can come back to it.
   if (!player.history.length) player.history.push({ id: player.current.id, i: player.current.index });
+  shuffler.setTrackCount(player.current.id, player.current.tracks.length);
+  shuffler.markPlayed(player.current.id, player.current.index);
   emit(true);
   return undefined;
 }

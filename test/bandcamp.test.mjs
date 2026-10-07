@@ -62,7 +62,7 @@ describe('parseRecommendations', () => {
 });
 
 describe('parseTracks', () => {
-  const page = (tracks) => `<div data-tralbum="${JSON.stringify({ trackinfo: tracks }).replace(/"/g, '&quot;')}"></div>`;
+  const page = (tracks, featured) => `<div data-tralbum="${JSON.stringify({ trackinfo: tracks, featured_track_id: featured }).replace(/"/g, '&quot;')}"></div>`;
 
   test('returns streamable tracks only, with https sources', () => {
     const tracks = parseTracks(page([
@@ -71,6 +71,15 @@ describe('parseTracks', () => {
       { title: 'bad scheme', file: { 'mp3-128': 'http://t4.bcbits.com/stream/x' } },
     ]));
     assert.deepEqual(tracks.map((t) => t.title), ['ok']);
+  });
+
+  test('marks the track the artist chose to highlight', () => {
+    const file = (n) => ({ 'mp3-128': `https://t4.bcbits.com/stream/${n}` });
+    const tracks = parseTracks(page([
+      { track_id: 11, title: 'one', file: file(1) }, { track_id: 22, title: 'two', file: file(2) }, { track_id: 33, title: 'three', file: file(3) },
+    ], 22));
+    assert.deepEqual(tracks.map((t) => t.featured), [false, true, false]);
+    assert.ok(parseTracks(page([{ track_id: 11, title: 'one', file: file(1) }])).every((t) => t.featured === false), 'no featured track set');
   });
 
   test('returns an empty list when the page has no track data', () => assert.deepEqual(parseTracks('<html></html>'), []));

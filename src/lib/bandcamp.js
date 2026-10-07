@@ -211,12 +211,20 @@ export function parseTags(html) {
   return tags;
 }
 
-/** Streamable tracks of an album page. Stream URLs expire, so this is read right before playing. */
+/**
+ * Streamable tracks of an album page (`featured` marks the one the artist chose to highlight, if any). Stream URLs
+ * expire, so this is read right before playing.
+ */
 export function parseTracks(html) {
   const match = html.match(/data-tralbum="([^"]+)"/);
   if (!match) return [];
   const tralbum = JSON.parse(decodeHtmlEntities(match[1]));
   return (tralbum.trackinfo || [])
-    .map((track) => ({ title: toLabel(track.title), src: toHttpsUrl(track.file && track.file['mp3-128']), duration: track.duration }))
+    .map((track) => ({
+      title: toLabel(track.title),
+      src: toHttpsUrl(track.file && track.file['mp3-128']),
+      duration: track.duration,
+      featured: Boolean(tralbum.featured_track_id) && String(track.track_id ?? track.id) === String(tralbum.featured_track_id),
+    }))
     .filter((track) => track.src);
 }
