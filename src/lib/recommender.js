@@ -1,0 +1,289 @@
+// Orchestration: a "run" reads some of the user's albums from Bandcamp, ranks what they recommend, and builds today's list.
+// Pure ES module: all browser APIs arrive through the `store` object and a `fetch` function, so it runs in the service
+// worker and in Node tests.
+//
+//   store = {
+//     load():                  Promise<state | null>
+//     save(state):             Promise<void>      – persists the (large) state
+//     setStatus(status):       Promise<void>      – publishes progress (small, frequent, not part of the state)
+//   }
+import {
+  NotLoggedInError, RateLimitedError, HttpError, fetchText, getFan, loadLibrary, parseRecommendations, parseTags, sleep,
+} from './bandcamp.js';
+import { addTasteTags, createSourceWeigher } from './taste-profile.js';
+import { hashSource, recordVote, rebuildVoteLists, VOTE } from './taste-sync.js';
+import { DAILY_COUNT, emptyState, migrateState, todayKey } from './state.js';
+import { markShown, pickBest, pickSources, pickSurprise, rankedCandidates } from './ranking.js';
+
+const SAMPLES_PER_RUN = 60;
+const FIRST_RUN_EXTRA_SAMPLES = 20;   // the very first run reads more albums so it can fill the list right away
+const TASTE_BOOTSTRAP_SOURCES = 100;  // the first run reads many more albums, to learn the genre profile properly at once
+const TOP_UP_SAMPLES = 40;
+const MAX_TOP_UPS = 2;
+const SAMPLE_CONCURRENCY = 2;
+const SAMPLE_DELAY_MS = 800;          // politeness delay between requests (plus up to 50% random, so it doesn't look like a clock)
+const MAX_CONSECUTIVE_FAILURES = 6;   // circuit breaker: stop hammering Bandcamp when it keeps failing
+const TASTE_CHECK_BEST = 120;          // candidates whose genre tags are read before picking "best matches"
+const TASTE_CHECK_SURPRISE = 150;     // surprise picks from deeper in the ranking, so it looks further
+const PROGRESS_INTERVAL_MS = 400;
+const STAGE_PAUSE_MS = 500;           // lets the user read a quick stage
+
+/** Phases published in the status. */
+export const PHASE = Object.freeze({
+  SIGNING_IN: 'signing-in',
+  LIBRARY: 'library',
+  SAMPLING: 'sampling',
+  RANKING: 'ranking',
+  TASTE: 'taste',
+  PICKING: 'picking',
+});
+
+/** Pacing knobs. Tests pass smaller values; production uses these defaults. */
+const withDefaults = (tuning = {}) => ({
+  delayMs: SAMPLE_DELAY_MS, stagePauseMs: STAGE_PAUSE_MS, retryDelayMs: undefined, pageDelayMs: undefined, ...tuning,
+});
+const httpOptions = (pacing) => ({ baseDelayMs: pacing.retryDelayMs, pageDelayMs: pacing.pageDelayMs });
+
+const chooser = (mode) => (mode === 'surprise' ? pickSurprise : pickBest);
+
+function errorCode(error) {
+  if (error instanceof NotLoggedInError) return 'not_logged_in';
+  if (error instanceof RateLimitedError) return 'rate_limited';
+  return String((error && error.message) || error);
+}
+
+/** Waits `ms` plus up to 50% at random. */
+const politePause = (ms) => sleep(ms ? ms + Math.random() * ms * 0.5 : 0);
+
+/** Publishes progress. `report(patch)` always writes; `report.throttled(patch)` skips writes that come too soon. */
+function createReporter(store, base) {
+  let lastWrite = 0;
+  const report = (patch) => { lastWrite = Date.now(); return store.setStatus({ running: true, ...base, ...patch }); };
+  report.throttled = (patch) => (Date.now() - lastWrite < PROGRESS_INTERVAL_MS ? undefined : report(patch));
+  return report;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Reading sources
+// ---------------------------------------------------------------------------------------------------------------------
+
+function addCandidates(state, source, recommendations) {
+  for (const rec of recommendations) {
+    if (!rec.artist || /^(various artists|compilation)$/i.test(rec.artist) || /various artists/i.test(rec.title)) continue;
+    const candidate = (state.pool[rec.id] ||= { ...rec, srcs: {} });
+    candidate.srcs[source.url] = rec.fans || 1;
+    candidate.via = rec.ownedTitle || candidate.via || source.title;
+  }
+}
+
+/** Reads the "you may also like" section of each source into the candidate pool. Throws if Bandcamp keeps failing. */
+async function readSources(fetchFn, state, sources, onProgress = () => {}, pacing = withDefaults()) {
+  const queue = [...sources];
+  const weigh = createSourceWeigher(state);
+  let done = 0;
+  let consecutiveFailures = 0;
+  let lastError = null;
+
+  async function worker() {
+    while (queue.length && consecutiveFailures < MAX_CONSECUTIVE_FAILURES) {
+      const source = queue.shift();
+      try {
+        const html = await fetchText(fetchFn, source.url, httpOptions(pacing));
+        addCandidates(state, source, parseRecommendations(html));
+        if (!state.sampled[source.url]) addTasteTags(state, parseTags(html), weigh(source.url)); // each source counts once
+        state.sampled[source.url] = Date.now();
+        consecutiveFailures = 0;
+      } catch (error) {
+        if (error instanceof HttpError && error.status < 500) {
+          state.sampled[source.url] = Date.now(); // e.g. 404: the album is gone, don't pick it again
+        } else {
+          consecutiveFailures++;
+          lastError = error;
+        }
+      }
+      onProgress(++done, sources.length);
+      await politePause(pacing.delayMs);
+    }
+  }
+  await Promise.all(Array.from({ length: SAMPLE_CONCURRENCY }, worker));
+  if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+    throw lastError instanceof RateLimitedError ? lastError : new Error("Bandcamp isn't responding right now. Try again in a few minutes.");
+  }
+}
+
+/**
+ * Reads the genre tags of the best-ranked candidates so the final order can take the user's taste into account.
+ * Tags are optional: a page that fails to load just keeps its score without them.
+ */
+async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
+  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => !candidate.tags);
+  const total = queue.length;
+  let done = 0;
+  let consecutiveFailures = 0;
+  async function worker() {
+    while (queue.length && consecutiveFailures < MAX_CONSECUTIVE_FAILURES) {
+      const candidate = queue.shift();
+      try {
+        candidate.tags = parseTags(await fetchText(fetchFn, candidate.url, httpOptions(pacing)));
+        consecutiveFailures = 0;
+      } catch {
+        consecutiveFailures++;
+      }
+      onProgress(++done, total);
+      await politePause(pacing.delayMs);
+    }
+  }
+  await Promise.all(Array.from({ length: SAMPLE_CONCURRENCY }, worker));
+  return total;
+}
+
+/** Tag check with progress, then the choice itself: the order depends on the tags, so they come first. */
+async function pickWithTaste({ fetchFn, state, mode, count, report, pacing }) {
+  const limit = mode === 'surprise' ? TASTE_CHECK_SURPRISE : TASTE_CHECK_BEST;
+  const total = await readCandidateTags(fetchFn, state, limit, (done, of) => report.throttled({ phase: PHASE.TASTE, done, total: of }), pacing);
+  if (total) await report({ phase: PHASE.TASTE, done: total, total });
+  return chooser(mode)(state, count);
+}
+
+/** Reads `sources`, publishing progress; `extra` is merged into every status update. */
+async function readWithProgress(fetchFn, state, sources, report, extra, pacing) {
+  const total = sources.length;
+  await report({ phase: PHASE.SAMPLING, done: 0, total, ...extra });
+  await readSources(fetchFn, state, sources, (done) => {
+    const patch = { phase: PHASE.SAMPLING, done, total, ...extra };
+    return done === total ? report(patch) : report.throttled(patch);
+  }, pacing);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// A full run (new day, or "Surprise me")
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Builds a list for today. Two lists can exist side by side: `state.today` (best matches, built first) and
+ * `state.surprise` (deeper in the ranking, built only when asked). Without `force` this is a no-op when the list for
+ * `mode` already exists. A new best list invalidates the surprise one.
+ * mode: 'best' (top matches) or 'surprise'.
+ */
+export async function refresh({ fetch: fetchFn, store, force = false, mode = 'best', sampleCount = SAMPLES_PER_RUN, now = new Date(), tuning }) {
+  const pacing = withDefaults(tuning);
+  const state = migrateState((await store.load()) || emptyState());
+  const today = todayKey(now);
+
+  const existing = mode === 'surprise' ? state.surprise : state.today;
+  // A best list built before the taste profile existed is rebuilt once, so the new ranking applies right away.
+  const outdated = mode === 'best' && !state.tasteBootstrapped;
+  if (!force && !outdated && existing && existing.date === today) {
+    if (!state.profileUrl) await rememberProfileUrl(fetchFn, state, store); // state saved by an older version
+    return state;
+  }
+
+  const report = createReporter(store, { mode, scope: 'list' });
+  await report({ phase: PHASE.SIGNING_IN });
+  try {
+    const fan = await getFan(fetchFn);
+    // No stockpile: every run fetches a fresh batch. Liked albums stay in the pool (they keep acting as sources), and so
+    // does today's best list when building the surprise one (its cards still need their data).
+    const keep = new Set(state.liked);
+    if (mode === 'surprise' && state.today && state.today.date === today) state.today.ids.forEach((id) => keep.add(id));
+    state.pool = Object.fromEntries([...keep].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
+    await report({ phase: PHASE.LIBRARY });
+    state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing));
+    state.fanId = fan.fanId;
+    state.profileUrl = fan.profileUrl;
+
+    const firstRun = Object.keys(state.sampled).length === 0;
+    const bootstrap = !state.tasteBootstrapped;
+    const wanted = bootstrap ? Math.max(sampleCount, TASTE_BOOTSTRAP_SOURCES) : firstRun ? sampleCount + FIRST_RUN_EXTRA_SAMPLES : sampleCount;
+    const sources = pickSources(state, wanted);
+    const likedUrls = new Set(state.liked.map((id) => state.pool[id] && state.pool[id].url).filter(Boolean));
+    const info = {
+      library: state.owned.sources.length,
+      picked: sources.length,
+      likedPicked: sources.filter((source) => likedUrls.has(source.url)).length,
+      bootstrap,
+    };
+    await readWithProgress(fetchFn, state, sources, report, info, pacing);
+    await store.save(state); // checkpoint: the candidates survive even if the rest of the run is interrupted
+
+    await report({ phase: PHASE.RANKING, candidates: Object.keys(state.pool).length });
+    await sleep(pacing.stagePauseMs);
+    let ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing });
+    await report({ phase: PHASE.PICKING });
+    for (let top = 0; top < MAX_TOP_UPS && ids.length < DAILY_COUNT; top++) { // make sure the list is full
+      const more = pickSources(state, TOP_UP_SAMPLES);
+      if (!more.length) break;
+      await readWithProgress(fetchFn, state, more, report, { ...info, picked: more.length }, pacing);
+      ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing });
+    }
+    markShown(state, ids);
+    if (mode === 'surprise') {
+      state.surprise = { date: today, ids };
+    } else {
+      state.today = { date: today, ids };
+      state.surprise = null;
+    }
+    state.tasteBootstrapped = true;
+    await store.save(state);
+    await store.setStatus({ running: false, finishedAt: Date.now(), scope: 'list' });
+  } catch (error) {
+    await store.setStatus({ running: false, error: errorCode(error), scope: 'list' });
+  }
+  return state;
+}
+
+async function rememberProfileUrl(fetchFn, state, store) {
+  try {
+    state.profileUrl = (await getFan(fetchFn)).profileUrl;
+    await store.save(state);
+  } catch { /* the toolbar button opens Bandcamp's home until the next run */ }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Feedback: like / unlike / dislike / undislike
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Applies a vote. Votes move the thermometer points of the album's sources; a like also reads the liked album's own
+ * recommendations right away, so the taste becomes new candidates without waiting for the next day.
+ * kind: 'like' | 'unlike' | 'dislike' | 'undislike'
+ */
+export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning }) {
+  const state = await store.load();
+  const candidate = state && state.pool[id];
+  if (!candidate) return state;
+  migrateState(state);
+
+  const sourceUrls = [...Object.keys(candidate.srcs || {}), candidate.url];
+  // The album's own URL counts double for likes; everything else counts once. Scores never go below zero.
+  const adjust = (scores, delta, ownWeight = 1) => {
+    for (const url of sourceUrls) {
+      const key = hashSource(url);
+      scores[key] = Math.max(0, (scores[key] || 0) + delta * (url === candidate.url ? ownWeight : 1));
+    }
+  };
+
+  if (kind === 'like' && !state.liked.includes(id)) {
+    recordVote(state, id, VOTE.LIKE);
+    adjust(state.sourceLikes, +1, 2);
+    rebuildVoteLists(state);
+    await store.save(state);
+    if (!state.sampled[candidate.url]) {
+      try { await readSources(fetchFn, state, [{ url: candidate.url, title: candidate.title }], undefined, withDefaults(tuning)); } catch { /* the vote itself is already recorded */ }
+    }
+  } else if (kind === 'unlike' && state.liked.includes(id)) {
+    recordVote(state, id, VOTE.UNLIKE); // tombstone, so the removal also spreads to other devices
+    adjust(state.sourceLikes, -1, 2);
+    rebuildVoteLists(state);
+  } else if (kind === 'dislike' && !state.dismissed.includes(id)) {
+    recordVote(state, id, VOTE.DISLIKE);
+    adjust(state.sourceDislikes, +1);
+    rebuildVoteLists(state);
+  } else if (kind === 'undislike' && state.dismissed.includes(id)) {
+    recordVote(state, id, VOTE.UNDISLIKE); // back to neutral: only undoes the points the dislike gave
+    adjust(state.sourceDislikes, -1);
+    rebuildVoteLists(state);
+  }
+  await store.save(state);
+  return state;
+}

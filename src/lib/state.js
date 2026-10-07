@@ -1,0 +1,64 @@
+// Shape of the persisted state, its schema version, and migrations from older versions.
+import { migrateTaste } from './taste-sync.js';
+
+export const SCHEMA_VERSION = 3;
+export const DAILY_COUNT = 50;
+
+export const todayKey = (date = new Date()) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+export const emptyState = () => ({
+  schemaVersion: SCHEMA_VERSION,
+  pool: {},              // albumId -> candidate { id, title, artist, artistId, url, art, fans, via, srcs }
+  sampled: {},           // source url -> timestamp of the last time its recommendations were read
+  shown: [],             // album ids already shown (they never repeat)
+  shownArtists: [],      // artist ids already shown (they don't come back with another album)
+  liked: [],             // derived from `votes`
+  dismissed: [],         // derived from `votes` (albums marked "don't show again")
+  votes: {},             // albumId -> "<vote>.<time>" (see taste-sync.js)
+  tasteBootstrapped: false, // true once a run has read enough of the library to learn the genre profile
+  tasteTags: {},         // genre tag -> weight, built from the user's own albums (see taste-profile.js)
+  sourceLikes: {},       // hashed source url -> likes that came from it
+  sourceDislikes: {},    // hashed source url -> dislikes that came from it
+  today: null,           // { date, ids } – best matches, built first
+  surprise: null,        // { date, ids } – built only when asked; the best list stays saved next to it
+  owned: null,           // snapshot of the user's library (see loadLibrary)
+  wishQueue: [],         // wishlist operations waiting for the profile tab: [{ op, id, bandId }]
+  fanId: '',
+  profileUrl: '',
+});
+
+/** Brings any previously saved state up to the current schema. Mutates and returns the state. */
+export function migrateState(state) {
+  migrateTaste(state);
+  if (state.owned && state.owned.count !== undefined) { // legacy names
+    state.owned.collectionCount = state.owned.count;
+    state.owned.wishlistCount = state.owned.wishCount || 0;
+    delete state.owned.count; delete state.owned.wishCount; delete state.owned.name;
+  }
+  // Fields that no longer live in `state`: progress moved to its own storage key, the rest was unused.
+  for (const legacy of ['status', 'wished', 'focus', 'opened', 'fanName', 'lastMode']) delete state[legacy];
+  const defaults = emptyState();
+  for (const [key, value] of Object.entries(defaults)) if (state[key] === undefined) state[key] = value;
+  state.schemaVersion = SCHEMA_VERSION;
+  return state;
+}
+
+// ---- Wishlist operations that couldn't run right away (e.g. a failed removal) ----
+
+/** Queues an operation. Opposite operations on the same album cancel each other out. */
+export function queueWishlistOp(state, { op, id, bandId }) {
+  state.wishQueue ||= [];
+  const index = state.wishQueue.findIndex((entry) => entry.id === id);
+  if (index >= 0) {
+    if (state.wishQueue[index].op !== op) state.wishQueue.splice(index, 1);
+  } else {
+    state.wishQueue.push({ op, id, bandId });
+  }
+  return state.wishQueue;
+}
+
+export function dequeueWishlistOp(state, id) {
+  state.wishQueue = (state.wishQueue || []).filter((entry) => entry.id !== id);
+  return state.wishQueue;
+}

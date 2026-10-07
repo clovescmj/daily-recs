@@ -1,0 +1,73 @@
+# Chrome Web Store listing (draft)
+
+Paste these into the developer dashboard. Not shipped inside the extension package.
+
+## Store listing tab
+
+**Name:** Daily Recs for Bandcamp
+
+**Summary (max 132 characters):**
+New Bandcamp albums every day, picked from your own collection. Never shows what you already own.
+
+**Category:** Entertainment (or the closest music option available)
+
+**Language:** English
+
+**Description:**
+
+> Find new music every day, without losing the evening.
+>
+> Daily Recs starts from what you own and what you've saved on Bandcamp, finds albums that fans of those records love, and keeps the ones that fit your taste. Every list is made of albums you don't own, from artists you don't have, and nothing repeats.
+>
+> • A fresh list of 50 albums every day, right inside your Bandcamp profile, in a new "daily recs" tab
+> • Heart what you love: it goes to your Bandcamp wishlist and the next lists get sharper
+> • Hide what you don't: it never comes back
+> • "Surprise me" goes a little further from the obvious, and "Best matches" brings you back instantly
+> • A built-in player in Bandcamp's own style, with shuffle, queue and media keys
+> • Your likes and dislikes sync across your computers through your Google account
+>
+> Private by design: everything runs in your browser and only talks to bandcamp.com. No analytics, no ads, no accounts.
+>
+> You need to be signed in to Bandcamp. This is an independent project. It is not made, endorsed or supported by Bandcamp.
+
+**Support URL:** https://github.com/clovescmj/daily-recs/issues  (or leave the store's own Support tab on)
+**Homepage URL:** https://github.com/clovescmj/daily-recs
+
+## Graphics (you need to make these with the extension running)
+- Icon 128×128: already in the package (`icons/icon-128.png`).
+- Screenshots, 1280×800 (at least 1, up to 5):
+  1. The "daily recs" tab on your profile with the album grid.
+  2. A card with hover on the title/artist and the heart and "don't show again" icons.
+  3. The player bar playing an album, with the queue open.
+  4. "Surprise me" loading (progress) or its list, with the "Best matches" button.
+  5. The About page.
+- Small promo tile 440×280 (required): the grid of covers with the name "Daily Recs".
+
+## Privacy practices tab
+
+**Single purpose:**
+Show a daily list of new album recommendations on the user's own Bandcamp profile, based on their collection and wishlist.
+
+**Permission justifications**
+- `storage`: keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs likes and dislikes through the user's Google account.
+- `alarms`: checks once every few hours whether a new day has started, to prepare the day's list in the background, and schedules a retry when Bandcamp asks to slow down.
+- `contextMenus`: adds the right-click menu on the toolbar icon (Open Daily Recs, Feedback, Report a bug, About).
+- `scripting`: when the user clicks the heart, runs Bandcamp's own "add to wishlist" function in the user's Bandcamp tab, so the wishlist changes exactly as if they had clicked Bandcamp's button.
+- Host access `https://*.bandcamp.com/*`: reads the user's collection and wishlist, and the "you may also like" section and tags of album pages (these live on artists' subdomains). Nothing else is accessed.
+- Content script on `https://bandcamp.com/*`: adds the "daily recs" tab and the player bar to the user's own profile page.
+
+**Remote code:** No, I am not using remote code.
+
+**Data usage (check what applies, and be accurate)**
+- The extension reads website content (the user's Bandcamp library and album pages) and stores the user's likes and dislikes. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
+- Certify: the data is not sold to third parties, not used for purposes unrelated to the single purpose, and not used for creditworthiness or lending.
+
+**Privacy policy URL:** https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md
+(This only works once the code is pushed to the repository.)
+
+## Before submitting
+- [ ] Push the code to GitHub (so the privacy policy URL exists).
+- [ ] Take the screenshots and the promo tile.
+- [ ] Upload `bandcamp-daily-recs.zip` (run `npm run package`).
+- [ ] Choose visibility: Public, or Unlisted (only people with the link).
+- [ ] Re-read the Bandcamp terms about automated access.

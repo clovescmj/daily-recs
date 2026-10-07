@@ -1,0 +1,18 @@
+// State shared by the page modules. Kept in one place so every module sees the same values and nothing depends on
+// module evaluation order.
+export const HOST_ORIGIN = 'https://bandcamp.com';
+
+export const session = {
+  /** Which saved list is on screen: 'best' (always on open) or 'surprise'. Switching costs nothing once both exist. */
+  view: 'best',
+  /** Set while a "Surprise me" run is loading, so the page switches to it as soon as it is ready. */
+  pendingSurprise: null,
+  /** Latest `state` read from storage (null until loaded). */
+  state: null,
+  /** Albums disliked during this visit: they stay on the page (dimmed) so the dislike can be undone. */
+  dislikedThisVisit: new Set(),
+  /** Albums with a like (mirrors the stored list; updated immediately on click). */
+  liked: new Set(),
+  /** True when a list for today exists, which is when the player bar is shown even if nothing is playing. */
+  hasList: false,
+};

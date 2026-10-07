@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" class="recs-page">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Recs</title>
+<link rel="stylesheet" href="recs.css">
+</head>
+<body>
+<main class="page">
+  <header class="page-header">
+    <div class="page-heading">
+      <button type="button" id="play-all" class="play-all" aria-label="Play" title="Play" hidden><span class="play-all-icon" aria-hidden="true"></span></button>
+      <div>
+        <h1 class="page-title" id="page-title">Today's recommendations for you</h1>
+        <p class="page-subtitle">Dig deeper into your collection and wishlist, with fresh picks for your shelf.</p>
+      </div>
+    </div>
+    <div class="page-actions">
+      <button type="button" id="mode-toggle" class="button button--ghost" aria-describedby="mode-help"><svg class="icon-stroke" viewBox="0 0 24 24" aria-hidden="true" focusable="false"></svg><span>Surprise me</span></button>
+      <span id="mode-help" class="sr-only"></span>
+    </div>
+  </header>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <section id="status" class="status-box" hidden></section>
+  <section id="album-grid" class="album-grid" aria-label="Today's recommendations"></section>
+  <nav class="page-footer" aria-label="Extension info"><a href="../about/about.html" target="_blank" rel="noopener">About</a> · <span>v<span id="version">–</span></span> · <a id="feedback-link" href="#" target="_blank" rel="noopener">Feedback</a> · <a id="bug-link" href="#" target="_blank" rel="noopener">Report a bug</a></nav>
+</main>
+<script type="module" src="main.js"></script>
+</body>
+</html>
