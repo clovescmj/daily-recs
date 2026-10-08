@@ -93,13 +93,13 @@ async function init() {
   $('play-all').addEventListener('click', () => togglePlay());
   $('album-grid').addEventListener('click', onGridClick);
 
+  send({ type: MSG.REFRESH }); // builds today's list in the background if it doesn't exist yet, even while the opening screen shows
   initPlayer();
   listenToHost(runCommand);
 
   setLandingVisible(!(await pickedToday()));   // once a day: the first time the tab is opened
   watchStorage(refreshView);
   await refreshView();
-  send({ type: MSG.REFRESH }); // builds today's list if it doesn't exist yet
 }
 
 init();

@@ -123,6 +123,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .landing-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
 .landing-options { justify-content: center; }
+.landing-status { min-height: 1.5em; margin: 12px auto 0; max-width: 420px; font-size: var(--bc-font-size-100); color: var(--muted); }
 .landing-hint { max-width: 420px; margin: 14px auto 18px; font-size: var(--bc-font-size-100); color: var(--muted); }
 .button--large { height: 40px; padding: 0 28px; font-size: var(--bc-font-size-200); justify-content: center; }
 

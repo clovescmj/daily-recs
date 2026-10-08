@@ -5,6 +5,7 @@ import { $ } from './dom.js';
 import { emit, markPlaying } from './player.js';
 import { session } from './session.js';
 import { renderStatus } from './status-line.js';
+import { renderLandingStatus } from './landing.js';
 import { renderViewSwitch } from './views.js';
 import { flushWishlistQueue } from './wishlist-actions.js';
 
@@ -65,6 +66,7 @@ export function render(state, status) {
   session.state = state;
   const running = Boolean(status.running);
   renderViewSwitch(state, status);
+  renderLandingStatus(status);
   renderStatus(status);
   renderGrid(state, status);
   $('play-all').hidden = !session.hasList;

@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.3.8
+- The opening screen says, in one quiet line under "Start digging", that today's list is being prepared in the background (and
+  that the very first time takes a few minutes). Building the list starts the moment the tab opens.
+
 ## 0.3.7
 - The selected button of the toggle keeps its dark look on hover (the text used to turn white on a light background).
 
