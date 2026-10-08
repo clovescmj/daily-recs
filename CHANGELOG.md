@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.10
+- The two icons of the Playback button (and of its list) are centred in their own box and have a similar size: the record box was
+  bigger and heavier than the music note, so it is a little smaller and the note a little bigger.
+
 ## 0.14.9
 - Once a song is in Liked Songs, the + becomes a **filled** green disc with Bandcamp's check mark cut out of it (cards, player bar and list),
   filled the way the heart is when it is selected.

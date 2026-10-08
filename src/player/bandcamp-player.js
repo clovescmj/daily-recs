@@ -14,11 +14,11 @@
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // Icons of the two ways to play: a music note (one song per album), and Bandcamp's collection icon (the record box of the "next album"
+  // Icons of the two ways to play (each one centred in its own box and of a similar size): a music note (one song per album), and Bandcamp's collection icon (the record box of the "next album"
   // button) turned 90° to the right (whole albums).
   const MODE_ICON = {
-    one: `<svg class="pb-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`,
-    album: `<svg class="pb-ico" viewBox="3.42 5.9 18 18" aria-hidden="true" focusable="false"><g transform="rotate(90 12.42 14.9)"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.657 8.31c0-.7.567-1.269 1.268-1.269H18.91c.7 0 1.268.568 1.268 1.269v13.187c0 .7-.567 1.268-1.268 1.268H5.925c-.7 0-1.268-.568-1.268-1.268zm1.521.253v12.68h12.479V8.563z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12.418 13.33c-.823 0-1.529.683-1.529 1.573s.706 1.573 1.529 1.573c.822 0 1.528-.682 1.528-1.573s-.706-1.573-1.528-1.573m-4.694 1.573c0-2.595 2.08-4.738 4.694-4.738s4.694 2.143 4.694 4.738-2.08 4.74-4.694 4.74-4.694-2.144-4.694-4.74"/></g></svg>`,
+    one: `<svg class="pb-ico" viewBox="4 2 14 20" aria-hidden="true" focusable="false"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`,
+    album: `<svg class="pb-ico" viewBox="2.67 5.15 19.5 19.5" aria-hidden="true" focusable="false"><g transform="rotate(90 12.42 14.9)"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.657 8.31c0-.7.567-1.269 1.268-1.269H18.91c.7 0 1.268.568 1.268 1.269v13.187c0 .7-.567 1.268-1.268 1.268H5.925c-.7 0-1.268-.568-1.268-1.268zm1.521.253v12.68h12.479V8.563z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12.418 13.33c-.823 0-1.529.683-1.529 1.573s.706 1.573 1.529 1.573c.822 0 1.528-.682 1.528-1.573s-.706-1.573-1.528-1.573m-4.694 1.573c0-2.595 2.08-4.738 4.694-4.738s4.694 2.143 4.694 4.738-2.08 4.74-4.694 4.74-4.694-2.144-4.694-4.74"/></g></svg>`,
   };
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
