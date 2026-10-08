@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.12
+- The button that opens the Liked Songs list in the player bar uses the "library music" icon (a note on a stack of albums) instead of the
+  bookmark.
+
 ## 0.14.11
 - The + on a card says **"Add album to Liked Songs"** (and "Remove album from Liked Songs"), and it adds **all the songs** of the album
   (up to 60); taking it out removes them all. The + of the player bar says **"Add to Liked Songs"** and adds **only the song that is
