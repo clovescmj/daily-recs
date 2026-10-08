@@ -57,28 +57,26 @@ export async function dislikeAlbum(id) {
   session.dislikedThisVisit.add(id);
   const card = findCard(id);
   if (card) paintDislike(card, true);
-  // inside a genre list the genres go along: there, hiding an album weighs more. The wishlist is not touched: only the heart changes it
-  await send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) });
-  await replaceHidden(wasPlaying, nextId);
+  // Nothing below waits for the extension's background worker: it may be busy with a long job (a scan, a list being built) and
+  // would only answer when it is done, and the music has to skip right now. The requests keep their order.
+  // Inside a genre list the genres go along: there, hiding an album weighs more. The wishlist is not touched: only the heart changes it.
+  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) }).catch(() => undefined);
+  const replacement = requestReplacement();
+  if (wasPlaying) {
+    continueAfterRemoval(nextId);
+    if (!nextId && !isShuffling()) replacement.then((newId) => newId && playAlbum(newId)); // it was the last one: the new album plays when it arrives
+  }
   emit(true);
+  await feedback;
 }
 
-/** Asks for one new album at the end of the current list, in the background: it can take a while, so nothing waits for it. */
+/**
+ * Asks for one new album at the end of the current list, in the background: it can take a while, so nothing waits for it. In
+ * shuffle it simply joins the albums that are left to play.
+ */
 const requestReplacement = () => send({ type: MSG.EXTEND_LIST, view: session.view, tags: session.tagKeys })
   .then((reply) => (reply && reply.ok ? reply.id : null))
   .catch(() => null);
-
-/**
- * A hidden album is replaced by a new one at the end of the list (in shuffle it simply joins the albums that are left to
- * play). Playback never waits for it: if the hidden album was playing, the next one starts right away. Only when the hidden
- * album was the last one does the new album play, as soon as it arrives.
- */
-async function replaceHidden(wasPlaying, nextId) {
-  const replacement = requestReplacement();
-  if (!wasPlaying) return;
-  continueAfterRemoval(nextId);
-  if (!nextId && !isShuffling()) replacement.then((id) => id && playAlbum(id));
-}
 
 /** Back to neutral (the like that the dislike replaced is not restored). */
 export async function undoDislike(id) {

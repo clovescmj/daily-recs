@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.6.3
+- Fix: hiding the album that is playing sometimes took a while to skip. The page waited for the background worker to confirm the dislike
+  before moving on, and the worker answers only after the job it is busy with (a scan, a list being built). Now the next album (or the
+  next shuffled track) starts at once, and the dislike and the replacement album are sent in the background, in the same order.
+
 ## 0.6.2
 - Hiding an album from a genre list now says more: it is further from the genres that were selected. The dislike counts twice for where the
   album came from, and the other tags the album had besides the genre are held against the albums that come next in lists of those same
