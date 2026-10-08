@@ -116,7 +116,7 @@
 #dr-player .queue .qact .ci { width: 16px; height: 16px; fill: #8a8f91; display: block; }
 #dr-player .queue .q-wish:hover .ci { fill: rgb(0,161,198); }
 #dr-player .queue .q-wish.on .ci, #dr-player .queue .q-wish.on:hover .ci { fill: #f7931e; }
-#dr-player .queue .q-save:hover .ci, #dr-player .queue .q-save.on .ci { fill: #2e9e5b; }
+#dr-player .queue .q-save:hover .ci, #dr-player .queue .q-save.on .ci, #dr-player .queue .q-saveAlbum:hover .ci, #dr-player .queue .q-saveAlbum.on .ci { fill: #2e9e5b; }
 #dr-player .queue .q-dislike:hover .ci, #dr-player .queue .q-dislike.on .ci { fill: #d64541; }
 #dr-player .queue li.active, #dr-player .queue li:hover { background: #f7f6f6; }
 #dr-player .queue .qpp { flex: none; display: inline-block; vertical-align: middle; width: 14px; margin-right: 8px; height: 12px; visibility: hidden; }

@@ -1,7 +1,7 @@
 // Commands sent by the player bar in the Bandcamp tab (postMessage), after validation.
 import { session } from './session.js';
 import * as player from './player.js';
-import { dislikeAlbum, setSave, setWish, undoDislike } from './wishlist-actions.js';
+import { dislikeAlbum, saveAlbumSong, setSave, setWish, undoDislike } from './wishlist-actions.js';
 
 const isFraction = (v) => typeof v === 'number' && Number.isFinite(v);
 const isAlbumId = (v) => (typeof v === 'string' || typeof v === 'number') && /^\d+$/.test(String(v));
@@ -24,6 +24,7 @@ const COMMANDS = {
   wish: (v) => { const id = targetId(v); return id && setWish(id, !session.wished.has(id)); },
   // the + : the track that is playing, or the one named in the command (from the Liked list)
   save: (v) => { const track = isTrack(v) ? v : player.currentTrack(); return track && setSave(track, !session.saved.has(`${track.id}:${track.i}`)); },
+  saveAlbum: (v) => isAlbumId(v) && saveAlbumSong(String(v)), // the + of a queue item: the whole album, like on the cards
   playTrack: (v) => isTrack(v) && player.playSavedTrack(String(v.id), v.i),
   dislike: (v) => {
     const id = targetId(v);

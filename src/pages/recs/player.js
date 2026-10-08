@@ -220,10 +220,13 @@ export function markPlaying() {
 
 // ── Bar state ───────────────────────────────────────────────────────────────────────────────────────────────────
 
+/** True when a song of the album is in Liked Songs. */
+const hasSavedSong = (id) => [...session.saved].some((key) => key.startsWith(`${id}:`));
+
 function queueItems() {
   const ids = visibleCardIds();
   // the heart of each item is part of the key, so the bar redraws when one of them changes
-  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}`).join(',');
+  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${hasSavedSong(id) ? 's' : ''}`).join(',');
   if (key !== queueCache.key) {
     queueCache = {
       key,
@@ -231,7 +234,7 @@ function queueItems() {
         const card = findCard(id);
         return {
           id, label: `${card.querySelector('.album-artist').textContent} - ${card.querySelector('.album-title').textContent}`,
-          wished: session.wished.has(id),
+          wished: session.wished.has(id), saved: hasSavedSong(id),
         };
       }),
     };

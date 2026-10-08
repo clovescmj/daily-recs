@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.1
+- Each item of the queue has the + for Liked Songs, between the heart and the ⊘: it adds the whole album (like on the cards), turns into
+  the green check when a song of the album is in the list, and a second click takes the album out.
+
 ## 0.15.0
 - **New loading.** While a list is being built, the grey box with one line is replaced by a box with an animated equalizer, what is being
   done ("Digging through your collection…"), a detail line ("Reading 60 of your 1,605 albums"), a counter (24 / 60) and a thin progress

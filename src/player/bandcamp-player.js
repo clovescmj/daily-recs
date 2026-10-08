@@ -23,7 +23,7 @@
   const LIKED_ICON = `<svg class="x-icon" viewBox="0 -960 960 960" role="img" aria-label="Liked songs"><title>Liked songs</title><path d="M500-360q42 0 71-29t29-71v-220h120v-80H560v220q-13-10-28-15t-32-5q-42 0-71 29t-29 71q0 42 29 71t71 29ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z"/></svg>`;
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}`).join(',');
+  const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}`).join(',');
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
   function create({ spriteUrl, busyUrl, onCmd }) {
@@ -178,6 +178,7 @@
         q('.queue ol').innerHTML = queue.map((it, i) =>
           `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span><span class="qlabel">${i + 1}. ${esc(it.label)}</span><span class="qact">`
           + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
+          + action('saveAlbum', it.saved, 'Add album to Liked Songs', 'Remove album from Liked Songs', P.addCircle, P.checkCircle)
           + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
           + '</span></li>').join('');
       }
