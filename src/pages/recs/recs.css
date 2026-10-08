@@ -30,7 +30,6 @@
   --link-dark: var(--blue500);
   --accent: var(--link-blue);
   --icon: #8a8f91;
-  --restore: var(--green500);       /* the "+" that brings a hidden album back */
   --danger: #d64541;                /* "don't show again", on white */
   --wishlist: #f7931e;              /* heart when the album is in the wishlist */
   --border-hover: #b4b4b4;
@@ -201,8 +200,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .album-actions svg { width: 17px; height: 17px; fill: var(--icon); }
 .action-wishlist:hover svg { fill: var(--accent); }
 .action-wishlist.is-on svg, .action-wishlist.is-on:hover svg { fill: var(--wishlist); }
-.action-dislike:hover svg { fill: var(--danger); }
-.action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--restore); } /* the "+" that brings it back */
+.action-dislike:hover svg, .action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--danger); } /* red when active; click again to bring the album back */
 
 /* ── Footer and toast ───────────────────────────────────────────────────────────────────────────────────────────── */
 .page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); }

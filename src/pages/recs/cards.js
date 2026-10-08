@@ -1,6 +1,6 @@
 // Album card markup and the in-place updates of its wishlist / dislike controls.
 import { esc, safeUrl } from './dom.js';
-import { ADD_CIRCLE, BLOCK, HEART, HEART_FILLED, decorativeIcon, dislikeLabel, labelledIcon, wishlistLabel } from './icons.js';
+import { BLOCK, HEART, HEART_FILLED, decorativeIcon, dislikeLabel, labelledIcon, wishlistLabel } from './icons.js';
 
 /** `album`: a candidate from the state pool. `flags`: { wished (in the wishlist), disliked }. */
 export function cardHtml(album, { wished = false, disliked }) {
@@ -22,7 +22,7 @@ export function cardHtml(album, { wished = false, disliked }) {
       <div class="album-reason">${reason}${fans}</div>
       <div class="album-actions">
         <a href="#" class="action-wishlist${wished ? ' is-on' : ''}" data-wish title="${wishlistText}" aria-label="${wishlistText}: ${title}">${labelledIcon(wished ? HEART_FILLED : HEART, wishlistText)}</a>
-        <a href="#" class="action-dislike${disliked ? ' is-on' : ''}" data-dislike title="${dislikeText}" aria-label="${dislikeText}: ${title}">${labelledIcon(disliked ? ADD_CIRCLE : BLOCK, dislikeText)}</a>
+        <a href="#" class="action-dislike${disliked ? ' is-on' : ''}" data-dislike title="${dislikeText}" aria-label="${dislikeText}: ${title}">${labelledIcon(BLOCK, dislikeText)}</a>
       </div>
     </div>
   </article>`;
@@ -46,5 +46,5 @@ export const paintWish = (card, on) => paintControl(card, '[data-wish]', on, on 
 /** Dislike: the album is dimmed (the wishlist is not touched). */
 export function paintDislike(card, on) {
   card.classList.toggle('is-disliked', on);
-  paintControl(card, '[data-dislike]', on, on ? ADD_CIRCLE : BLOCK, dislikeLabel(on));
+  paintControl(card, '[data-dislike]', on, BLOCK, dislikeLabel(on));
 }

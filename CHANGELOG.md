@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.1
+- The "don't show music like this" icon no longer turns into a "+": it keeps the same icon, turns red while it is on, and a second click
+  brings the album back (cards, queue and player bar).
+
 ## 0.8.0
 - Simpler feedback. The thumbs up and the list of liked albums are gone; the card has the **heart** (Bandcamp wishlist) and the **⊘**
   (the icon is back). The ⊘ now means **"don't show music like this"**: the album stays hidden, and so do its artist and the albums

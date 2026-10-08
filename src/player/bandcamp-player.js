@@ -7,7 +7,6 @@
     skip: 'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
     heart: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
     heartOn: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
-    addCircle: 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
     block: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z',
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
@@ -149,7 +148,7 @@
         q('.queue ol').innerHTML = queue.map((it, i) =>
           `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span><span class="qlabel">${i + 1}. ${esc(it.label)}</span><span class="qact">`
           + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
-          + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.addCircle)
+          + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
           + '</span></li>').join('');
       }
       q('.queue').classList.toggle('audible', !!s.playing);
@@ -162,7 +161,7 @@
         if (path.getAttribute('d') !== d) path.setAttribute('d', d);
       };
       paint('.wish', !!s.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn);
-      paint('.dislike', !!s.disliked, "Don't show music like this", 'Show this album again', P.block, P.addCircle);
+      paint('.dislike', !!s.disliked, "Don't show music like this", 'Show this album again', P.block, P.block);
       setText(q('.trk-no'), s.trackNo && !s.msg ? `${s.trackNo}. ` : '');
       setText(q('.trk'), s.msg || s.track || '');
       setText(q('.pos'), mmss(s.cur)); setText(q('.dur'), mmss(s.dur));
