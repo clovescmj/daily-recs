@@ -89,7 +89,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .tags-picker .view-button { border-radius: var(--bc-radius) 0 0 var(--bc-radius); }
 .view-switch > .view-button:last-child { border-radius: 0 var(--bc-radius) var(--bc-radius) 0; }
 .view-button:hover:not(:disabled) { background: var(--soft); }
-.view-button.is-active { background: var(--gray700); border-color: var(--gray700); color: var(--white); position: relative; z-index: 1; }
+.view-button.is-active, .view-button.is-active:hover:not(:disabled) { background: var(--gray700); border-color: var(--gray700); color: var(--white); position: relative; z-index: 1; } /* stays dark on hover */
 .view-button:disabled { opacity: .6; cursor: default; }
 .view-button .icon-stroke:last-child { width: 12px; height: 12px; }
 .tags-picker { position: relative; }

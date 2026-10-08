@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.3.7
+- The selected button of the toggle keeps its dark look on hover (the text used to turn white on a light background).
+
 ## 0.3.6
 - The opening screen no longer shows the progress bar of the list that is being built in the background; it appears once the
   user picks something (errors, like being signed out, are still shown).
