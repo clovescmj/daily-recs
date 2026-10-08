@@ -210,12 +210,12 @@ export function markShown(state, ids) {
  * the ones with more of them first. Albums whose tags weren't read still come from the user's albums of that genre, so they
  * fill the end of the list.
  */
-export function pickFocused(state, count, keys, exclude) {
+export function pickFocused(state, count, keys, exclude, { allowUnknown = true } = {}) {
   const wanted = new Set(keys.map(normalizeTag));
   const ranked = rankedCandidates(state, exclude);
   const matches = (candidate) => (candidate.tags || []).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
   const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => matches(b) - matches(a));
-  const unknown = ranked.filter((candidate) => !candidate.tags);
+  const unknown = allowUnknown ? ranked.filter((candidate) => !candidate.tags) : [];
   const artists = new Set();
   const picks = [];
   for (const candidate of [...tagged, ...unknown]) {

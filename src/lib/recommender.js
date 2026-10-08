@@ -332,6 +332,7 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
 // One more album for a list (when the user hides one, a new one takes its place at the end)
 // ---------------------------------------------------------------------------------------------------------------------
 
+const EXTEND_TAG_CHECK = 400;   // how deep into the leftovers the tags are read when none of the checked ones is left
 const EXTEND_READS = 25;   // when the candidates left over from the run are used up: read this many more albums, quietly
 const quiet = Object.assign(() => Promise.resolve(), { throttled: () => undefined });
 
@@ -348,10 +349,15 @@ export async function extendList({ fetch: fetchFn, store, view = 'best', tags = 
   const list = view === 'surprise' ? state.surprise : view === 'tags' ? state.tagLists[tagListKey(keys)] : state.today;
   if (!list || list.date !== today || !state.owned) return null;
   const exclude = () => ({ ids: list.ids, artists: list.ids.map((id) => state.pool[id] && state.pool[id].artistId).filter(Boolean) });
-  const pick = () => (view === 'surprise' ? pickSurprise : view === 'tags' ? (s, n, e) => pickFocused(s, n, keys, e) : pickBest)(state, 1, exclude());
+  // For a genre list the new album must really be of that genre: albums whose tags were never read are not taken on trust.
+  const pick = () => (view === 'surprise' ? pickSurprise : view === 'tags' ? (s, n, e) => pickFocused(s, n, keys, e, { allowUnknown: false }) : pickBest)(state, 1, exclude());
 
   try {
     let [id] = pick();
+    if (!id && view === 'tags') { // read the tags of more of the leftovers, and check them against the genre
+      await readCandidateTags(fetchFn, state, EXTEND_TAG_CHECK, () => {}, pacing);
+      [id] = pick();
+    }
     if (!id) { // nothing left from the run: read a few more albums
       const sources = view === 'tags' ? seedsFor(state, keys).filter((source) => !state.sampled[source.url]).slice(0, EXTEND_READS) : pickSources(state, EXTEND_READS);
       if (sources.length) {

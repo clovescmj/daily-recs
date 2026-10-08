@@ -233,6 +233,20 @@ describe('one more album for a list', () => {
     assert.ok(Number(saved.pool[tagId].url.match(/cand(\d+)/)[1]) % 2 === 0, 'a metal album');
   });
 
+  test('a replacement for a genre list is really of that genre, even after the checked candidates run out', async () => {
+    const ctx = await setup({ libraryCount: 120, wishlistCount: 0, candidateCount: 600, sourceTags: (n) => (n % 4 === 0 ? ['metal'] : ['pop']), candidateTags: (i) => (i % 2 === 0 ? ['metal'] : ['pop']) });
+    await refreshTags({ fetch: ctx.fake.fetch, store: ctx.store, tags: ['metal'], tuning: TUNING, now: NOW });
+    const isMetal = (state, id) => Number(state.pool[id].url.match(/cand(\d+)/)[1]) % 2 === 0;
+    let found = 0;
+    for (let i = 0; i < 20; i++) {
+      const id = await extend(ctx, { view: 'tags', tags: ['metal'] });
+      if (!id) break; // nothing of the genre left to offer: better no replacement than one of another genre
+      found++;
+      assert.ok(isMetal(await ctx.store.load(), id), `replacement ${i + 1} is a metal album`);
+    }
+    assert.ok(found >= 5, `found ${found}`);
+  });
+
   test('keeps finding new albums, reading a few more of the user\'s albums when the run\'s leftovers are used up', async () => {
     const ctx = await setup({ libraryCount: 100, wishlistCount: 0, candidateCount: 120, recsPerPage: 6 });
     await ctx.run();

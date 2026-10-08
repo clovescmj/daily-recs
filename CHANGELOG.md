@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.11
+- Fix: the album that takes the place of a hidden one in a genre list is now really of that genre. Albums whose tags were never read are
+  no longer taken on trust: the tags of more of the leftovers are read and checked first, and if none fits there is no replacement.
+
 ## 0.4.10
 - The favicon of the extension pages (About) is the same symbol as the toolbar icon, drawn in dark or white to match the theme (an SVG that
   follows the colour scheme), with the toolbar PNG as a fallback.
