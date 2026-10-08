@@ -117,7 +117,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* ── Opening screen ──────────────────────────────────────────────────────────────────────────────────────────────── */
 .is-landing .page-header, .is-landing .album-grid { display: none; }
-.landing { text-align: center; padding: 36px 0 28px; min-height: 500px; }   /* room for the genre menu: no jump when it opens */
+.landing { text-align: center; padding: 36px 0 28px; min-height: 380px; }   /* room for the genre menu (landing.js measures it): no jump when it opens */
 .landing-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
 .landing-options { justify-content: center; }

@@ -12,8 +12,9 @@ const OPTIONS = [
 ];
 
 // The pop-up of "My tags" works exactly like the one on the list: the button opens a drop-down with the genres.
-// The page is an iframe as tall as its content, so the opening screen is always tall enough for the menu (see .landing in the CSS):
-// opening the menu doesn't change the height and doesn't push Bandcamp's footer down.
+// The page is an iframe as tall as its content, so the opening screen is always tall enough for the menu: it is measured (and
+// kept up to date as genres are found), so there is no more room than the list needs, and opening the menu doesn't change the height
+// and doesn't push Bandcamp's footer down.
 let choice = null; // nothing is chosen until the user picks one
 let picker = null;
 
@@ -29,6 +30,18 @@ function setOptionHtml(option) {
   const text = option.view === 'tags' ? tagsButtonText() : option.text;
   const html = `${option.icon}<span>${esc(text)}</span>${option.view === 'tags' ? CHEVRON_DOWN_ICON : ''}`;
   if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; }
+}
+
+const ROOM_BELOW_MENU_PX = 40;
+
+/** Reserves just the height the genre menu needs: it is shown out of sight for a moment to measure it. */
+function reserveMenuRoom() {
+  const menu = $('landing-tags');
+  const wasHidden = menu.hidden;
+  if (wasHidden) { picker.render(); menu.hidden = false; menu.style.visibility = 'hidden'; }
+  const bottom = menu.getBoundingClientRect().bottom - $('landing').getBoundingClientRect().top;
+  if (wasHidden) { menu.hidden = true; menu.style.visibility = ''; }
+  if (bottom > 0) $('landing').style.minHeight = `${Math.ceil(bottom + ROOM_BELOW_MENU_PX)}px`;
 }
 
 function closeMenu() {
@@ -78,8 +91,11 @@ export function setLandingVisible(visible) {
   session.landing = visible;
   $('landing').hidden = !visible;
   document.body.classList.toggle('is-landing', visible);
-  if (visible) renderChoice(); else closeMenu();
+  if (visible) { renderChoice(); reserveMenuRoom(); } else closeMenu();
 }
 
 /** Keeps the genre list on the opening screen current while it is open. */
-export const refreshLanding = () => { if (session.landing && !$('landing-tags').hidden) picker.render(); };
+export const refreshLanding = () => {
+  if (!session.landing) return;
+  if ($('landing-tags').hidden) reserveMenuRoom(); else picker.render(); // genres found in the meantime: the room follows
+};
