@@ -3,6 +3,15 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.0
+- **Liked Songs on the cards.** A + next to the heart on each card adds the song the album starts with (the featured one, or the first) to
+  Liked Songs; it turns into a green check ring when a song of that album is in the list, and a second click takes the album's songs out.
+- **Bandcamp's own check mark.** The check inside the ring (cards, player bar and list) is the one Bandcamp uses for "following", scaled
+  into the ring, instead of the generic one.
+- **Same buttons everywhere.** The heart, the + and the ⊘ have the same size (18 px) and spacing (12 px) on the cards and in the player bar.
+- **Player bar.** A "·" after the heart, and the same space (16 px) between all the elements on the right side (Playback, next album,
+  queue, Liked Songs, volume and the separators).
+
 ## 0.13.1
 - The Playback button is centred vertically on the player bar, on the same line as the icons next to it (next album, queue, Liked Songs,
   volume) and the separators. They all sit on the middle of the bar now (the whole group moved up by 1 px).

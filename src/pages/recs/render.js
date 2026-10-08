@@ -1,6 +1,6 @@
 // Draws the page from the stored state and the run status.
 import { hiddenIn, tagListKey, todayKey } from '../../lib/state.js';
-import { cardHtml, findCard, paintDislike, paintWish } from './cards.js';
+import { cardHtml, findCard, paintDislike, paintSave, paintWish } from './cards.js';
 import { $ } from './dom.js';
 import { emit, markPlaying } from './player.js';
 import { session } from './session.js';
@@ -24,6 +24,9 @@ export function listFor(state, view, keys = []) {
   return isFromToday(list) ? list : null;
 }
 
+/** True when a song of the album is in Liked Songs. */
+const hasSavedSong = (id) => [...session.saved].some((key) => key.startsWith(`${id}:`));
+
 /** The list on screen. */
 export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' ? null : listFor(state, 'best'));
 
@@ -46,7 +49,7 @@ function renderGrid(state, status) {
   const key = ids.join(',');
   if (key !== renderedKey) {
     $('album-grid').innerHTML = ids.map((id) => cardHtml(state.pool[id], {
-      wished: session.wished.has(id), disliked: session.dislikedThisVisit.has(id),
+      wished: session.wished.has(id), saved: hasSavedSong(id), disliked: session.dislikedThisVisit.has(id),
     })).join('');
     renderedKey = key;
   } else {
@@ -54,6 +57,7 @@ function renderGrid(state, status) {
       const card = findCard(id);
       if (!card) continue;
       paintWish(card, session.wished.has(id));
+      paintSave(card, hasSavedSong(id));
       paintDislike(card, session.dislikedThisVisit.has(id));
     }
   }

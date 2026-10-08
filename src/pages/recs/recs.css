@@ -189,11 +189,12 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
 
 /* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
-.album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; }
+.album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .album-actions a { color: var(--accent); display: inline-flex; align-items: center; }
 .album-actions a:hover { text-decoration: underline; }
 .album-actions .action-dislike { margin-left: auto; } /* the "don't show" icon sits at the right edge of the card */
-.album-actions svg { width: 17px; height: 17px; fill: var(--icon); }
+.album-actions svg { width: 18px; height: 18px; fill: var(--icon); } /* the same size and spacing as the icons in the player bar */
+.action-save:hover svg, .action-save.is-on svg, .action-save.is-on:hover svg { fill: var(--green500); } /* green: a song of it is in Liked Songs */
 .action-wishlist:hover svg { fill: var(--accent); }
 .action-wishlist.is-on svg, .action-wishlist.is-on:hover svg { fill: var(--wishlist); }
 .action-dislike:hover svg, .action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--danger); } /* red when active; click again to bring the album back */

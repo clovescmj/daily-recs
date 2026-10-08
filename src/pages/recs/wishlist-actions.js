@@ -4,7 +4,7 @@ import { MSG } from '../../lib/messages.js';
 import { findCard, paintDislike, paintWish, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
-import { continueAfterRemoval, currentId, emit, playAlbum } from './player.js';
+import { albumSong, continueAfterRemoval, currentId, emit, playAlbum } from './player.js';
 import { session } from './session.js';
 import { toast } from './toast.js';
 
@@ -45,6 +45,25 @@ export async function setSave({ id, i, title }, on) {
   emit(true);
   toast(on ? 'Added to Liked Songs' : 'Removed from Liked Songs');
   await send({ type: MSG.FEEDBACK, id, kind: on ? 'save' : 'unsave', index: i, track: String(title || '').slice(0, 200) });
+}
+
+/**
+ * The + of a card: adds the song the album starts with to Liked Songs, or, when a song of the album is already there, takes the
+ * album's songs out.
+ */
+export async function saveAlbumSong(id) {
+  const keys = [...session.saved].filter((key) => key.startsWith(`${id}:`));
+  if (keys.length) { // already in: take its songs out
+    for (const key of keys) {
+      const i = Number(key.split(':')[1]);
+      const entry = ((await loadState()) || {}).saved?.find((item) => item.id === id && item.i === i);
+      await setSave({ id, i, title: entry ? entry.title : '' }, false);
+    }
+    return;
+  }
+  const song = await albumSong(id).catch(() => null);
+  if (!song) { toast("Couldn't read this album's songs. Try again."); return; }
+  await setSave(song, true);
 }
 
 export async function dislikeAlbum(id) {

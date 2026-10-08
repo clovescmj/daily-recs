@@ -30,7 +30,8 @@ test('cardHtml escapes album text and exposes accessible names', () => {
   assert.ok(!html.includes('<b>"Title"</b>'), 'title must be escaped');
   assert.match(html, /aria-label="Add to wishlist: /);
   assert.match(html, /aria-label="Don't show music like this: |aria-label="Don&#39;t show music like this: /);
-  assert.ok(!/data-like|data-save|thumb/i.test(html), 'there is no like or save button on a card: the + belongs to the song that plays');
+  assert.ok(!/data-like|thumb/i.test(html), 'there is no like button');
+  assert.match(html, /data-save[^>]*aria-label="Add to Liked Songs: /);
   assert.ok(!/go to album/i.test(html), 'no "go to album" link: the cover and the title already open it');
   assert.match(html, /People who own “Other” also own/);
   assert.match(html, /3 fans in common/);
@@ -42,6 +43,7 @@ test('cardHtml reflects liked / disliked state', () => {
   assert.match(html, /action-wishlist is-on/);
   assert.match(html, /Remove from wishlist/);
   assert.match(html, /Show this album again/);
+  assert.match(cardHtml(album, { saved: true, disliked: false }), /action-save is-on[^>]*title="Remove from Liked Songs"/);
   const neutral = cardHtml(album, { liked: false, disliked: false });
   assert.ok(!/is-on/.test(neutral), 'nothing is marked on a neutral card');
 });

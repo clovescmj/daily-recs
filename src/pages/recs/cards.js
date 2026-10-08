@@ -1,14 +1,15 @@
 // Album card markup and the in-place updates of its wishlist / dislike controls.
 import { esc, safeUrl } from './dom.js';
-import { BLOCK, HEART, HEART_FILLED, decorativeIcon, dislikeLabel, labelledIcon, wishlistLabel } from './icons.js';
+import { ADD_CIRCLE, BLOCK, CHECK_CIRCLE, HEART, HEART_FILLED, decorativeIcon, dislikeLabel, labelledIcon, saveLabel, wishlistLabel } from './icons.js';
 
-/** `album`: a candidate from the state pool. `flags`: { wished (in the wishlist), disliked }. */
-export function cardHtml(album, { wished = false, disliked }) {
+/** `album`: a candidate from the state pool. `flags`: { wished (in the wishlist), saved (a song of it is in Liked Songs), disliked }. */
+export function cardHtml(album, { wished = false, saved = false, disliked }) {
   const url = esc(safeUrl(album.url));
   const title = esc(album.title);
   const reason = album.via ? `People who own “${esc(album.via)}” also own` : '';
   const fans = album.fans ? ` · ${album.fans} fans in common` : '';
   const wishlistText = wishlistLabel(wished);
+  const saveText = saveLabel(saved);
   const dislikeText = dislikeLabel(disliked);
   return `<article class="album-card${disliked ? ' is-disliked' : ''}" data-id="${album.id}" data-title="${title}">
     <div class="album-cover">
@@ -22,6 +23,7 @@ export function cardHtml(album, { wished = false, disliked }) {
       <div class="album-reason">${reason}${fans}</div>
       <div class="album-actions">
         <a href="#" class="action-wishlist${wished ? ' is-on' : ''}" data-wish title="${wishlistText}" aria-label="${wishlistText}: ${title}">${labelledIcon(wished ? HEART_FILLED : HEART, wishlistText)}</a>
+        <a href="#" class="action-save${saved ? ' is-on' : ''}" data-save title="${saveText}" aria-label="${saveText}: ${title}">${labelledIcon(saved ? CHECK_CIRCLE : ADD_CIRCLE, saveText)}</a>
         <a href="#" class="action-dislike${disliked ? ' is-on' : ''}" data-dislike title="${dislikeText}" aria-label="${dislikeText}: ${title}">${labelledIcon(BLOCK, dislikeText)}</a>
       </div>
     </div>
@@ -41,6 +43,7 @@ function paintControl(card, selector, on, path, label) {
   link.querySelector('title').textContent = label;
 }
 
+export const paintSave = (card, on) => paintControl(card, '[data-save]', on, on ? CHECK_CIRCLE : ADD_CIRCLE, saveLabel(on));
 export const paintWish = (card, on) => paintControl(card, '[data-wish]', on, on ? HEART_FILLED : HEART, wishlistLabel(on));
 
 /** Dislike: the album is dimmed (the wishlist is not touched). */

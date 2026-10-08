@@ -10,7 +10,7 @@ import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, refreshLanding, setLandingVisible } from './landing.js';
 import { initViewSwitch } from './views.js';
-import { dislikeAlbum, setWish, undoDislike } from './wishlist-actions.js';
+import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-actions.js';
 
 /** Switches to a list the moment the run that was asked for has produced it. */
 function resolvePending(state, status) {
@@ -68,6 +68,9 @@ function onGridClick(event) {
   } else if (event.target.closest('[data-wish]')) {
     event.preventDefault();
     setWish(id, !session.wished.has(id));
+  } else if (event.target.closest('[data-save]')) {
+    event.preventDefault();
+    saveAlbumSong(id);
   } else if (event.target.closest('[data-dislike]')) {
     event.preventDefault();
     if (session.dislikedThisVisit.has(id)) undoDislike(id); else dislikeAlbum(id);
