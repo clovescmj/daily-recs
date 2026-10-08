@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.5
+- Shuffle icon: the line that goes behind is shorter, as in Spotify's. Both of its pieces now stop the same distance from the crossing
+  (before, one of them almost touched the front line), leaving an even gap on each side.
+
 ## 0.8.4
 - The shuffle icon follows the Spotify one more closely (drawn over a picture of it): straight 45° diagonals in an X, short flat ends and
   open arrow heads, and a thinner stroke (1.25 on a 24 × 24 grid).
