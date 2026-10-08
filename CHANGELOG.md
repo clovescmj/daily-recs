@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.6
+- The banner image at the top of the About page, shown through a shorter window (the same image, no new file for it).
+
 ## 0.4.5
 - The number of new albums on the tab ("daily recs 35 new"), on the toolbar icon and in its menu now follows the list the user is
   using today (a genre list, Surprise me or Best matches), not only the Best matches list, and it changes when they pick another.
