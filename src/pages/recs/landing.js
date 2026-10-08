@@ -1,5 +1,5 @@
 // The opening screen, shown the first time the user opens the tab each day: "What do you want to hear today?".
-import { $, esc } from './dom.js';
+import { $, alignDropdown, esc } from './dom.js';
 import { CHEVRON_DOWN_ICON, SPARKLES_ICON, TAGS_ICON, TARGET_ARROW_ICON } from './icons.js';
 import { session } from './session.js';
 import { createTagPicker, labelOf } from './tag-picker.js';
@@ -40,6 +40,7 @@ function openMenu() {
   picker.render();
   document.body.style.minHeight = `${MENU_ROOM_PX}px`;
   $('landing-tags').hidden = false;
+  alignDropdown($('landing-tags'));
   $('landing-tags-option').setAttribute('aria-expanded', 'true');
   picker.focus();
 }

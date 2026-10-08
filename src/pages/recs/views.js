@@ -1,6 +1,6 @@
 // The switch between the lists of the day (My tags, Best matches, Surprise me) and the genre picker behind "My tags".
 import { DAILY_COUNT } from '../../lib/state.js';
-import { $, esc } from './dom.js';
+import { $, alignDropdown, esc } from './dom.js';
 import { CHEVRON_DOWN_ICON, SPARKLES_ICON, TAGS_ICON, TARGET_ARROW_ICON } from './icons.js';
 import { session } from './session.js';
 import { createTagPicker, labelOf } from './tag-picker.js';
@@ -49,6 +49,7 @@ function openTagsMenu() {
   picker.setSelected(session.view === 'tags' ? session.tagKeys : []);
   document.body.style.minHeight = `${MENU_ROOM_PX}px`;
   $('tags-menu').hidden = false;
+  alignDropdown($('tags-menu'));
   $('view-tags').setAttribute('aria-expanded', 'true');
   picker.focus();
 }

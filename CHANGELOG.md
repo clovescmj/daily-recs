@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.2
+- The genre drop-down opens aligned to the left edge of its button, and to the right edge only when it would run past the window
+  (on the opening screen and on the list).
+
 ## 0.4.1
 - On the opening screen, "My tags" opens a drop-down with the genres, exactly like the one on the list (it used to open an inline
   box). The button shows the ticked genres, and the menu closes with a click outside or Esc.
