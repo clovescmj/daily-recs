@@ -61,11 +61,12 @@
 #dr-player .collect a:hover { text-decoration: underline; }
 #dr-player .collect a { display: inline-flex; align-items: center; vertical-align: middle; }
 #dr-player .collect .ci { width: 16px; height: 16px; fill: #8a8f91; display: block; }
-#dr-player .collect .like { margin-right: 10px; } /* same spacing as the album cards */
-#dr-player .collect .like:hover .ci { fill: rgb(0,161,198); }
-#dr-player .collect .dislike:hover .ci { fill: #d64541; } /* dislike: red on hover too */
-#dr-player .collect .like.on .ci, #dr-player .collect .like.on:hover .ci { fill: #f7931e; }
-#dr-player .collect .goto { margin-left: 10px; } /* same spacing as the album cards (no dot between them) */
+#dr-player .collect a + a { margin-left: 10px; } /* same spacing as the album cards */
+#dr-player .collect .wish { margin-right: 6px; } /* the heart (wishlist) stands a little apart from the thumbs */
+#dr-player .collect .wish:hover .ci { fill: rgb(0,161,198); }
+#dr-player .collect .wish.on .ci, #dr-player .collect .wish.on:hover .ci { fill: #f7931e; }
+#dr-player .collect .like:hover .ci, #dr-player .collect .like.on .ci { fill: #2e9e5b; } /* green: I like it */
+#dr-player .collect .dislike:hover .ci, #dr-player .collect .dislike.on .ci { fill: #d64541; } /* red: not for me */
 
 
 /* extras + volume */
@@ -116,7 +117,6 @@
 #dr-player .queue .qpp::before { content: ""; display: inline-block; width: 0; height: 0; border-top: 6px inset transparent; border-bottom: 6px inset transparent; border-left: 9px solid rgb(34,34,34); }
 #dr-player .queue.audible li.active .qpp::before { border: 0; border-left: 3px solid #2d2d2d; border-right: 3px solid #2d2d2d; height: 12px; width: 2px; }
 #dr-player .now-playing img:not([src]) { visibility: hidden; }
-#dr-player .collect .dislike.on .ci, #dr-player .collect .dislike.on:hover .ci { fill: #2e9e5b; } /* disliked: the "+" (bring it back) is green */
 
 /* Slide transition when the bar appears / disappears (tab switch) */
 #dr-player { transition: transform .3s ease .12s, visibility 0s linear 0s; }

@@ -3,6 +3,16 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.5.0
+- The wishlist is kept apart from the like. On each card, the **heart** (left) only adds the album to, or removes it from, the Bandcamp
+  wishlist. The **thumbs up** and **thumbs down** (right) only teach the taste: thumbs up turns green, thumbs down turns red and hides the
+  album (a new one takes its place at the end, as before). The player bar has the same three buttons. "Go to album" is gone: the cover and
+  the title already open it.
+- A thumbs down never touches the wishlist any more (before, hiding a hearted album also removed it from the wishlist). Liking a hidden
+  album brings it back; hiding a liked album takes the like back.
+- Albums in the wishlist are remembered on this computer, never come back in a list, and count a little for the taste (less than a like).
+- Albums that had a heart before this version keep it as a like and as a wishlist entry.
+
 ## 0.4.15
 - A genre list aims for a full 50. When the user's own albums of the genre are used up and the list is still short, it goes on to the
   albums of that genre that Bandcamp recommended (one step beyond the user's albums, never further): their "you may also like" is read,

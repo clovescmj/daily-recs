@@ -80,7 +80,7 @@ export function shuffle(items) {
 export function rankedCandidates(state, exclude = {}) {
   const weigh = createSourceWeigher(state);
   // `exclude` ({ ids, artists }): albums already in the list being extended, so the new one is really new there
-  const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || []), ...(exclude.ids || [])]);
+  const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || []), ...(state.wishlisted || []), ...(exclude.ids || [])]);
   const seenArtists = new Set([...(state.shownArtists || []), ...(exclude.artists || [])]);
   return Object.values(state.pool)
     .filter((c) => !seen.has(c.id) && !seenArtists.has(c.artistId) && !isOwned(c, state.owned))

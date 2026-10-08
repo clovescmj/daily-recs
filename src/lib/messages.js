@@ -14,7 +14,7 @@ export const MSG = Object.freeze({
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
 });
 
-export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike']);
+export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish']);
 export const WISHLIST_OPS = Object.freeze(['add', 'remove']);
 
 /** Returns the normalised message, or null if it isn't a well-formed message of ours. */

@@ -8,7 +8,7 @@ Daily Recs for Bandcamp is an independent extension. It is not made, endorsed or
 - It uses the Bandcamp session you are already signed in with to read **your collection and wishlist** and the "you may also like" section and genre tags of album pages on `bandcamp.com`. It never sees or stores your password.
 - It stores, **on your computer** (`chrome.storage.local`): a snapshot of your library (titles, artists and links), the recommendations it found, and a profile of the genre tags of your albums.
 - It stores your **likes and dislikes** in `chrome.storage.sync`, which Chrome syncs through your own Google account, so they follow you to your other computers. This is controlled by your Chrome sync settings.
-- It adds or removes an album from your Bandcamp wishlist **only when you click** the heart (or hide an album you had hearted).
+- It adds or removes an album from your Bandcamp wishlist **only when you click** the heart. Thumbs up and thumbs down never change your Bandcamp account.
 
 ## What it does not do
 - It does not send your data to the developer or to any server other than `bandcamp.com`.

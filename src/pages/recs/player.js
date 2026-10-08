@@ -308,6 +308,7 @@ function snapshot() {
     buf: audio.buffered.length ? audio.buffered.end(audio.buffered.length - 1) : 0,
     vol: audio.muted ? 0 : audio.volume, shuffle: player.shuffle,
     curId: current.id,
+    wished: Boolean(album) && session.wished.has(album.id),
     liked: Boolean(album) && session.liked.has(album.id),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     hasPrev: player.shuffle ? player.history.length > 1 : current.index > 0,

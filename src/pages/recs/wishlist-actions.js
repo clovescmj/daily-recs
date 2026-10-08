@@ -1,8 +1,8 @@
-// Like / dislike / wishlist. The heart toggles the Bandcamp wishlist AND the taste; the dislike hides the album,
-// teaches the taste and removes it from the wishlist when it was there. Wishlist changes are made by Bandcamp's own
-// function, run inside the profile tab.
+// Wishlist / like / dislike. The heart toggles the Bandcamp wishlist (the only control that changes the user's Bandcamp
+// account); the thumbs only teach the taste: the like asks for more like it, the dislike hides the album. Wishlist changes
+// are made by Bandcamp's own function, run inside the profile tab.
 import { MSG } from '../../lib/messages.js';
-import { findCard, paintDislike, paintLike, visibleCardIds } from './cards.js';
+import { findCard, paintDislike, paintLike, paintWish, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
 import { continueAfterRemoval, currentId, emit, playUpNextNow, setUpNext } from './player.js';
@@ -15,46 +15,49 @@ let flushing = false;
 
 const poolAlbum = async (id) => ((await loadState()) || { pool: {} }).pool[id];
 
-/** Heart: wishlist + like. Adding counts only if Bandcamp confirms; removing is best effort. */
-export async function setLike(id, on) {
+/** Heart: the Bandcamp wishlist. Adding counts only if Bandcamp confirms; removing is best effort. */
+export async function setWish(id, on) {
   if (busyHearts.has(id)) return;
   const album = await poolAlbum(id);
   if (!album) return;
   busyHearts.add(id);
   const card = findCard(id);
-  if (card) paintLike(card, on); // optimistic; rolled back on failure
+  if (card) paintWish(card, on); // optimistic; rolled back on failure
   try {
     const result = await requestWishlistOp(on ? 'add' : 'remove', album);
     if (!result.ok && on) {
-      if (card) paintLike(card, false);
+      if (card) paintWish(card, false);
       toast("Couldn't add it to your wishlist. Try again.");
       return;
     }
-    toast(result.ok ? (on ? 'Album added to your wishlist. Reload the page to see it in your wishlist tab.' : 'Album removed from your wishlist') : "Unliked. Couldn't confirm the wishlist removal.");
-    if (on) session.liked.add(id); else session.liked.delete(id);
-    send({ type: MSG.FEEDBACK, id, kind: on ? 'like' : 'unlike' });
+    toast(result.ok ? (on ? 'Album added to your wishlist. Reload the page to see it in your wishlist tab.' : 'Album removed from your wishlist') : "Couldn't confirm the wishlist removal.");
+    if (on) session.wished.add(id); else session.wished.delete(id);
+    send({ type: MSG.FEEDBACK, id, kind: on ? 'wish' : 'unwish' });
     emit(true);
   } finally {
     busyHearts.delete(id);
   }
 }
 
+/** Thumbs up: "I like this album". Only teaches the taste; liking an album that was hidden brings it back first. */
+export async function setLike(id, on) {
+  if (on && session.dislikedThisVisit.has(id)) await undoDislike(id);
+  if (on) session.liked.add(id); else session.liked.delete(id);
+  const card = findCard(id);
+  if (card) paintLike(card, on);
+  emit(true);
+  await send({ type: MSG.FEEDBACK, id, kind: on ? 'like' : 'unlike' });
+}
+
 export async function dislikeAlbum(id) {
   const ids = visibleCardIds();
   const nextId = ids[ids.indexOf(id) + 1];
   const wasPlaying = currentId() === id;
-  const hadHeart = session.liked.has(id);
-  const album = await poolAlbum(id);
   session.liked.delete(id);
   session.dislikedThisVisit.add(id);
   const card = findCard(id);
   if (card) paintDislike(card, true);
-  await send({ type: MSG.FEEDBACK, id, kind: 'dislike' });
-  if (hadHeart && album) {
-    const result = await requestWishlistOp('remove', album);
-    if (result.ok) toast('Album removed from your wishlist');
-    else await send({ type: MSG.WISHLIST_QUEUE, op: 'remove', id, bandId: album.artistId }); // retry later
-  }
+  await send({ type: MSG.FEEDBACK, id, kind: 'dislike' }); // the wishlist is not touched: only the heart changes it
   await replaceHidden(wasPlaying, nextId);
   emit(true);
 }
@@ -79,7 +82,7 @@ async function replaceHidden(wasPlaying, nextId) {
   replacement.then((id) => id && setUpNext(id));
 }
 
-/** Back to neutral. Neither the heart nor the wishlist entry is restored (the dislike had removed them). */
+/** Back to neutral (the like that the dislike replaced is not restored). */
 export async function undoDislike(id) {
   session.dislikedThisVisit.delete(id);
   const card = findCard(id);

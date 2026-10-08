@@ -10,7 +10,7 @@ import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, refreshLanding, setLandingVisible } from './landing.js';
 import { initViewSwitch } from './views.js';
-import { dislikeAlbum, setLike, undoDislike } from './wishlist-actions.js';
+import { dislikeAlbum, setLike, setWish, undoDislike } from './wishlist-actions.js';
 
 /** Switches to a list the moment the run that was asked for has produced it. */
 function resolvePending(state, status) {
@@ -65,6 +65,9 @@ function onGridClick(event) {
   const { id } = card.dataset;
   if (event.target.closest('[data-play]')) {
     playAlbum(id);
+  } else if (event.target.closest('[data-wish]')) {
+    event.preventDefault();
+    setWish(id, !session.wished.has(id));
   } else if (event.target.closest('[data-like]')) {
     event.preventDefault();
     setLike(id, !session.liked.has(id));

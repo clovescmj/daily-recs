@@ -1,7 +1,7 @@
 // Commands sent by the player bar in the Bandcamp tab (postMessage), after validation.
 import { session } from './session.js';
 import * as player from './player.js';
-import { dislikeAlbum, setLike, undoDislike } from './wishlist-actions.js';
+import { dislikeAlbum, setLike, setWish, undoDislike } from './wishlist-actions.js';
 
 const isFraction = (v) => typeof v === 'number' && Number.isFinite(v);
 const isAlbumId = (v) => (typeof v === 'string' || typeof v === 'number') && /^\d+$/.test(String(v));
@@ -18,6 +18,7 @@ const COMMANDS = {
   seekBy: (v) => isFraction(v) && player.seekBy(Math.max(-60, Math.min(60, v))),
   vol: (v) => isFraction(v) && player.setVolume(v),
   playAlbum: (v) => isAlbumId(v) && player.playAlbum(String(v)),
+  wish: () => { const album = player.currentAlbum(); return album && setWish(album.id, !session.wished.has(album.id)); },
   like: () => { const album = player.currentAlbum(); return album && setLike(album.id, !session.liked.has(album.id)); },
   dislike: () => {
     const album = player.currentAlbum();

@@ -20,7 +20,8 @@ New Bandcamp albums every day, picked from your own collection. Never shows what
 > Daily Recs starts from what you own and what you've saved on Bandcamp, finds albums that fans of those records love, and keeps the ones that fit your taste. Every list is made of albums you don't own, from artists you don't have, and nothing repeats.
 >
 > • A fresh list of 50 albums every day, right inside your Bandcamp profile, in a new "daily recs" tab
-> • Heart what you love: it goes to your Bandcamp wishlist and the next lists get sharper
+> • Thumbs up what you like and thumbs down what you don't: the next lists get sharper
+> • The heart adds an album to your Bandcamp wishlist
 > • Hide what you don't: it never comes back
 > • "Surprise me" goes a little further from the obvious, and "Best matches" brings you back instantly
 > • A built-in player in Bandcamp's own style, with shuffle, queue and media keys
@@ -37,7 +38,7 @@ New Bandcamp albums every day, picked from your own collection. Never shows what
 - Icon 128×128: already in the package (`icons/icon-128.png`).
 - Screenshots, 1280×800 (at least 1, up to 5):
   1. The "daily recs" tab on your profile with the album grid.
-  2. A card with hover on the title/artist and the heart and "don't show again" icons.
+  2. A card with hover on the title/artist and the heart, thumbs up and thumbs down icons.
   3. The player bar playing an album, with the queue open.
   4. "Surprise me" loading (progress) or its list, with the "Best matches" button.
   5. The About page.

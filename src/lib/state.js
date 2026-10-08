@@ -17,7 +17,8 @@ export const emptyState = () => ({
   shownToday: [],        // ...and shown today: they may appear again in another list of the same day
   shownArtistsToday: [],
   shownDate: '',         // the day shownToday refers to
-  liked: [],             // derived from `votes`
+  liked: [],             // derived from `votes` (albums the user gave a thumbs up)
+  wishlisted: [],        // albums the user put in the Bandcamp wishlist from the extension (kept on this computer)
   dismissed: [],         // derived from `votes` (albums marked "don't show again")
   votes: {},             // albumId -> "<vote>.<time>" (see taste-sync.js)
   tasteBootstrapped: false, // true once a run has read enough of the library to learn the genre profile
@@ -39,6 +40,7 @@ export const emptyState = () => ({
 /** Brings any previously saved state up to the current schema. Mutates and returns the state. */
 export function migrateState(state) {
   migrateTaste(state);
+  state.wishlisted ||= [...(state.liked || [])]; // before the two were separated, a like was also a wishlist entry
   normalizeTasteTags(state);
   if (state.owned && state.owned.count !== undefined) { // legacy names
     state.owned.collectionCount = state.owned.count;

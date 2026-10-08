@@ -14,7 +14,7 @@ A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fr
 - Starts from what you own and what you've saved on Bandcamp.
 - Finds albums that fans of those records love, and keeps the ones that fit your taste.
 - Shows only what's new to you: nothing you own, nothing repeated.
-- **Heart** what you love, **hide** what you don't, and the next list gets sharper.
+- **Thumbs up** what you like, **thumbs down** what you don't, and the next list gets sharper. The **heart** adds the album to your Bandcamp wishlist.
 - **Surprise me** goes a little further from the obvious.
 
 ## Project layout

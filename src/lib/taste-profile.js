@@ -8,6 +8,7 @@ import { hashSource } from './taste-sync.js';
 // items say more about the current taste than old ones.
 export const KIND_WEIGHT = Object.freeze({ collection: 1, wishlist: 0.85 });
 export const LIKED_BONUS = 1.5;        // albums liked in the extension are the strongest signal
+export const WISHLISTED_BONUS = 1.2;   // ...and so, a little less, are the ones the user put in the wishlist from there
 const RECENCY_FLOOR = 0.75;            // the oldest item still counts 75% as much as the newest
 const MAX_TASTE_TAGS = 300;
 
@@ -18,8 +19,10 @@ export function createSourceWeigher(state) {
     const kindWeight = KIND_WEIGHT[source.kind] ?? 1;
     base.set(source.url, kindWeight * (RECENCY_FLOOR + (1 - RECENCY_FLOOR) * (source.recent ?? 1)));
   }
-  const likedUrls = new Set((state.liked || []).map((id) => state.pool && state.pool[id] && state.pool[id].url).filter(Boolean));
-  return (url) => (base.get(url) ?? 1) * (likedUrls.has(url) ? LIKED_BONUS : 1);
+  const urlsOf = (ids) => new Set((ids || []).map((id) => state.pool && state.pool[id] && state.pool[id].url).filter(Boolean));
+  const likedUrls = urlsOf(state.liked);
+  const wishlistedUrls = urlsOf(state.wishlisted);
+  return (url) => (base.get(url) ?? 1) * (likedUrls.has(url) ? LIKED_BONUS : wishlistedUrls.has(url) ? WISHLISTED_BONUS : 1);
 }
 
 /** Merges spellings of the same tag that were stored before they were normalised ("e.b.m" + "ebm"). */

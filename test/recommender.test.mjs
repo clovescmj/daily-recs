@@ -376,6 +376,45 @@ describe('feedback', () => {
     assert.ok(Object.keys(state.pool).length >= poolBefore);
   });
 
+  test('the wishlist is kept apart from the like: a heart is not a like, a like is not a heart', async () => {
+    const ctx = await withList();
+    let state = await apply(ctx, 'wish');
+    assert.deepEqual(state.wishlisted, [ctx.id]);
+    assert.deepEqual(state.liked, [], 'the wishlist is not a like');
+    assert.ok(Object.values(state.sourceLikes).every((n) => n === 0), 'and does not move the thermometer');
+    assert.ok(state.sampled[ctx.state.pool[ctx.id].url], 'but its own recommendations are read');
+    state = await apply(ctx, 'like');
+    assert.deepEqual(state.liked, [ctx.id]);
+    state = await apply(ctx, 'unlike');
+    assert.deepEqual(state.wishlisted, [ctx.id], 'removing the like leaves the wishlist as it was');
+    state = await apply(ctx, 'unwish');
+    assert.deepEqual(state.wishlisted, []);
+    state = await apply(ctx, 'unwish');
+    assert.deepEqual(state.wishlisted, [], 'repeating it changes nothing');
+  });
+
+  test('a dislike never touches the wishlist, and it replaces a like instead of adding to it', async () => {
+    const ctx = await withList();
+    await apply(ctx, 'wish');
+    await apply(ctx, 'like');
+    let state = await apply(ctx, 'dislike');
+    assert.deepEqual(state.wishlisted, [ctx.id]);
+    assert.deepEqual(state.liked, []);
+    assert.deepEqual(state.dismissed, [ctx.id]);
+    assert.ok(Object.values(state.sourceLikes).every((n) => n === 0), 'the like no longer counts');
+    state = await apply(ctx, 'like');
+    assert.deepEqual(state.dismissed, [], 'liking an album that was hidden brings it back');
+    assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0), 'and takes the dislike back');
+  });
+
+  test('albums in the wishlist never come back in a list', async () => {
+    const ctx = await withList();
+    const [wished] = ctx.state.today.ids;
+    await apply(ctx, 'wish', wished);
+    const state = await ctx.run({ mode: 'surprise', force: true });
+    assert.ok(!state.surprise.ids.includes(wished));
+  });
+
   test('dislike → undislike returns the thermometer to zero and does not become a like', async () => {
     const ctx = await withList();
     let state = await apply(ctx, 'dislike');

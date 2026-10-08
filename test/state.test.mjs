@@ -24,6 +24,7 @@ describe('migrateState', () => {
     for (const gone of ['status', 'wished', 'focus', 'opened', 'fanName', 'tasteTs', 'likedSrc']) assert.ok(!(gone in state), gone);
     assert.deepEqual(state.today.ids, ['a']);
     assert.ok(Array.isArray(state.wishQueue));
+    assert.deepEqual(state.wishlisted, ['1'], 'a like used to be a wishlist entry too, and stays one');
   });
 
   test('is idempotent', () => {

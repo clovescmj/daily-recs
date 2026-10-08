@@ -187,7 +187,7 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
     const fan = await getFan(fetchFn);
     // No stockpile: every run fetches a fresh batch. Liked albums stay in the pool (they keep acting as sources), and so
     // do the albums of today's other lists (their cards still need their data).
-    const keep = new Set([...state.liked, ...idsOfTodaysLists(state, today)]);
+    const keep = new Set([...state.liked, ...state.wishlisted, ...idsOfTodaysLists(state, today)]);
     state.pool = Object.fromEntries([...keep].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     await report({ phase: PHASE.LIBRARY });
     state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing));
@@ -314,7 +314,7 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
       return state;
     }
 
-    state.pool = Object.fromEntries([...new Set([...state.liked, ...idsOfTodaysLists(state, today)])].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
+    state.pool = Object.fromEntries([...new Set([...state.liked, ...state.wishlisted, ...idsOfTodaysLists(state, today)])].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     const read = new Set();
     const nextSeeds = (count) => {
       const fresh = seeds.filter((source) => !read.has(source.url)).slice(0, count);
@@ -431,8 +431,9 @@ async function rememberProfileUrl(fetchFn, state, store) {
 
 /**
  * Applies a vote. Votes move the thermometer points of the album's sources; a like also reads the liked album's own
- * recommendations right away, so the taste becomes new candidates without waiting for the next day.
- * kind: 'like' | 'unlike' | 'dislike' | 'undislike'
+ * recommendations right away, so the taste becomes new candidates without waiting for the next day. Putting an album in the
+ * wishlist (the heart) is remembered apart from the like, and it is read the same way.
+ * kind: 'like' | 'unlike' | 'dislike' | 'undislike' | 'wish' | 'unwish'
  */
 export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning }) {
   const state = await store.load();
@@ -449,19 +450,31 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning })
     }
   };
 
+  const readOwnRecommendations = async () => {
+    if (!state.sampled[candidate.url] && isBandcampUrl(candidate.url)) {
+      try { await readSources(fetchFn, state, [{ url: candidate.url, title: candidate.title }], undefined, withDefaults(tuning)); } catch { /* the vote itself is already recorded */ }
+    }
+  };
+
   if (kind === 'like' && !state.liked.includes(id)) {
+    if (state.dismissed.includes(id)) adjust(state.sourceDislikes, -1); // a like replaces the dislike
     recordVote(state, id, VOTE.LIKE);
     adjust(state.sourceLikes, +1, 2);
     rebuildVoteLists(state);
     await store.save(state);
-    if (!state.sampled[candidate.url] && isBandcampUrl(candidate.url)) {
-      try { await readSources(fetchFn, state, [{ url: candidate.url, title: candidate.title }], undefined, withDefaults(tuning)); } catch { /* the vote itself is already recorded */ }
-    }
+    await readOwnRecommendations();
+  } else if (kind === 'wish' && !state.wishlisted.includes(id)) {
+    state.wishlisted.push(id);
+    await store.save(state);
+    await readOwnRecommendations();
+  } else if (kind === 'unwish') {
+    state.wishlisted = state.wishlisted.filter((other) => other !== id);
   } else if (kind === 'unlike' && state.liked.includes(id)) {
     recordVote(state, id, VOTE.UNLIKE); // tombstone, so the removal also spreads to other devices
     adjust(state.sourceLikes, -1, 2);
     rebuildVoteLists(state);
   } else if (kind === 'dislike' && !state.dismissed.includes(id)) {
+    if (state.liked.includes(id)) adjust(state.sourceLikes, -1, 2); // a dislike replaces the like
     recordVote(state, id, VOTE.DISLIKE);
     adjust(state.sourceDislikes, +1);
     rebuildVoteLists(state);
