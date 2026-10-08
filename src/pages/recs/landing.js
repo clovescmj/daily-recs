@@ -12,7 +12,8 @@ const OPTIONS = [
 ];
 
 // The pop-up of "My tags" works exactly like the one on the list: the button opens a drop-down with the genres.
-const MENU_ROOM_PX = 520;   // the page is an iframe as tall as its content: keep it tall enough to show the whole menu
+// The page is an iframe as tall as its content, so the opening screen is always tall enough for the menu (see .landing in the CSS):
+// opening the menu doesn't change the height and doesn't push Bandcamp's footer down.
 let choice = 'best';
 let picker = null;
 
@@ -31,14 +32,12 @@ function setOptionHtml(option) {
 }
 
 function closeMenu() {
-  document.body.style.minHeight = '';
   $('landing-tags').hidden = true;
   $('landing-tags-option').setAttribute('aria-expanded', 'false');
 }
 
 function openMenu() {
   picker.render();
-  document.body.style.minHeight = `${MENU_ROOM_PX}px`;
   $('landing-tags').hidden = false;
   alignDropdown($('landing-tags'));
   $('landing-tags-option').setAttribute('aria-expanded', 'true');

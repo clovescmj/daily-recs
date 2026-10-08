@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.3
+- Opening the genre drop-down on the opening screen no longer pushes Bandcamp's footer down: that screen is always tall enough for
+  the menu, which is also a little shorter.
+
 ## 0.4.2
 - The genre drop-down opens aligned to the left edge of its button, and to the right edge only when it would run past the window
   (on the opening screen and on the list).

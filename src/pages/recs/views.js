@@ -12,7 +12,7 @@ export const VIEW_HELP = {
 };
 
 // This page lives in an iframe as tall as its content: while the menu is open the page is kept tall enough to show all of it.
-const MENU_ROOM_PX = 520;
+const MENU_ROOM_PX = 480;
 let picker = null;
 
 function tagsButtonText(state) {
