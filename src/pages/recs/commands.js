@@ -6,6 +6,8 @@ import { dislikeAlbum, setLike, setWish, undoDislike } from './wishlist-actions.
 const isFraction = (v) => typeof v === 'number' && Number.isFinite(v);
 const isAlbumId = (v) => (typeof v === 'string' || typeof v === 'number') && /^\d+$/.test(String(v));
 
+const targetId = (v) => (isAlbumId(v) ? String(v) : (player.currentAlbum() || {}).id);
+
 const COMMANDS = {
   toggle: () => player.togglePlay(),
   prev: () => player.previousTrack(),
@@ -18,12 +20,13 @@ const COMMANDS = {
   seekBy: (v) => isFraction(v) && player.seekBy(Math.max(-60, Math.min(60, v))),
   vol: (v) => isFraction(v) && player.setVolume(v),
   playAlbum: (v) => isAlbumId(v) && player.playAlbum(String(v)),
-  wish: () => { const album = player.currentAlbum(); return album && setWish(album.id, !session.wished.has(album.id)); },
-  like: () => { const album = player.currentAlbum(); return album && setLike(album.id, !session.liked.has(album.id)); },
-  dislike: () => {
-    const album = player.currentAlbum();
-    if (!album) return undefined;
-    return session.dislikedThisVisit.has(album.id) ? undoDislike(album.id) : dislikeAlbum(album.id);
+  // the heart and the thumbs act on the album named in the command (the queue's items), or on the one that is playing
+  wish: (v) => { const id = targetId(v); return id && setWish(id, !session.wished.has(id)); },
+  like: (v) => { const id = targetId(v); return id && setLike(id, !session.liked.has(id)); },
+  dislike: (v) => {
+    const id = targetId(v);
+    if (!id) return undefined;
+    return session.dislikedThisVisit.has(id) ? undoDislike(id) : dislikeAlbum(id);
   },
 };
 

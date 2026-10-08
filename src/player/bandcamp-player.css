@@ -110,11 +110,19 @@
 #dr-player .close-icon { height: 20px; width: 20px; margin-top: 2px; cursor: pointer; fill: #333; display: block; }
 #dr-player .queue ol, #dr-player .queue li { list-style: none; padding: 0; margin: 0; }
 #dr-player .queue ol { height: calc(100% - 54px); overflow-y: auto; }
-#dr-player .queue li { padding: 8px 12px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#dr-player .queue li { padding: 8px 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; }
+#dr-player .queue .qlabel { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#dr-player .queue .qact { flex: none; display: inline-flex; align-items: center; gap: 10px; margin-left: 12px; }
+#dr-player .queue .qact a { display: inline-flex; align-items: center; }
+#dr-player .queue .qact .ci { width: 16px; height: 16px; fill: #8a8f91; display: block; }
+#dr-player .queue .q-wish:hover .ci { fill: rgb(0,161,198); }
+#dr-player .queue .q-wish.on .ci, #dr-player .queue .q-wish.on:hover .ci { fill: #f7931e; }
+#dr-player .queue .q-like:hover .ci, #dr-player .queue .q-like.on .ci { fill: #2e9e5b; }
+#dr-player .queue .q-dislike:hover .ci { fill: #d64541; }
 #dr-player .queue li.active, #dr-player .queue li:hover { background: #f7f6f6; }
-#dr-player .queue .qpp { display: inline-block; vertical-align: middle; width: 14px; margin-right: 8px; height: 12px; visibility: hidden; }
+#dr-player .queue .qpp { flex: none; display: inline-block; vertical-align: middle; width: 14px; margin-right: 8px; height: 12px; visibility: hidden; }
 #dr-player .queue li.active .qpp, #dr-player .queue li:hover .qpp { visibility: visible; }
-#dr-player .queue .qpp::before { content: ""; display: inline-block; width: 0; height: 0; border-top: 6px inset transparent; border-bottom: 6px inset transparent; border-left: 9px solid rgb(34,34,34); }
+#dr-player .queue .qpp::before { content: ""; box-sizing: content-box; display: inline-block; width: 0; height: 0; border-top: 6px inset transparent; border-bottom: 6px inset transparent; border-left: 9px solid rgb(34,34,34); }
 #dr-player .queue.audible li.active .qpp::before { border: 0; border-left: 3px solid #2d2d2d; border-right: 3px solid #2d2d2d; height: 12px; width: 2px; }
 #dr-player .now-playing img:not([src]) { visibility: hidden; }
 

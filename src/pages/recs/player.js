@@ -258,13 +258,17 @@ export function markPlaying() {
 
 function queueItems() {
   const ids = visibleCardIds();
-  const key = ids.join(',');
+  // the heart and the thumb of each item are part of the key, so the bar redraws when one of them changes
+  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${session.liked.has(id) ? 'l' : ''}`).join(',');
   if (key !== queueCache.key) {
     queueCache = {
       key,
       items: ids.map((id) => {
         const card = findCard(id);
-        return { id, label: `${card.querySelector('.album-artist').textContent} - ${card.querySelector('.album-title').textContent}` };
+        return {
+          id, label: `${card.querySelector('.album-artist').textContent} - ${card.querySelector('.album-title').textContent}`,
+          wished: session.wished.has(id), liked: session.liked.has(id),
+        };
       }),
     };
   }

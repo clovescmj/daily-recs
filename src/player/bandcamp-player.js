@@ -28,7 +28,7 @@
     <g transform="translate(18.72 15.37) scale(0.212)"><path d="M22.9043 13.2236V0.106445H28.2109V30.5322H22.9043V17.4141L0 30.6387V0L22.9043 13.2236Z"/></g></svg>`;
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const queueVersion = (items) => items.map((it) => it.id).join(',');
+  const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.liked ? 'l' : ''}`).join(',');
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
   function create({ spriteUrl, busyUrl, onCmd }) {
@@ -117,7 +117,12 @@
     const setQueue = (on) => { q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
     q('.q-close').addEventListener('click', () => setQueue(false));
-    q('.queue ol').addEventListener('click', (e) => { const li = e.target.closest('li[data-id]'); if (li) onCmd('playAlbum', li.dataset.id); });
+    q('.queue ol').addEventListener('click', (e) => {
+      const li = e.target.closest('li[data-id]');
+      if (!li) return;
+      const act = e.target.closest('[data-act]');
+      if (act) { e.preventDefault(); onCmd(act.dataset.act, li.dataset.id); } else onCmd('playAlbum', li.dataset.id);
+    });
     let queueSig = '', queueKey = '', queue = [];
     q('.x-skip').addEventListener('click', (e) => { e.preventDefault(); onCmd('skip'); });
     q('.vol-icon-wrapper').addEventListener('click', () => onCmd('mute'));
@@ -140,8 +145,13 @@
       const sig = `${s.curId}|${queueKey}`;
       if (sig !== queueSig) {
         queueSig = sig;
+        const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
         q('.queue ol').innerHTML = queue.map((it, i) =>
-          `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span>${i + 1}. ${esc(it.label)}</li>`).join('');
+          `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span><span class="qlabel">${i + 1}. ${esc(it.label)}</span><span class="qact">`
+          + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
+          + action('like', it.liked, 'See more like this', 'Stop seeing more like this', P.thumbUp, P.thumbUpOn)
+          + action('dislike', false, 'Hide this album', 'Show this album again', P.thumbDown, P.thumbDownOn)
+          + '</span></li>').join('');
       }
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart, thumbs up, thumbs down: each one has its own icon and label

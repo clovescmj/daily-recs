@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.5.3
+- Fix: the pause icon in the queue showed a single thick bar; it shows two bars again.
+- Each item of the queue has the heart, the thumbs up and the thumbs down, and they act on that album (the heart and the thumbs up keep their colour).
+
 ## 0.5.2
 - New wording for the thumbs: "See more like this" / "Stop seeing more like this" and "Hide this album" / "Show this album again".
 
