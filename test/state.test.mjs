@@ -104,3 +104,17 @@ describe('wishlistOpInPage (runs inside the Bandcamp page)', () => {
     uninstallPage();
   });
 });
+
+import { activeList } from '../src/lib/state.js';
+test('activeList: the list the user picked today, or any list of today', () => {
+  const state = emptyState();
+  state.today = { date: '2026-10-08', ids: ['1'] };
+  state.tagLists = { 'ebm+noise': { date: '2026-10-08', ids: ['2', '3'], tags: ['ebm', 'noise'] }, old: { date: '2026-10-07', ids: ['9'] } };
+  const picked = (view, tags = []) => ({ date: '2026-10-08', view, tags });
+  assert.deepEqual(activeList(state, picked('tags', ['noise', 'ebm']), '2026-10-08').ids, ['2', '3']);   // order of the genres doesn't matter
+  assert.deepEqual(activeList(state, picked('best'), '2026-10-08').ids, ['1']);
+  assert.deepEqual(activeList(state, picked('surprise'), '2026-10-08').ids, ['1'], 'a picked list that doesn\'t exist falls back to another of today');
+  assert.deepEqual(activeList(state, { date: '2026-10-07', view: 'tags', tags: ['x'] }, '2026-10-08').ids, ['1'], 'a choice from another day is ignored');
+  assert.equal(activeList(state, null, '2026-10-09'), null, 'nothing from yesterday');
+  assert.equal(activeList(null, null), null);
+});

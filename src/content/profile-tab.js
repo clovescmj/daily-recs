@@ -48,19 +48,26 @@
     } catch { return false; }
   }
 
-  /** Today's albums that were neither rejected nor opened yet (the same number as on the toolbar icon). */
+  /** Albums of the list being used today (the one the user picked) that were neither hidden nor opened yet: the same number as on the toolbar icon. */
   async function countNewAlbums() {
-    const { state: stored, opened } = await chrome.storage.local.get(['state', 'opened']);
-    if (!stored || !stored.today) return 0;
+    const { state: stored, opened, pickedDate: picked } = await chrome.storage.local.get(['state', 'opened', 'pickedDate']);
+    if (!stored) return 0;
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    if (stored.today.date !== today) return 0;
+    const lists = [stored.today, stored.surprise, ...Object.values(stored.tagLists || {})].filter((list) => list && list.date === today);
+    let list = null;
+    if (picked && picked.date === today) { // the list the user picked, if it exists
+      const key = [...new Set(picked.tags || [])].sort().join('+');
+      list = picked.view === 'surprise' ? stored.surprise : picked.view === 'tags' ? (stored.tagLists || {})[key] : stored.today;
+      if (!list || list.date !== today) list = null;
+    }
+    list = list || lists[0];
+    if (!list) return 0;
     const gone = new Set(stored.dismissed || []);
     if (opened && opened.date === today) opened.ids.forEach((id) => gone.add(id));
-    return stored.today.ids.filter((id) => !gone.has(id)).length;
+    return list.ids.filter((id) => !gone.has(id)).length;
   }
 
-  // Every grid of the profile: collection, wishlist, their search results, followers and following.
   const collectionGrids = () => [...(tabsContainer.closest('#grids') || document).querySelectorAll('.grid')]
     .filter((grid) => grid.parentElement && grid.parentElement.id === 'grids');
 
@@ -241,7 +248,7 @@
     state.countEl.textContent = count ? `${count} new` : '';
   }
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes.state || changes.opened)) updateTabCount();
+    if (area === 'local' && (changes.state || changes.opened || changes.pickedDate)) updateTabCount();
   });
 
   // The toolbar icon reuses the profile tab by changing only the hash (no reload), so listen for it.

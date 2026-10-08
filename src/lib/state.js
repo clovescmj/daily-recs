@@ -86,6 +86,20 @@ export function todaysLists(state, today = todayKey()) {
   return lists;
 }
 
+/**
+ * The list the user is looking at today: the one they picked ({ date, view, tags } saved when they chose), or, if that one
+ * doesn't exist, any other list of today. Used for the numbers on the icon and on the tab.
+ */
+export function activeList(state, picked, today = todayKey()) {
+  if (!state) return null;
+  if (picked && picked.date === today) {
+    const list = picked.view === 'surprise' ? state.surprise : picked.view === 'tags' ? (state.tagLists || {})[tagListKey(picked.tags || [])] : state.today;
+    if (list && list.date === today) return list;
+  }
+  const [first] = todaysLists(state, today);
+  return first ? first.list : null;
+}
+
 /** Album ids on any of today's lists (their cards need the candidate data kept in the pool). */
 export const idsOfTodaysLists = (state, today) => todaysLists(state, today).flatMap(({ list }) => list.ids);
 

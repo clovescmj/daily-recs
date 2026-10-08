@@ -9,6 +9,7 @@ import { registerMessageHandler } from './messages.js';
 import { RETRY_ALARM, enqueue, retryAfterRateLimit, runScan, syncNow, updateBadge } from './jobs.js';
 import { restoreToolbarIcon, startColorSchemeWatcher } from './icon.js';
 import { continueAfterLogin, forgetLoginTab, openMainPage } from './navigation.js';
+import { PICKED_KEY } from '../lib/storage-keys.js';
 import { clearStaleStatus } from './storage.js';
 
 const DAILY_ALARM = 'daily';
@@ -41,4 +42,6 @@ chrome.tabs.onRemoved.addListener(forgetLoginTab);
 // Another device changed the shared taste: merge it.
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes['taste:meta']) enqueue(syncNow);
+  // The user picked another list: the numbers on the icon follow it.
+  if (area === 'local' && changes[PICKED_KEY]) enqueue(updateBadge);
 });

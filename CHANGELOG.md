@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.5
+- The number of new albums on the tab ("daily recs 35 new"), on the toolbar icon and in its menu now follows the list the user is
+  using today (a genre list, Surprise me or Best matches), not only the Best matches list, and it changes when they pick another.
+
 ## 0.4.4
 - The toggle shows the option the user just chose (for example "My tags: ebm") as soon as the list starts loading, instead of
   keeping the previous option highlighted until the list is ready. Same on the opening screen and on the list.
