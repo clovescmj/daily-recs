@@ -5,9 +5,9 @@ export const HEART_FILLED = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42
 export const BLOCK = 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z';
 
 
-/** Circle with a plus: add a song to Liked Songs. Once it is there: the same ring with Bandcamp's own check mark inside. */
+/** Circle with a plus: add a song to Liked Songs. Once it is there: a filled disc with Bandcamp's own check mark cut out of it (filled, like the heart). */
 export const ADD_CIRCLE = 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z';
-export const CHECK_CIRCLE = 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM10.48 16.17L7.13 12.35 8.3 11.34l2.18 2.42 5.23-5.94 1.17 1.02z';
+export const CHECK_CIRCLE = 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM10.25 17.13L6.38 12.72 7.73 11.55l2.52 2.79 6.03-6.84 1.35 1.17z';
 export const wishlistLabel = (on) => (on ? 'Remove from wishlist' : 'Add to wishlist');
 export const saveLabel = (on) => (on ? 'Remove from Liked Songs' : 'Add to Liked Songs');
 export const dislikeLabel = (on) => (on ? 'Show this album again' : "Don't show music like this");
