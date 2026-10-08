@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.7
+- The shuffle button at the top of the page is gone; shuffle is only in the player bar.
+
 ## 0.8.6
 - The shuffle icon is back to the first one (Material "shuffle": straight diagonals and solid arrow heads), on the page and in the player bar.
 

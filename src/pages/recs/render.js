@@ -67,7 +67,6 @@ export function render(state, status) {
   renderStatus(status);
   renderGrid(state, status);
   $('play-all').hidden = !session.hasList;
-  $('shuffle-all').hidden = !session.hasList;
   emit(true);
   if (state && state.wishQueue && state.wishQueue.length) flushWishlistQueue();
 }
