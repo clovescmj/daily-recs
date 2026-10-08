@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.7.3
+- Faster genre lists: when a list comes out short, the genre tags of more candidates are read in steps of 50 (up to 300), and it stops
+  after two steps that found no new album, instead of always reading all 300.
+
 ## 0.7.2
 - Faster lists: the library (collection + wishlist) is no longer read page by page every time. The profile page already says how many
   items there are and which are the newest, so when that is what was saved, the saved copy is used (one request instead of one per 100

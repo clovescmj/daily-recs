@@ -260,7 +260,8 @@ const MIN_SEEDS = 12;               // fewer albums of the genre than this: look
 const SCAN_FOR_SEEDS = 60;          // how many unread albums are read to find them
 const SEED_READS = 60;              // albums of the genre whose "you may also like" is read
 const TASTE_CHECK_FOCUSED = 150;
-const STRICT_TAG_CHECK = 300;       // a list that came out short: the genre tags of this many candidates are read (never more than that)
+const STRICT_TAG_CHECK = 300;       // a list that came out short: the genre tags of up to this many candidates are read (never more than that)
+const STRICT_TAG_STEP = 50;         // ...in steps of this many, and it stops after two steps that found nothing new
 const MAX_TAGS_PER_LIST = 5;
 const MAX_TAG_LISTS = 6;
 
@@ -338,7 +339,12 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
       await readWithProgress(fetchFn, state, more, report, { ...info, picked: more.length }, pacing);
       ids = await pick();
     }
-    if (ids.length < DAILY_COUNT) ids = await pick(STRICT_TAG_CHECK); // short: the genre of more candidates is checked, but the list is never filled with albums that don't match
+    // Short: the genre of more candidates is checked, a few at a time, but the list is never filled with albums that don't match.
+    for (let depth = TASTE_CHECK_FOCUSED + STRICT_TAG_STEP, idle = 0; depth <= STRICT_TAG_CHECK && ids.length < DAILY_COUNT && idle < 2; depth += STRICT_TAG_STEP) {
+      const before = ids.length;
+      ids = await pick(depth);
+      idle = ids.length > before ? 0 : idle + 1;
+    }
     markShown(state, ids);
     state.tagLists[listKey] = { date: today, ids, tags: keys };
     const lists = Object.entries(state.tagLists).filter(([, list]) => list.date === today); // keep the latest few
