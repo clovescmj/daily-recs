@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.7.1
+- Faster lists: the genre tags of a candidate album are remembered (up to 1,500 albums, for 30 days), so the same album is not read again in
+  the next list, the next day or in a genre list. The lists themselves do not change, they only need fewer requests to Bandcamp.
+
 ## 0.7.0
 - Lists built around genres now only hold close matches, for any genre you pick (think of a DJ digging for a sound):
   - the genre must be one of the album's **first three tags**; a tag far down the list no longer counts;

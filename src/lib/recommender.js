@@ -113,11 +113,32 @@ async function readSources(fetchFn, state, sources, onProgress = () => {}, pacin
   }
 }
 
+const TAG_CACHE_MAX = 1500;                     // entries kept (about 80 KB)
+const TAG_CACHE_DAYS = 30;                      // an album's tags are read again after this long, in case the artist edited them
+
+/** Gives the candidates whose tags were read in an earlier run their tags back, without a request. */
+function applyCachedTags(state) {
+  const cutoff = Date.now() - TAG_CACHE_DAYS * 86_400_000;
+  for (const candidate of Object.values(state.pool)) {
+    const entry = !candidate.tags && state.tagCache[candidate.id];
+    if (entry && entry.at >= cutoff) candidate.tags = entry.t ? entry.t.split('|') : [];
+  }
+}
+
+function rememberTags(state, candidate) {
+  state.tagCache[candidate.id] = { t: candidate.tags.join('|'), at: Date.now() };
+  const ids = Object.keys(state.tagCache);
+  if (ids.length <= TAG_CACHE_MAX) return;
+  const oldest = ids.sort((a, b) => state.tagCache[a].at - state.tagCache[b].at).slice(0, ids.length - TAG_CACHE_MAX);
+  for (const id of oldest) delete state.tagCache[id];
+}
+
 /**
  * Reads the genre tags of the best-ranked candidates so the final order can take the user's taste into account.
  * Tags are optional: a page that fails to load just keeps its score without them.
  */
 async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
+  applyCachedTags(state);
   const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => !candidate.tags && isBandcampUrl(candidate.url));
   const total = queue.length;
   let done = 0;
@@ -127,6 +148,7 @@ async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
       const candidate = queue.shift();
       try {
         candidate.tags = parseTags(await fetchText(fetchFn, candidate.url, httpOptions(pacing)));
+        rememberTags(state, candidate);
         consecutiveFailures = 0;
       } catch {
         consecutiveFailures++;

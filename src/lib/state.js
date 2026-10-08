@@ -18,6 +18,7 @@ export const emptyState = () => ({
   shownArtistsToday: [],
   shownDate: '',         // the day shownToday refers to
   liked: [],             // derived from `votes` (albums the user gave a thumbs up)
+  tagCache: {},          // albumId -> { t: "tag|tag", at: ms }: the genre tags of candidates already read (they don't change, so they are not read twice)
   focusDislikes: {},     // albumId -> { keys, tags }: albums hidden from a genre list (the genres selected, and the album's own tags)
   wishlisted: [],        // albums the user put in the Bandcamp wishlist from the extension (kept on this computer)
   dismissed: [],         // derived from `votes` (albums marked "don't show again")
@@ -42,6 +43,7 @@ export const emptyState = () => ({
 export function migrateState(state) {
   migrateTaste(state);
   state.focusDislikes ||= {};
+  state.tagCache ||= {};
   state.wishlisted ||= [...(state.liked || [])]; // before the two were separated, a like was also a wishlist entry
   normalizeTasteTags(state);
   if (state.owned && state.owned.count !== undefined) { // legacy names

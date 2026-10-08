@@ -148,6 +148,33 @@ describe('resilience', () => {
   });
 });
 
+describe('tags of candidates', () => {
+  test('are read once: the next list of the day finds them in the cache', async () => {
+    const ctx = await setup({ libraryCount: 120, wishlistCount: 0, candidateCount: 300, recsPerPage: 10, candidateTags: (i) => (i % 2 ? ['pop'] : ['ebm']) });
+    await ctx.run();
+    await ctx.run({ mode: 'surprise' });
+    const reads = {};
+    for (const call of ctx.fake.calls) if (/cand\d+\.bandcamp\.com/.test(call.url)) reads[call.url] = (reads[call.url] || 0) + 1;
+    assert.ok(Object.keys(reads).length > 100, 'candidates were checked');
+    assert.ok(Object.values(reads).every((n) => n === 1), 'and none of them twice');
+    const state = await ctx.store.load();
+    assert.ok(Object.keys(state.tagCache).length > 100);
+  });
+
+  test('are read again after a month, and the cache does not grow without limit', async () => {
+    const ctx = await setup({ libraryCount: 60, wishlistCount: 0, candidateCount: 200, recsPerPage: 8 });
+    await ctx.run();
+    const state = await ctx.store.load();
+    const ids = Object.keys(state.tagCache);
+    state.tagCache[ids[0]].at = Date.now() - 31 * 86_400_000;
+    for (let i = 0; i < 1600; i++) state.tagCache[`x${i}`] = { t: 'a', at: Date.now() - i };
+    await ctx.store.save(state);
+    await ctx.run({ mode: 'surprise', force: true });
+    const after = await ctx.store.load();
+    assert.ok(Object.keys(after.tagCache).length <= 1500);
+  });
+});
+
 describe('lists built around genres the user picked', () => {
   const metalOptions = {
     libraryCount: 120, wishlistCount: 0, candidateCount: 600,
