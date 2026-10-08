@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.14
+- The icons (heart, +, ⊘ and the buttons of the player bar and of its lists) no longer get a grey background when clicked. The focus ring
+  for keyboard users is kept.
+
 ## 0.14.13
 - Player bar: the "·" after the heart is closer to the icons on both sides (7 px instead of 12 px).
 

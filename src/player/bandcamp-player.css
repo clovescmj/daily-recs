@@ -148,3 +148,9 @@
 #dr-player .pb-ico { width: 16px; height: 16px; fill: currentColor; flex: none; display: block; }
 #dr-player .pb-slot { display: inline-flex; }
 @media (max-width: 1150px) { #dr-player .pb-label { display: none; } } /* narrow window: the icon says it, the title shows the name */
+
+/* No grey flash or box on the icons when they are clicked (the keyboard focus ring stays) */
+#dr-player a, #dr-player [role="button"] { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+#dr-player .collect a:active, #dr-player .collect a:focus, #dr-player .x-btn:active, #dr-player .x-btn:focus,
+#dr-player .qact a:active, #dr-player .qact a:focus, #dr-player .vol-icon-wrapper:active, #dr-player .vol-icon-wrapper:focus { background: transparent; box-shadow: none; }
+#dr-player .collect a:focus:not(:focus-visible), #dr-player .x-btn:focus:not(:focus-visible), #dr-player .qact a:focus:not(:focus-visible) { outline: none; }

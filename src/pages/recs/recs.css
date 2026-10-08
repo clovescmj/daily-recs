@@ -213,3 +213,8 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .recs-page .page-title { font-size: 18px; }
 .recs-page .page-header { margin-bottom: 14px; }             /* 16px of padding below the subtitle stays */
 .recs-page .page-footer { margin-top: 20px; }
+
+/* No grey flash or box on the icons of a card when they are clicked (the keyboard focus ring stays) */
+.album-actions a { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.album-actions a:active, .album-actions a:focus { background: transparent; box-shadow: none; }
+.album-actions a:focus:not(:focus-visible) { outline: none; }
