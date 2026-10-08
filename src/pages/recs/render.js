@@ -1,5 +1,5 @@
 // Draws the page from the stored state and the run status.
-import { tagListKey, todayKey } from '../../lib/state.js';
+import { hiddenIn, tagListKey, todayKey } from '../../lib/state.js';
 import { cardHtml, findCard, paintDislike, paintWish } from './cards.js';
 import { $ } from './dom.js';
 import { emit, markPlaying } from './player.js';
@@ -27,16 +27,15 @@ export function listFor(state, view, keys = []) {
 /** The list on screen. */
 export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' ? null : listFor(state, 'best'));
 
-/** Albums of the current list that should be on the page: not dismissed (unless dismissed during this visit). */
+/** Albums of the current list that should be on the page: not hidden (unless hidden during this visit). */
 function visibleAlbumIds(state, list) {
-  const dismissed = new Set(state.dismissed || []);
-  return list.ids.filter((id) => !dismissed.has(id) || session.dislikedThisVisit.has(id));
+  return list.ids.filter((id) => !hiddenIn(state, id, list) || session.dislikedThisVisit.has(id));
 }
 
 function renderGrid(state, status) {
   const list = currentList(state);
   const ids = list ? visibleAlbumIds(state, list) : [];
-  session.hasList = Boolean(list) && list.ids.some((id) => !(state.dismissed || []).includes(id));
+  session.hasList = Boolean(list) && list.ids.some((id) => !hiddenIn(state, id, list));
   session.wished = new Set(state ? state.wishlisted || [] : []);
 
   if (!list) { setEmpty(status.running || status.error ? '' : 'Getting your recommendations ready…'); return; }

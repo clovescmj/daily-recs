@@ -37,7 +37,12 @@ export function parseMessage(raw) {
     case MSG.OPEN_MAIN:
       return { type: raw.type };
     case MSG.FEEDBACK:
-      return id && FEEDBACK_KINDS.includes(raw.kind) ? { type: raw.type, id, kind: raw.kind } : null;
+    {
+      if (!id || !FEEDBACK_KINDS.includes(raw.kind)) return null;
+      // a dislike made inside a genre list says which genres were selected: it is then scoped to them
+      const tags = Array.isArray(raw.tags) ? raw.tags.filter((tag) => typeof tag === 'string' && /^[\p{L}\p{N}]{1,40}$/u.test(tag)).slice(0, 5) : [];
+      return tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
+    }
     case MSG.WISHLIST_OP:
     case MSG.WISHLIST_QUEUE: {
       const bandId = toNumericId(raw.bandId);

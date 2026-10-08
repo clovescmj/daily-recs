@@ -85,9 +85,13 @@ export function rankedCandidates(state, exclude = {}) {
   const seenArtists = new Set([...(state.shownArtists || []), ...(exclude.artists || [])]);
   // "Don't show music like this": the artist of a hidden album, and the albums Bandcamp pairs with it, never come back
   const avoided = new Set();
-  for (const entry of Object.values(state.avoid || {})) {
-    if (entry.artistId) seenArtists.add(entry.artistId);
-    for (const id of entry.near) avoided.add(id);
+  const forget = (entry) => { if (entry.artistId) seenArtists.add(entry.artistId); for (const id of entry.near) avoided.add(id); };
+  Object.values(state.avoid || {}).forEach(forget);
+  // hidden from a genre list: the same, but only when ranking a list of a genre they share (`exclude.keys`)
+  for (const [id, entry] of Object.entries(state.scoped || {})) {
+    if (!(exclude.keys || []).some((key) => entry.keys.includes(key))) continue;
+    seen.add(id);
+    forget(entry);
   }
   return Object.values(state.pool)
     .filter((c) => !seen.has(c.id) && !avoided.has(c.id) && !seenArtists.has(c.artistId) && !isOwned(c, state.owned))
@@ -219,7 +223,7 @@ export function markShown(state, ids) {
  */
 export function pickFocused(state, count, keys, exclude, { allowUnknown = true } = {}) {
   const wanted = new Set(keys.map(normalizeTag));
-  const ranked = rankedCandidates(state, exclude);
+  const ranked = rankedCandidates(state, { ...exclude, keys: [...wanted] });
   // The genre must be one of the album's first tags: a tag far down the list is incidental, and a list for a DJ needs close matches.
   // What comes only from albums the user doesn't own (`hop`, see recommender.js) goes after what comes from theirs.
   const matches = (candidate) => (candidate.tags || []).slice(0, FOCUS_PRIMARY_TAGS).map(normalizeTag).filter((tag) => wanted.has(tag)).length;

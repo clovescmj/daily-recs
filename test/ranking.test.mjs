@@ -176,6 +176,16 @@ describe('how much each album counts', () => {
     assert.deepEqual(pickBest(state, 4), ['c'], 'the artist x and the neighbour b are out');
   });
 
+  test('hidden from a genre list: out of lists of that genre (album, artist, neighbours), still there in lists of others', () => {
+    const tagged = (id, artist, tags) => ({ ...candidate(id, artist, { u: 3 }), tags });
+    const state = stateWith([tagged('a', 'x', ['ebm']), tagged('b', 'y', ['ebm']), tagged('c', 'z', ['ebm']), tagged('d', 'x', ['ebm', 'metal'])]);
+    state.scoped = { 99: { keys: ['ebm'], artistId: 'x', near: ['b'] } };
+    assert.deepEqual(pickFocused(state, 4, ['ebm']), ['c'], 'artist x and the neighbour b are out of the ebm list');
+    assert.deepEqual(pickFocused(state, 4, ['ebm', 'industrial']).sort(), ['c'], 'and of a list that shares ebm');
+    assert.ok(pickFocused(state, 4, ['metal']).includes('d'), 'but not of a list of another genre');
+    assert.deepEqual(pickBest(state, 4).sort(), ['a', 'b', 'c', 'd'], 'nor of the daily lists');
+  });
+
   test('in a genre list, an album recommended by more of the user\'s albums comes first', () => {
     const one = { ...candidate('a', 'a', { u: 3 }), tags: ['ebm'] };
     const three = { ...candidate('b', 'b', { u: 3, v: 3, w: 3 }), tags: ['ebm'] };

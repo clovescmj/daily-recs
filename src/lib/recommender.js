@@ -454,6 +454,7 @@ async function rememberProfileUrl(fetchFn, state, store) {
 // Feedback: like / unlike / dislike / undislike
 // ---------------------------------------------------------------------------------------------------------------------
 
+const scopeKeys = (tags) => [...new Set((tags || []).map(normalizeTag).filter(Boolean))];
 const AVOID_MAX = 300;      // hidden albums whose neighbours are remembered (the oldest are forgotten first)
 
 /**
@@ -475,7 +476,7 @@ async function neighboursOf(fetchFn, candidate, tuning) {
  * wishlist (the heart) is remembered apart from the like, and it is read the same way.
  * kind: 'like' | 'unlike' | 'dislike' | 'undislike' | 'wish' | 'unwish'
  */
-export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning }) {
+export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], tuning }) {
   const state = await store.load();
   const candidate = state && state.pool[id];
   if (!candidate) return state;
@@ -516,7 +517,15 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning })
     recordVote(state, id, VOTE.UNLIKE); // tombstone, so the removal also spreads to other devices
     adjust(state.sourceLikes, -1, 2);
     rebuildVoteLists(state);
+  } else if (kind === 'dislike' && !state.dismissed.includes(id) && scopeKeys(tags).length) {
+    // Hidden from a genre list: it holds only for lists of those genres. The album stays out of the votes (so it can show up elsewhere).
+    const before = state.scoped[id];
+    const entry = { keys: scopeKeys([...(before ? before.keys : []), ...tags]), artistId: candidate.artistId || '', near: before ? before.near : [] };
+    state.scoped[id] = entry;
+    await store.save(state);
+    if (!before) entry.near = await neighboursOf(fetchFn, candidate, tuning);
   } else if (kind === 'dislike' && !state.dismissed.includes(id)) {
+    delete state.scoped[id]; // hidden everywhere now: that includes what was hidden from one genre only
     if (state.liked.includes(id)) adjust(state.sourceLikes, -1, 2); // a dislike replaces the like
     recordVote(state, id, VOTE.DISLIKE);
     adjust(state.sourceDislikes, +1);
@@ -524,14 +533,18 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning })
     state.avoid[id] = { artistId: candidate.artistId || '', near: [] }; // the artist stops coming at once; the neighbours are found next
     await store.save(state);
     state.avoid[id].near = await neighboursOf(fetchFn, candidate, tuning);
+  } else if (kind === 'undislike' && state.scoped[id]) {
+    delete state.scoped[id];
   } else if (kind === 'undislike' && state.dismissed.includes(id)) {
     recordVote(state, id, VOTE.UNDISLIKE); // back to neutral: only undoes the points the dislike gave
     adjust(state.sourceDislikes, -1);
     delete state.avoid[id];
     rebuildVoteLists(state);
   }
-  const hidden = Object.keys(state.avoid);
-  for (const old of hidden.slice(0, Math.max(0, hidden.length - AVOID_MAX))) delete state.avoid[old];
+  for (const book of [state.avoid, state.scoped]) {
+    const hidden = Object.keys(book);
+    for (const old of hidden.slice(0, Math.max(0, hidden.length - AVOID_MAX))) delete book[old];
+  }
   await store.save(state);
   return state;
 }

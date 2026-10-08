@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.9.1
+- Hiding an album from inside a genre list now holds only for lists of those genres: the album, its artist and the albums Bandcamp pairs
+  with it stay out of lists that share one of those genres, but can still show up in the daily lists and in lists of other genres. The
+  taste thermometer is not touched either. Hiding an album anywhere else works for every list, as before (and hiding it again outside a
+  genre list makes it global).
+
 ## 0.9.0
 - Genre lists are less strict, because they were coming out too short:
   - the genre may be among the album's **first four** tags (it was three);

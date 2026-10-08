@@ -19,6 +19,7 @@ export const emptyState = () => ({
   shownDate: '',         // the day shownToday refers to
   liked: [],             // derived from `votes` (albums the user gave a thumbs up)
   tagCache: {},          // albumId -> { t: "tag|tag", at: ms }: the genre tags of candidates already read (they don't change, so they are not read twice)
+  scoped: {},            // albumId -> { keys, artistId, near }: albums hidden from a genre list, hidden again only in lists of those genres
   avoid: {},             // albumId -> { artistId, near: [ids] }: albums hidden with "don't show music like this", and the albums Bandcamp pairs with them
   wishlisted: [],        // albums the user put in the Bandcamp wishlist from the extension (kept on this computer)
   dismissed: [],         // derived from `votes` (albums marked "don't show again")
@@ -43,6 +44,7 @@ export const emptyState = () => ({
 export function migrateState(state) {
   migrateTaste(state);
   state.avoid ||= {};
+  state.scoped ||= {};
   delete state.focusDislikes;
   state.tagCache ||= {};
   state.wishlisted ||= [...(state.liked || [])]; // before the two were separated, a like was also a wishlist entry
@@ -105,6 +107,13 @@ export function activeList(state, picked, today = todayKey()) {
   }
   const [first] = todaysLists(state, today);
   return first ? first.list : null;
+}
+
+/** True when the album must not show in `list`: hidden everywhere, or hidden from a genre list that shares a genre with this one. */
+export function hiddenIn(state, id, list) {
+  if ((state.dismissed || []).includes(id)) return true;
+  const entry = (state.scoped || {})[id];
+  return Boolean(entry && list && list.tags && entry.keys.some((key) => list.tags.includes(key)));
 }
 
 /** Album ids on any of today's lists (their cards need the candidate data kept in the pool). */

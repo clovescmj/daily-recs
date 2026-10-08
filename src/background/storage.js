@@ -1,7 +1,7 @@
 // Storage adapter for the service worker. The recommender talks to this through the `store` interface
 // (see recommender.js); the pages read the same keys directly.
 import { OPENED_KEY, PICKED_KEY, STATE_KEY, STATUS_KEY } from '../lib/storage-keys.js';
-import { activeList, todayKey } from '../lib/state.js';
+import { activeList, hiddenIn, todayKey } from '../lib/state.js';
 
 export const store = {
   async load() {
@@ -49,6 +49,6 @@ export async function todaySummary() {
   const [state, picked] = [await store.load(), (await chrome.storage.local.get(PICKED_KEY))[PICKED_KEY]];
   const list = activeList(state, picked);
   if (!list) return { total: 0, unopened: 0 };
-  const gone = new Set([...(state.dismissed || []), ...(await loadOpened()).ids]);
-  return { total: list.ids.length, unopened: list.ids.filter((id) => !gone.has(id)).length };
+  const opened = new Set((await loadOpened()).ids);
+  return { total: list.ids.length, unopened: list.ids.filter((id) => !opened.has(id) && !hiddenIn(state, id, list)).length };
 }

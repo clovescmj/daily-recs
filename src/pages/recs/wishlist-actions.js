@@ -47,8 +47,9 @@ export async function dislikeAlbum(id) {
   if (card) paintDislike(card, true);
   // Nothing below waits for the extension's background worker: it may be busy with a long job (a scan, a list being built) and
   // would only answer when it is done, and the music has to skip right now. The requests keep their order.
-  // "Don't show music like this": the album, its artist and what is closely tied to it stop coming. The wishlist is not touched: only the heart changes it.
-  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike' }).catch(() => undefined);
+  // "Don't show music like this": the album, its artist and what is closely tied to it stop coming. Inside a genre list that holds only for lists
+  // of those genres (the genres go along); anywhere else it holds everywhere. The wishlist is not touched: only the heart changes it.
+  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) }).catch(() => undefined);
   const replacement = requestReplacement();
   if (wasPlaying) {
     continueAfterRemoval(nextId);

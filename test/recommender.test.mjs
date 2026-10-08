@@ -470,6 +470,29 @@ describe('feedback', () => {
     assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0));
   });
 
+  test('hidden from a genre list, an album stays out only of lists of those genres; it still counts as itself elsewhere', async () => {
+    const ctx = await withList();
+    const hidden = ctx.state.pool[ctx.id];
+    let state = await applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id: ctx.id, kind: 'dislike', tags: ['ebm'], tuning: TUNING });
+    assert.deepEqual(state.dismissed, [], 'no global vote');
+    assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0), 'the thermometer is not touched');
+    assert.deepEqual(state.avoid, {});
+    assert.equal(state.scoped[ctx.id].artistId, hidden.artistId);
+    assert.deepEqual(state.scoped[ctx.id].keys, ['ebm']);
+    assert.ok(state.scoped[ctx.id].near.length > 0);
+    state = await applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id: ctx.id, kind: 'undislike', tuning: TUNING });
+    assert.deepEqual(state.scoped, {}, 'undoing it forgets it');
+  });
+
+  test('hiding the same album outside a genre list makes it global, and what was hidden from one genre is absorbed', async () => {
+    const ctx = await withList();
+    await applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id: ctx.id, kind: 'dislike', tags: ['ebm'], tuning: TUNING });
+    const state = await apply(ctx, 'dislike');
+    assert.deepEqual(state.dismissed, [ctx.id]);
+    assert.deepEqual(state.scoped, {});
+    assert.ok(state.avoid[ctx.id]);
+  });
+
   test('a hidden album is never replaced by its neighbours or by another album of its artist', async () => {
     const ctx = await withList();
     let state = await apply(ctx, 'dislike');

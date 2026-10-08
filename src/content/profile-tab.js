@@ -63,9 +63,11 @@
     }
     list = list || lists[0];
     if (!list) return 0;
-    const gone = new Set(stored.dismissed || []);
-    if (opened && opened.date === today) opened.ids.forEach((id) => gone.add(id));
-    return list.ids.filter((id) => !gone.has(id)).length;
+    const gone = new Set(opened && opened.date === today ? opened.ids : []);
+    const dismissed = new Set(stored.dismissed || []);
+    // hidden from a genre list: hidden again only in lists that share a genre with that one (same rule as hiddenIn in src/lib/state.js)
+    const hidden = (id) => dismissed.has(id) || Boolean((stored.scoped || {})[id] && list.tags && stored.scoped[id].keys.some((key) => list.tags.includes(key)));
+    return list.ids.filter((id) => !gone.has(id) && !hidden(id)).length;
   }
 
   const collectionGrids = () => [...(tabsContainer.closest('#grids') || document).querySelectorAll('.grid')]

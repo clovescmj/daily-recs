@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { SCHEMA_VERSION, dequeueWishlistOp, emptyState, migrateState, queueWishlistOp, todayKey } from '../src/lib/state.js';
+import { SCHEMA_VERSION, dequeueWishlistOp, emptyState, hiddenIn, migrateState, queueWishlistOp, todayKey } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { wishlistOpInPage } from '../src/background/wishlist-in-page.js';
 
@@ -118,4 +118,16 @@ test('activeList: the list the user picked today, or any list of today', () => {
   assert.deepEqual(activeList(state, { date: '2026-10-07', view: 'tags', tags: ['x'] }, '2026-10-08').ids, ['1'], 'a choice from another day is ignored');
   assert.equal(activeList(state, null, '2026-10-09'), null, 'nothing from yesterday');
   assert.equal(activeList(null, null), null);
+});
+
+describe('hiddenIn', () => {
+  test('an album hidden everywhere is hidden in every list; one hidden from a genre list only in lists that share a genre with it', () => {
+    const state = emptyState();
+    state.dismissed = ['1'];
+    state.scoped = { 2: { keys: ['ebm', 'industrial'], artistId: 'x', near: [] } };
+    assert.ok(hiddenIn(state, '1', { tags: ['metal'] }) && hiddenIn(state, '1', {}));
+    assert.ok(hiddenIn(state, '2', { tags: ['industrial'] }));
+    assert.ok(!hiddenIn(state, '2', { tags: ['metal'] }));
+    assert.ok(!hiddenIn(state, '2', {}), 'not in the daily lists');
+  });
 });
