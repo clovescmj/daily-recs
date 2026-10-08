@@ -10,7 +10,7 @@
 import {
   NotLoggedInError, RateLimitedError, HttpError, fetchText, getFan, isBandcampUrl, loadLibrary, normalizeTag, parseRecommendations, parseTagLabels, parseTags, sleep,
 } from './bandcamp.js';
-import { addTasteTags, createSourceWeigher, recordSourceRead, tagsOfAlbum } from './taste-profile.js';
+import { GENERIC_GENRES, addTasteTags, createSourceWeigher, recordSourceRead, tagsOfAlbum } from './taste-profile.js';
 import { hashSource, recordVote, rebuildVoteLists, VOTE } from './taste-sync.js';
 import { DAILY_COUNT, emptyState, idsOfTodaysLists, migrateState, rollShownOver, tagListKey, todayKey } from './state.js';
 import { markShown, pickBest, pickFocused, pickSources, pickSurprise, rankedCandidates } from './ranking.js';
@@ -308,7 +308,7 @@ async function readHop(fetchFn, state, sources, report, extra, pacing) {
  */
 export async function refreshTags({ fetch: fetchFn, store, tags, force = false, now = new Date(), tuning }) {
   const pacing = withDefaults(tuning);
-  const keys = [...new Set((tags || []).map(normalizeTag).filter(Boolean))].slice(0, MAX_TAGS_PER_LIST).sort();
+  const keys = [...new Set((tags || []).map(normalizeTag).filter((key) => key && !GENERIC_GENRES.has(key)))].slice(0, MAX_TAGS_PER_LIST).sort();
   const state = migrateState((await store.load()) || emptyState());
   if (!keys.length) return state;
   const today = todayKey(now);

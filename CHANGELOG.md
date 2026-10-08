@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.9.2
+- Umbrella genres (the ones that cover many sub-genres: electronic, rock, pop, ambient, folk, jazz, classical, hip hop, dance, experimental,
+  indie...) are ignored: they are not offered in "My tags", typing one does not offer to add it, a list is never built around one (or only
+  with the specific genres picked next to it), and they no longer count when judging how well an album fits your taste.
+
 ## 0.9.1
 - Hiding an album from inside a genre list now holds only for lists of those genres: the album, its artist and the albums Bandcamp pairs
   with it stay out of lists that share one of those genres, but can still show up in the daily lists and in lists of other genres. The

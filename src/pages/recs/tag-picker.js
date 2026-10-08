@@ -1,7 +1,7 @@
 // The genre picker: scanned genres as check boxes (with how many of the user's albums have each), and a field to type one that
 // isn't listed yet. Used in the pop-up of the "My tags" button and, inline, on the opening screen.
 import { normalizeTag } from '../../lib/bandcamp.js';
-import { scanProgress, selectableTags } from '../../lib/taste-profile.js';
+import { GENERIC_GENRES, scanProgress, selectableTags } from '../../lib/taste-profile.js';
 import { esc, formatNumber } from './dom.js';
 import { session } from './session.js';
 
@@ -45,7 +45,7 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
       .slice(0, MAX_LISTED_TAGS)
       .map((tag) => ({ key: tag.key, label: tag.label, count: tag.count }));
     for (const key of selected) if (!rows.some((row) => row.key === key)) rows.unshift({ key, label: labelOf(state, key), count: null }); // ticked, not scanned yet
-    if (typed && typedKey && !known.some((tag) => tag.key === typedKey) && !rows.some((row) => row.key === typedKey)) {
+    if (typed && typedKey && !GENERIC_GENRES.has(typedKey) && !known.some((tag) => tag.key === typedKey) && !rows.some((row) => row.key === typedKey)) {
       rows.push({ key: typedKey, label: typed.toLowerCase(), count: null, typed: true });
     }
     // A genre that was typed but isn't in the scanned list yet is added with "+ Add": it then shows up ticked, like the others.

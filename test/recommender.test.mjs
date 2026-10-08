@@ -242,6 +242,15 @@ describe('lists built around genres the user picked', () => {
     assert.ok(ids.every((id) => candidateIndex(state, id) % 4 === 0), 'albums with the genre only as their 5th tag stay out');
   });
 
+  test('a genre that is too broad (electronic, rock, ambient...) is ignored: no list for it, and it does not count in a list with others', async () => {
+    const { store, runTags } = await setupTags();
+    const only = await runTags({ tags: ['electronic'] });
+    assert.deepEqual(only.tagLists, {}, 'nothing to build');
+    const mixed = await runTags({ tags: ['rock', 'metal'] });
+    assert.deepEqual(Object.keys(mixed.tagLists), ['metal'], 'only the specific one is kept');
+    assert.equal(store.getStatus().error, undefined);
+  });
+
   test('no list, and a clear reason, when none of the user\'s albums has the genre', async () => {
     const { store, runTags } = await setupTags({ ...metalOptions, sourceTags: () => ['pop'] });
     const state = await runTags();

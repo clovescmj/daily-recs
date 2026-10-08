@@ -63,9 +63,10 @@ export function addTasteTags(state, tags, weight) {
 export function tagFit(state, rawTags) {
   const profile = state.tasteTags;
   if (!profile || !rawTags || !rawTags.length) return null;
-  const tags = rawTags.map(normalizeTag);
+  const tags = rawTags.map(normalizeTag).filter((tag) => !GENERIC_GENRES.has(tag)); // "electronic" says nothing about which album fits
+  if (!tags.length) return null;
   let norm = 0;
-  for (const weight of Object.values(profile)) norm += weight * weight;
+  for (const [tag, weight] of Object.entries(profile)) if (!GENERIC_GENRES.has(tag)) norm += weight * weight;
   if (!norm) return null;
   let dot = 0;
   for (const tag of tags) dot += profile[tag] || 0;
@@ -138,6 +139,15 @@ export function recordSourceRead(state, url, tags, weight) {
 // names of labels and artists. These stay in the taste profile (they do no harm there), they just aren't offered as genres.
 // ---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * Umbrella genres, each one covering many sub-genres ("electronic" covers half of Bandcamp): never offered, never searched for, and
+ * ignored when judging fit. "metal" is not here on purpose: it is one of the genres people pick to listen to.
+ */
+export const GENERIC_GENRES = new Set([
+  'electronic', 'electronica', 'experimental', 'alternative', 'instrumental', 'indie', 'rock', 'pop', 'ambient', 'folk', 'jazz',
+  'classical', 'hiphop', 'rap', 'dance', 'world', 'soundtrack', 'other',
+]);
+
 const NOT_GENRES = new Set([
   'cassette', 'cassettes', 'tape', 'tapes', 'vinyl', 'lp', 'ep', 'cd', 'cds', 'digital', 'single', 'singles', 'album', 'albums',
   'compilation', 'compilations', 'split', 'bandcamp', 'free', 'freedownload', 'limited', 'exclusive', 'preorder', 'new', 'newrelease',
@@ -170,7 +180,7 @@ export function selectableTags(state) {
   }
   return knownTags(state, MIN_ALBUMS).filter(({ key }) => {
     const entry = stats[key];
-    return !NOT_GENRES.has(key) && !/^(19|20)\d\d$/.test(key)
+    return !NOT_GENRES.has(key) && !GENERIC_GENRES.has(key) && !/^(19|20)\d\d$/.test(key)
       && entry.primary / entry.albums >= MIN_PRIMARY_SHARE
       && !(entry.named >= 2 && entry.named / entry.albums >= NAME_SHARE);
   });
