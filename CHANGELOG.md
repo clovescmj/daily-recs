@@ -3,6 +3,14 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.9.0
+- Genre lists are less strict, because they were coming out too short:
+  - the genre may be among the album's **first four** tags (it was three);
+  - when a list still has fewer than **20** albums, it looks one step further: at the albums of that genre that Bandcamp recommended
+    (read in batches of 40, up to three times). They come after the albums that come straight from yours, they only need to carry the
+    genre, and their tags don't enter your taste profile.
+- A list with 20 or more albums is still not filled up to 50 with albums that don't match.
+
 ## 0.8.8
 - In the player bar, the name of the album and the artist are underlined when you hover over them (both together, like on the cards).
 

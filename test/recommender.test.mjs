@@ -202,28 +202,44 @@ describe('lists built around genres the user picked', () => {
     assert.ok(state.today.ids.every((id) => state.pool[id]), 'the best list keeps its card data');
   });
 
-  test('a list is never filled with albums that do not match: with few albums of the genre it is shorter', async () => {
+  test('with very few albums of the genre it looks one step further, to albums Bandcamp recommended, up to a small minimum', async () => {
     const { store, runTags } = await setupTags({
-      libraryCount: 40, wishlistCount: 0, candidateCount: 600, recsPerPage: 6,
+      libraryCount: 40, wishlistCount: 0, candidateCount: 600, recsPerPage: 5,
       sourceTags: (n) => (n % 13 === 0 ? ['metal'] : ['pop']),                    // 4 metal albums in 40
       candidateTags: (i) => (i % 2 === 0 ? ['metal'] : ['pop']),
     });
     const state = await runTags();
     const ids = state.tagLists.metal.ids;
-    assert.ok(ids.length > 0 && ids.length < DAILY_COUNT, `got ${ids.length}`);
+    assert.ok(ids.length >= 20, `got ${ids.length}`);
     assert.ok(ids.every((id) => candidateIndex(state, id) % 2 === 0), 'only metal albums');
+    const hops = ids.map((id) => Boolean(state.pool[id].hop));
+    assert.ok(hops.some(Boolean), 'some come from the recommended ones');
+    assert.equal(hops.indexOf(true), hops.length - hops.filter(Boolean).length, 'and they come last');
+    assert.ok(Object.keys(state.albumTags).length <= 40, 'their tags did not enter the taste profile');
     assert.equal(store.getStatus().error, undefined);
   });
 
-  test('the genre must be among the first three tags of the album', async () => {
+  test('a list with enough albums is not filled up to 50 with albums that do not match', async () => {
+    const { runTags } = await setupTags({
+      libraryCount: 120, wishlistCount: 0, candidateCount: 400, recsPerPage: 8,
+      sourceTags: (n) => (n % 4 === 0 ? ['metal'] : ['pop']),
+      candidateTags: (i) => (i % 20 === 0 ? ['metal'] : ['pop']),                 // few metal candidates
+    });
+    const state = await runTags();
+    const ids = state.tagLists.metal.ids;
+    assert.ok(ids.length > 0 && ids.length < 50);
+    assert.ok(ids.every((id) => candidateIndex(state, id) % 20 === 0), 'only metal albums');
+  });
+
+  test('the genre must be among the first four tags of the album', async () => {
     const { runTags } = await setupTags({
       ...metalOptions,
-      candidateTags: (i) => (i % 2 === 0 ? (i % 4 === 0 ? ['metal'] : ['pop', 'rock', 'indie', 'metal']) : ['pop']), // half of the metal ones have it 4th
+      candidateTags: (i) => (i % 2 === 0 ? (i % 4 === 0 ? ['metal'] : ['pop', 'rock', 'indie', 'folk', 'metal']) : ['pop']), // half of the metal ones have it 5th
     });
     const state = await runTags();
     const ids = state.tagLists.metal.ids;
     assert.ok(ids.length > 0);
-    assert.ok(ids.every((id) => candidateIndex(state, id) % 4 === 0), 'albums with the genre only as their 4th tag stay out');
+    assert.ok(ids.every((id) => candidateIndex(state, id) % 4 === 0), 'albums with the genre only as their 5th tag stay out');
   });
 
   test('no list, and a clear reason, when none of the user\'s albums has the genre', async () => {
