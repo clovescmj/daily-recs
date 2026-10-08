@@ -40,7 +40,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="like" href="#" title="Add to wishlist and see more like this" aria-label="Add to wishlist and see more like this">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="dislike" href="#" title="Don't show this album again" aria-label="Don't show this album again">${svg(P.block, 'ci', '', 'Don\'t show this album again')}</a><span class="dot">·</span><a class="goto" target="_blank" rel="noopener" aria-label="Go to album on Bandcamp">go to album</a></div></div>
+          <div class="collect"><a class="like" href="#" title="Add to wishlist and see more like this" aria-label="Add to wishlist and see more like this">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="dislike" href="#" title="Don't show this album again" aria-label="Don't show this album again">${svg(P.block, 'ci', '', 'Don\'t show this album again')}</a><a class="goto" target="_blank" rel="noopener" aria-label="Go to album on Bandcamp">go to album</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>

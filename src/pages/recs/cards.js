@@ -23,7 +23,7 @@ export function cardHtml(album, { liked, disliked }) {
       <div class="album-actions">
         <a href="#" class="action-wishlist${liked ? ' is-on' : ''}" data-like title="${wishlistText}" aria-label="${wishlistText}: ${title}">${labelledIcon(liked ? HEART_FILLED : HEART, wishlistText)}</a>
         <a href="#" class="action-dislike${disliked ? ' is-on' : ''}" data-dislike title="${dislikeText}" aria-label="${dislikeText}: ${title}">${labelledIcon(disliked ? ADD_CIRCLE : BLOCK, dislikeText)}</a>
-        <span class="action-sep">·</span><a href="${url}" target="_blank" rel="noopener" data-open aria-label="Go to album ${title} on Bandcamp">go to album</a>
+        <a class="action-go" href="${url}" target="_blank" rel="noopener" data-open aria-label="Go to album ${title} on Bandcamp">go to album</a>
       </div>
     </div>
   </article>`;

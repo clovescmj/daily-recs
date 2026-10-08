@@ -61,11 +61,11 @@
 #dr-player .collect a:hover { text-decoration: underline; }
 #dr-player .collect a { display: inline-flex; align-items: center; vertical-align: middle; }
 #dr-player .collect .ci { width: 16px; height: 16px; fill: #8a8f91; display: block; }
-#dr-player .collect .like { margin-right: 8px; }
+#dr-player .collect .like { margin-right: 10px; } /* same spacing as the album cards */
 #dr-player .collect .like:hover .ci { fill: rgb(0,161,198); }
 #dr-player .collect .dislike:hover .ci { fill: #d64541; } /* dislike: red on hover too */
 #dr-player .collect .like.on .ci, #dr-player .collect .like.on:hover .ci { fill: #f7931e; }
-#dr-player .collect .dot { font-size: 12px; color: #999; padding: 0 .25em; }
+#dr-player .collect .goto { margin-left: 10px; } /* same spacing as the album cards (no dot between them) */
 
 
 /* extras + volume */
