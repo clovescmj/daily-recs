@@ -63,8 +63,8 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .play-all-icon { box-sizing: content-box; /* the page-wide border-box would squash the two pause bars into one */ width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 15px solid var(--gray700); margin-left: 3px; }
 .shuffle-all { color: var(--gray700); }
 .shuffle-all.is-on { color: var(--blue400); border-color: var(--blue400); }
-/* The shuffle of Bandcamp's app: straight cut line ends, sharp arrow corners (drawn on a square 780 × 780 grid, strokes 48 wide). */
-.shuffle-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 48; stroke-linecap: butt; stroke-linejoin: miter; }
+/* A thin shuffle (Spotify's shape): two crossing arrows with open heads, drawn with a 1.5 stroke on a 24 × 24 grid. */
+.shuffle-icon { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .play-all.is-playing .play-all-icon { width: 4px; height: 18px; border: 0; border-left: 5px solid #2d2d2d; border-right: 5px solid #2d2d2d; margin: 0; }
 .page-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .page-subtitle { margin: 0; font-size: var(--bc-font-size-200); line-height: var(--bc-line-height-200); color: var(--muted); }

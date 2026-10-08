@@ -73,7 +73,7 @@
 #dr-player .controls-extra > * { display: inline-block; }
 #dr-player .x-icon, #dr-player .vol-icon { fill: #333; width: 20px; height: 20px; cursor: pointer; display: block; }
 #dr-player .x-icon { color: #333; }
-#dr-player .x-btn.x-shuf .x-shuffle, #dr-player .x-btn.x-shuf.active .x-shuffle { width: 20px; height: 20px; margin: 0; fill: none; stroke: currentColor; stroke-width: 48; stroke-linecap: butt; stroke-linejoin: miter; }
+#dr-player .x-btn.x-shuf .x-shuffle, #dr-player .x-btn.x-shuf.active .x-shuffle { width: 22px; height: 22px; margin: -1px 0; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 #dr-player .x-icon.x-wide { width: 22px; height: 22px; margin: -1px 0; }
 #dr-player .x-btn { opacity: 0.7; margin-left: 14px; }
 #dr-player .x-sep { width: 1px; height: 20px; margin-left: 14px; background: rgba(0,0,0,.18); }
