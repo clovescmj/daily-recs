@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.13
+- Player bar: the "·" after the heart is closer to the icons on both sides (7 px instead of 12 px).
+
 ## 0.14.12
 - The button that opens the Liked Songs list in the player bar uses the "library music" icon (a note on a stack of albums) instead of the
   bookmark.

@@ -62,7 +62,7 @@
 #dr-player .collect a:hover { text-decoration: underline; }
 #dr-player .collect a { display: inline-flex; align-items: center; vertical-align: middle; }
 #dr-player .collect .ci { width: 18px; height: 18px; fill: #8a8f91; display: block; } /* the same size and spacing as the icons on the album cards */
-#dr-player .collect .dot { color: #8a8f91; }
+#dr-player .collect .dot { color: #8a8f91; margin: 0 -5px; } /* the dot sits closer to the heart and to the + than the icons are to each other */
 #dr-player .collect .wish:hover .ci { fill: rgb(0,161,198); }
 #dr-player .collect .wish.on .ci, #dr-player .collect .wish.on:hover .ci { fill: #f7931e; }
 #dr-player .collect .save:hover .ci, #dr-player .collect .save.on .ci { fill: #2e9e5b; } /* green: it is in the Liked list */
