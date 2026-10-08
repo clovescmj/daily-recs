@@ -46,7 +46,7 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
       .map((tag) => ({ key: tag.key, label: tag.label, count: tag.count }));
     for (const key of selected) if (!rows.some((row) => row.key === key)) rows.unshift({ key, label: labelOf(state, key), count: null }); // ticked, not scanned yet
     if (typed && typedKey && !GENERIC_GENRES.has(typedKey) && !known.some((tag) => tag.key === typedKey) && !rows.some((row) => row.key === typedKey)) {
-      rows.push({ key: typedKey, label: typed.toLowerCase(), count: null, typed: true });
+      rows.unshift({ key: typedKey, label: typed.toLowerCase(), count: null, typed: true }); // first, so it is never lost at the end of a long list
     }
     // A genre that was typed but isn't in the scanned list yet is added with "+ Add": it then shows up ticked, like the others.
     $in('.tags-list').innerHTML = rows.length ? rows.map((row) => (row.typed
@@ -65,7 +65,8 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
   $in('.tags-input').addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    const first = $in('.tags-list input[type=checkbox], .tags-list .tags-add-button');
+    // Enter takes the "+ Add" row when there is one, otherwise the first genre of the list that is not ticked yet
+    const first = $in('.tags-list .tags-add-button') || $in('.tags-list input[type=checkbox]:not(:checked)');
     if (first && selected.size < MAX_PICKED_TAGS) { add(first.value || first.dataset.key, first.dataset.label); $in('.tags-input').value = ''; render(); }
   });
   $in('.tags-list').addEventListener('click', (event) => {

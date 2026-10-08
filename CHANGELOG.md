@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.8
+- Genre picker: the "+ Add “…”" row for a typed genre now comes first in the list (it used to be at the end, out of sight in a long list),
+  and Enter adds it. When there is no such row, Enter ticks the first genre of the list that is not ticked yet (before, it took the first
+  one even if it was already ticked, so nothing seemed to happen).
+
 ## 0.14.7
 - The opening screen no longer reserves a fixed 500 px: it measures the genre menu and keeps just that room (plus a margin), so with few
   genres found there is much less white space, and it is still tall enough for the menu to open without pushing Bandcamp's footer.
