@@ -11,8 +11,8 @@
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
-  // A thin shuffle (the shape Spotify uses): two crossing arrows with open heads, drawn with a 1.25 stroke on a 24 × 24 grid.
-  const SHUFFLE = `<svg class="x-icon x-shuffle" viewBox="0 0 24 24" role="img" aria-label="Shuffle"><title>Shuffle</title><path d="M2.82 17.34H5.34C6.42 17.34 6.9 16.86 7.5 16.02L14.7 8.58C15.42 7.62 16.26 6.66 17.58 6.66H20.46"/><path d="M2.82 5.34H4.86C5.94 5.34 6.42 6.06 7.14 7.56L8.7 9.12"/><path d="M14.22 14.64L15.18 15.6C15.9 16.38 16.5 17.46 17.94 17.46H20.46"/><path d="M18.06 3.18L21.18 6.66L18.06 10.02"/><path d="M18.06 13.98L21.18 17.46L18.06 20.82"/></svg>`;
+  // Material "shuffle": straight diagonals and solid arrow heads.
+  const SHUFFLE = `<svg class="x-icon x-shuffle" viewBox="0 0 24 24" role="img" aria-label="Shuffle"><title>Shuffle</title><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`;
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
   // "Next album" icon: the record box from Bandcamp's menu (collection-outline-icon, minus the two top lines),
   // with a notch in the bottom-right corner where the ▶| triangle sits.
