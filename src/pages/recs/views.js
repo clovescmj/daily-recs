@@ -6,7 +6,7 @@ import { createTagPicker, labelOf } from './tag-picker.js';
 
 export const VIEW_HELP = {
   tags: 'Explore new music by genre.',
-  best: 'Perfect matches for your collection.',
+  best: 'Perfect matches with your collection.',
   surprise: 'Go beyond your collection.',
 };
 

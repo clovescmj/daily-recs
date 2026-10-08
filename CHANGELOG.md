@@ -3,8 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.5
+- Fix: Best matches says "Perfect matches with your collection" (it said "for").
+
 ## 0.14.4
-- Shorter descriptions of the lists: "Explore new music by genre." (My tags), "Perfect matches for your collection." (Best matches) and
+- Shorter descriptions of the lists: "Explore new music by genre." (My tags), "Perfect matches with your collection." (Best matches) and
   "Go beyond your collection." (Surprise me).
 
 ## 0.14.3
