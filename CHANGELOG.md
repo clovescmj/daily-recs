@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.13.0
+- Each way to play has its own icon, on the Playback button and in its list: a **music note** for one song per album, and Bandcamp's
+  collection icon (the record box) turned 90° to the right for whole albums. In a narrow window (up to 1,150 px) the button shows only the
+  icon and the arrow, so it does not run into the time counter; the tooltip and the list have the names.
+
 ## 0.12.2
 - Once a song is in Liked Songs, the + becomes a filled circle with a check mark (green), in the player bar and in the list.
 
