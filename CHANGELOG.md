@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.10.1
+- On the opening screen no option is selected to begin with ("Best matches" used to be). "Start digging" stays off until one is picked
+  (and, for "My tags", until at least one genre is ticked).
+
 ## 0.10.0
 - **Liked list (songs).** A **+** next to the heart in the player bar adds the song that is playing to your Liked list (green when it is
   there; a second click takes it out). A bookmark button in the bar opens the list: most recent first, each song can be played (it starts

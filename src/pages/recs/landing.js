@@ -14,7 +14,7 @@ const OPTIONS = [
 // The pop-up of "My tags" works exactly like the one on the list: the button opens a drop-down with the genres.
 // The page is an iframe as tall as its content, so the opening screen is always tall enough for the menu (see .landing in the CSS):
 // opening the menu doesn't change the height and doesn't push Bandcamp's footer down.
-let choice = 'best';
+let choice = null; // nothing is chosen until the user picks one
 let picker = null;
 
 const tagsButtonText = () => {
@@ -51,8 +51,8 @@ function renderChoice() {
     el.classList.toggle('is-active', option.view === choice);
     el.setAttribute('aria-checked', String(option.view === choice));
   }
-  $('landing-go').disabled = choice === 'tags' && !picker.getSelected().length;
-  $('landing-hint').textContent = VIEW_HELP[choice];
+  $('landing-go').disabled = !choice || (choice === 'tags' && !picker.getSelected().length);
+  $('landing-hint').textContent = choice ? VIEW_HELP[choice] : 'Pick one to start.';
 }
 
 /** `onStart(view, keys)` runs when the user presses "Start digging". */
@@ -67,7 +67,7 @@ export function initLanding(onStart) {
       renderChoice();
     });
   }
-  $('landing-go').addEventListener('click', () => { closeMenu(); onStart(choice, choice === 'tags' ? picker.getSelected() : []); });
+  $('landing-go').addEventListener('click', () => { if (!choice) return; closeMenu(); onStart(choice, choice === 'tags' ? picker.getSelected() : []); });
   document.addEventListener('click', (event) => { if (session.landing && !event.target.closest('#landing .tags-picker')) closeMenu(); });
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && session.landing) { closeMenu(); $('landing-tags-option').focus(); } });
   renderChoice();
