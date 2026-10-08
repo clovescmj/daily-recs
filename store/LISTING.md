@@ -24,7 +24,7 @@ New Bandcamp albums every day, picked from your own collection. Never shows what
 > • "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
 > • Hide what you don't: it never comes back
 > • "Surprise me" goes a little further from the obvious, and "Best matches" brings you back instantly
-> • A built-in player in Bandcamp's own style, with shuffle, queue and media keys
+> • A built-in player in Bandcamp's own style, with a playback choice (one song per album, or whole albums), queue and media keys
 > • The albums you hide sync across your computers through your Google account
 >
 > Private by design: everything runs in your browser and only talks to bandcamp.com. No analytics, no ads, no accounts.

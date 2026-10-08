@@ -4,7 +4,7 @@ import { MSG } from '../../lib/messages.js';
 import { findCard, paintDislike, paintWish, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
-import { continueAfterRemoval, currentId, emit, isShuffling, playAlbum } from './player.js';
+import { continueAfterRemoval, currentId, emit, playAlbum } from './player.js';
 import { session } from './session.js';
 import { toast } from './toast.js';
 
@@ -62,15 +62,14 @@ export async function dislikeAlbum(id) {
   const replacement = requestReplacement();
   if (wasPlaying) {
     continueAfterRemoval(nextId);
-    if (!nextId && !isShuffling()) replacement.then((newId) => newId && playAlbum(newId)); // it was the last one: the new album plays when it arrives
+    if (!nextId) replacement.then((newId) => newId && playAlbum(newId)); // it was the last one: the new album plays when it arrives
   }
   emit(true);
   await feedback;
 }
 
 /**
- * Asks for one new album at the end of the current list, in the background: it can take a while, so nothing waits for it. In
- * shuffle it simply joins the albums that are left to play.
+ * Asks for one new album at the end of the current list, in the background: it can take a while, so nothing waits for it.
  */
 const requestReplacement = () => send({ type: MSG.EXTEND_LIST, view: session.view, tags: session.tagKeys })
   .then((reply) => (reply && reply.ok ? reply.id : null))

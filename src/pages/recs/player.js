@@ -6,10 +6,8 @@ import { loadState, send } from './data.js';
 import { session } from './session.js';
 import { postToHost } from './host-bridge.js';
 import { MSG } from '../../lib/messages.js';
-import { createShuffler } from './shuffle.js';
 
 const TRACKS_TTL_MS = 20 * 60 * 1000;      // stream URLs expire, so cached track lists only live a few minutes
-const SHUFFLE_TRIES = 6;
 const EMIT_MIN_INTERVAL_MS = 200;
 const VOLUME_KEY = 'dr-vol';
 const MODE_KEY = 'dr-mode';
@@ -20,13 +18,10 @@ audio.preload = 'none';
 const player = {
   current: { id: null, tracks: [], index: 0 },
   album: null,          // candidate being played (for the bar and Media Session)
-  shuffle: false,
   mode: 'one',          // 'one': a song per album (its featured track, or the first), in the order of the list; 'album': whole albums
   busy: false,          // loading tracks
   message: '',          // error text for the bar
-  history: [],          // shuffle history, for "previous"
 };
-const shuffler = createShuffler();      // remembers which tracks the shuffle already played
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
@@ -38,7 +33,6 @@ let recoveredAt = null;          // guards the one-shot recovery from an expired
 export const isPlaying = () => !audio.paused;
 export const currentId = () => player.current.id;
 export const currentAlbum = () => player.album;
-export const isShuffling = () => player.shuffle;
 
 // ── Tracks ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -78,7 +72,6 @@ function playTrack(index) {
 
 export async function playAlbum(id, startIndex = null) {
   if (startIndex === null && player.current.id === id && audio.src) { togglePlay(); return; }
-  setShuffle(false);
   const album = await poolAlbum(id);
   if (!album) return;
   setAlbum(album);
@@ -112,47 +105,10 @@ export function currentTrack() {
 /** Where an album starts: the track the artist highlights on Bandcamp, or the first one when none is set. */
 const startingTrack = (tracks) => Math.max(0, tracks.findIndex((track) => track.featured));
 
-/**
- * Plays a shuffled track of one album. Normally an unplayed one; with `allowRepeat` (an album the user was waiting for) a
- * random one even if the whole album was already played this round. Returns false when it couldn't.
- */
-async function playShuffleFrom(id, state, { allowRepeat = false } = {}) {
-  const album = state.pool[id];
-  const tracks = await fetchTracks(album);
-  shuffler.setTrackCount(id, tracks.length);
-  let index = shuffler.pickTrack(id, tracks.length);
-  if (index === null && allowRepeat && tracks.length) index = Math.floor(Math.random() * tracks.length);
-  if (index === null) return false; // that album was already played completely (our guess of its size was off)
-  shuffler.markPlayed(id, index);
-  player.current = { id, tracks, index };
-  player.history.push({ id, i: index });
-  setAlbum(album);
-  send({ type: MSG.MARK_OPENED, id });
-  playTrack(index);
-  return true;
-}
-
-async function playRandomTrack() {
-  player.busy = true;
-  player.message = '';
-  emit(true);
-  const state = await loadState();
-  for (let tries = 0; tries < SHUFFLE_TRIES; tries++) {
-    const id = shuffler.pickAlbum(visibleCardIds());
-    if (id === null) break;
-    try {
-      if (await playShuffleFrom(id, state)) return;
-    } catch { /* try another album */ }
-  }
-  player.busy = false;
-  player.message = 'None of these albums have streamable tracks.';
-  emit(true);
-}
-
 // ── Transport ───────────────────────────────────────────────────────────────────────────────────────────────────
 
 const nextAlbumId = () => { const ids = visibleCardIds(); return ids[ids.indexOf(player.current.id) + 1]; };
-const startFirst = () => (player.shuffle ? playRandomTrack() : visibleCardIds()[0] && playAlbum(visibleCardIds()[0]));
+const startFirst = () => visibleCardIds()[0] && playAlbum(visibleCardIds()[0]);
 
 export const togglePlay = () => {
   if (!player.current.id) return startFirst();
@@ -163,7 +119,6 @@ export const pause = () => audio.pause();
 export function nextTrack() {
   if (!player.current.id) return startFirst();
   if (player.mode === 'one') return skipAlbum(); // a song per album: the next one is the next album's
-  if (player.shuffle) return playRandomTrack();
   if (player.current.index + 1 < player.current.tracks.length) return playTrack(player.current.index + 1);
   const next = nextAlbumId();
   return next && playAlbum(next);
@@ -171,7 +126,6 @@ export function nextTrack() {
 
 export function skipAlbum() {
   if (!player.current.id) return startFirst();
-  if (player.shuffle) return playRandomTrack();
   const next = nextAlbumId();
   return next && playAlbum(next);
 }
@@ -184,18 +138,8 @@ export async function previousTrack() {
     playAlbum(before);
     return;
   }
-  if (!player.shuffle) {
-    if (audio.currentTime > 3 || player.current.index === 0) { audio.currentTime = 0; return; }
-    playTrack(player.current.index - 1);
-    return;
-  }
-  if (audio.currentTime > 3 || player.history.length < 2) { audio.currentTime = 0; return; }
-  player.history.pop();
-  const last = player.history[player.history.length - 1];
-  const album = await poolAlbum(last.id);
-  player.current = { id: last.id, tracks: await fetchTracks(album), index: last.i };
-  setAlbum(album);
-  playTrack(last.i);
+  if (audio.currentTime > 3 || player.current.index === 0) { audio.currentTime = 0; return; }
+  playTrack(player.current.index - 1);
 }
 
 export const seekBy = (seconds) => {
@@ -210,37 +154,17 @@ export function setVolume(value) {
 }
 export const toggleMute = () => { audio.muted = !audio.muted; };
 
-/** 'one' (a song per album, the way Bandcamp's own lists play) or 'album'. Shuffle only exists for whole albums. */
-export function toggleMode() {
-  player.mode = player.mode === 'one' ? 'album' : 'one';
-  if (player.mode === 'one') player.shuffle = false;
+/** 'one' (a song per album, the way Bandcamp's own lists play) or 'album'. */
+export function setMode(mode) {
+  if (mode !== 'one' && mode !== 'album') return;
+  player.mode = mode;
   try { localStorage.setItem(MODE_KEY, player.mode); } catch { /* storage unavailable */ }
   emit(true);
 }
 
-function setShuffle(on) {
-  player.shuffle = on;
-  emit(true);
-}
-
-export function toggleShuffle() {
-  if (player.mode === 'one') return undefined; // no shuffle while a song per album is played
-  if (player.shuffle) { setShuffle(false); return undefined; }
-  setShuffle(true);
-  if (!player.current.id) return playRandomTrack(); // nothing playing yet: shuffle starts with a random track
-  // Something is playing (or paused): keep the current track and only shuffle from here on. It goes into the
-  // history so "previous" can come back to it.
-  if (!player.history.length) player.history.push({ id: player.current.id, i: player.current.index });
-  shuffler.setTrackCount(player.current.id, player.current.tracks.length);
-  shuffler.markPlayed(player.current.id, player.current.index);
-  emit(true);
-  return undefined;
-}
-
 /** The album that was playing was removed from the list: move on. */
 export function continueAfterRemoval(nextId) {
-  if (player.shuffle) playRandomTrack();
-  else if (nextId) playAlbum(nextId);
+  if (nextId) playAlbum(nextId);
   else audio.pause();
 }
 
@@ -335,14 +259,14 @@ function snapshot() {
     busy: player.busy || (!audio.paused && audio.readyState < 3),
     playing: !audio.paused, cur: audio.currentTime || 0, dur: audio.duration || 0,
     buf: audio.buffered.length ? audio.buffered.end(audio.buffered.length - 1) : 0,
-    vol: audio.muted ? 0 : audio.volume, shuffle: player.shuffle,
+    vol: audio.muted ? 0 : audio.volume,
     curId: current.id,
     wished: Boolean(album) && session.wished.has(album.id),
     isSaved: Boolean(album && track) && session.saved.has(`${album.id}:${current.index}`),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     mode: player.mode,
-    hasPrev: player.mode === 'one' ? albumIndex > 0 : player.shuffle ? player.history.length > 1 : current.index > 0,
-    hasNext: player.mode === 'one' ? albumIndex + 1 < queue.items.length : player.shuffle || current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
+    hasPrev: player.mode === 'one' ? albumIndex > 0 : current.index > 0,
+    hasNext: player.mode === 'one' ? albumIndex + 1 < queue.items.length : current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;

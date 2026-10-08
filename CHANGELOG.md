@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.12.0
+- The playback choice is now a **"Playback" button** with the name of the mode ("One per album" / "Full album"), in the place the shuffle
+  button was. It opens a short list upwards (with "One song per album" and "Full album", a tick on the one that is on); the list closes when
+  you pick, click outside or press Esc.
+- **Shuffle is gone** completely (the button, the code and its tests): a list plays in order, one song per album by default.
+
 ## 0.11.0
 - **Type of playback.** A new button in the player bar, next to "next album", switches between **one song per album** (the default: the song
   the artist features, or the first one, of each album in the order of the list, the way Bandcamp's own lists play) and **whole albums**
