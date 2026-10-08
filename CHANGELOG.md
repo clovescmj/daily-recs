@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.0
+- **Nothing is loaded until the user asks.** Opening the tab no longer builds a list in the background, and the extension no longer
+  builds one by itself every few hours or when the browser starts: the opening screen shows, and the list of the chosen option is
+  built when "Start digging" is pressed. The choice is remembered for the day: reopening the tab brings back the same list.
+- The one-line "getting the list ready" note of 0.3.8 is gone (nothing loads on the opening screen any more).
+
 ## 0.3.8
 - The opening screen says, in one quiet line under "Start digging", that today's list is being prepared in the background (and
   that the very first time takes a few minutes). Building the list starts the moment the tab opens.

@@ -47,18 +47,5 @@ export function setLandingVisible(visible) {
   if (visible) renderChoice();
 }
 
-/** One quiet line under the button saying the day's list is being prepared (the progress bar itself stays hidden here). */
-export function renderLandingStatus(status) {
-  const el = $('landing-status');
-  if (!session.landing) { el.textContent = ''; return; }
-  if (status.running && status.scope !== 'more') {
-    el.textContent = status.bootstrap
-      ? "Learning your taste and getting today's list ready. The first time takes a few minutes, but you can already choose."
-      : "Getting today's list ready in the background…";
-  } else {
-    el.textContent = '';
-  }
-}
-
 /** Keeps the genre list on the opening screen current while it is open. */
 export const refreshLanding = () => { if (session.landing && choice === 'tags') picker.render(); };

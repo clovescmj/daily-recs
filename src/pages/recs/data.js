@@ -14,11 +14,12 @@ export async function loadStatus() {
   return isStatusStale(status) ? { ...status, running: false } : status;
 }
 
-/** True when the user has already chosen what to hear today (so the opening screen is skipped). */
+/** What the user chose today ({ view, tags }), or null when they haven't chosen yet (then the opening screen shows). */
 export async function pickedToday() {
-  return (await chrome.storage.local.get(PICKED_KEY))[PICKED_KEY] === todayKey();
+  const picked = (await chrome.storage.local.get(PICKED_KEY))[PICKED_KEY];
+  return picked && picked.date === todayKey() ? { view: picked.view, tags: picked.tags || [] } : null;
 }
-export const markPickedToday = () => chrome.storage.local.set({ [PICKED_KEY]: todayKey() });
+export const savePicked = (view, tags = []) => chrome.storage.local.set({ [PICKED_KEY]: { date: todayKey(), view, tags } });
 
 /** Calls `onChange` whenever the stored state or the run status changes. */
 export function watchStorage(onChange) {

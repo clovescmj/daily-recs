@@ -2,7 +2,7 @@
 import { reportBugUrl, supportUrl } from '../../lib/config.js';
 import { MSG } from '../../lib/messages.js';
 import { runCommand } from './commands.js';
-import { loadState, loadStatus, markPickedToday, pickedToday, send, watchStorage } from './data.js';
+import { loadState, loadStatus, pickedToday, savePicked, send, watchStorage } from './data.js';
 import { $ } from './dom.js';
 import { listenToHost } from './host-bridge.js';
 import { initPlayer, playAlbum, togglePlay } from './player.js';
@@ -35,6 +35,7 @@ async function refreshView() {
 
 /** The user picked a list: show it if it exists today, otherwise ask for it and switch when it is ready. */
 async function chooseView(view, keys = []) {
+  await savePicked(view, keys);   // reopening the tab today brings this list back
   const state = await loadState();
   if (listFor(state, view, keys)) {
     session.view = view;
@@ -49,7 +50,6 @@ async function chooseView(view, keys = []) {
 
 /** "Start digging" on the opening screen: remember the choice for today and show the list. */
 async function startFromLanding(view, keys) {
-  await markPickedToday();
   setLandingVisible(false);
   await refreshView();   // a run that is already going on now shows its progress
   await chooseView(view, keys);
@@ -93,13 +93,14 @@ async function init() {
   $('play-all').addEventListener('click', () => togglePlay());
   $('album-grid').addEventListener('click', onGridClick);
 
-  send({ type: MSG.REFRESH }); // builds today's list in the background if it doesn't exist yet, even while the opening screen shows
   initPlayer();
   listenToHost(runCommand);
 
-  setLandingVisible(!(await pickedToday()));   // once a day: the first time the tab is opened
+  const picked = await pickedToday();
+  setLandingVisible(!picked);   // once a day: the first time the tab is opened. Nothing is loaded until the user presses the button
   watchStorage(refreshView);
   await refreshView();
+  if (picked) await chooseView(picked.view, picked.tags);   // already chose today: show that list (build it if it's missing)
 }
 
 init();
