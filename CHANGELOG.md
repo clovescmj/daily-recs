@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.13.1
+- The Playback button is centred vertically on the player bar, on the same line as the icons next to it (next album, queue, Liked Songs,
+  volume) and the separators. They all sit on the middle of the bar now (the whole group moved up by 1 px).
+
 ## 0.13.0
 - Each way to play has its own icon, on the Playback button and in its list: a **music note** for one song per album, and Bandcamp's
   collection icon (the record box) turned 90° to the right for whole albums. In a narrow window (up to 1,150 px) the button shows only the
