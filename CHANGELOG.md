@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.4
+- The shuffle icon follows the Spotify one more closely (drawn over a picture of it): straight 45° diagonals in an X, short flat ends and
+  open arrow heads, and a thinner stroke (1.25 on a 24 × 24 grid).
+
 ## 0.8.3
 - A new, thinner shuffle icon (page and player bar): the shape Spotify uses, two crossing arrows with open heads, drawn with a 1.5 stroke on
   a square grid. It replaces the Bandcamp-app-style one.
