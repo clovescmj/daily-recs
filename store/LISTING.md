@@ -23,7 +23,7 @@ New Bandcamp albums every day, picked from your own collection. Never shows what
 > • The heart adds an album to your Bandcamp wishlist
 > • "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
 > • Hide what you don't: it never comes back
-> • Three lists: "My tags" (the genres you pick), "Best matches" and "Surprise me" (music that goes beyond your collection)
+> • Three lists: "My tags" (the genres you pick), "Best matches" and "Surprise me" (go beyond your collection)
 > • A built-in player in Bandcamp's own style, with a playback choice (one song per album, or whole albums), queue and media keys
 > • The albums you hide sync across your computers through your Google account
 >

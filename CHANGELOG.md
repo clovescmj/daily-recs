@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.4
+- Shorter descriptions of the lists: "Explore new music by genre." (My tags), "Perfect matches for your collection." (Best matches) and
+  "Go beyond your collection." (Surprise me).
+
 ## 0.14.3
 - The descriptions of the three lists say what each one is for: My tags ("Discover other music based on your favorite genres"), Best
   matches ("Discover new music based on your collection") and Surprise me ("Music that goes beyond your collection: explore similar music
