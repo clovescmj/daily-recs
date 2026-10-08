@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.15
+- Under the "Find music" button of the genre menu there is now a caption (Bandcamp's small text size): "This will refresh your list with a new
+  search." The page keeps a little more room (540 px) for the menu, which is now taller.
+
 ## 0.14.14
 - The icons (heart, +, ⊘ and the buttons of the player bar and of its lists) no longer get a grey background when clicked. The focus ring
   for keyboard users is kept.

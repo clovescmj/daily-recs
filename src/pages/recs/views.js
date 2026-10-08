@@ -11,7 +11,7 @@ export const VIEW_HELP = {
 };
 
 // This page lives in an iframe as tall as its content: while the menu is open the page is kept tall enough to show all of it.
-const MENU_ROOM_PX = 480;
+const MENU_ROOM_PX = 540;
 let picker = null;
 
 /** What the toggle shows as chosen: the list being built (if the user just asked for one), otherwise the list on screen. */

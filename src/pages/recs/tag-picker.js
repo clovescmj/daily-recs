@@ -18,7 +18,7 @@ export const labelOf = (state, key) => (state && state.tagLabels && state.tagLab
 export function createTagPicker(root, { withButton = false, onGo = () => {}, onChange = () => {} } = {}) {
   root.innerHTML = `<div class="tags-coverage"></div>
     <input class="tags-input" type="search" placeholder="Type a genre…" aria-label="Find or add a genre" autocomplete="off">
-    <ul class="tags-list"></ul>${withButton ? '<div class="tags-foot"><button type="button" class="button tags-go">Find music</button></div>' : ''}`;
+    <ul class="tags-list"></ul>${withButton ? '<div class="tags-foot"><button type="button" class="button tags-go">Find music</button><p class="tags-note">This will refresh your list with a new search.</p></div>' : ''}`;
   const $in = (selector) => root.querySelector(selector);
   let selected = new Set();
 
