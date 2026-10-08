@@ -1,14 +1,13 @@
 // The switch between the lists of the day (My tags, Best matches, Surprise me) and the genre picker behind "My tags".
-import { DAILY_COUNT } from '../../lib/state.js';
 import { $, alignDropdown, esc } from './dom.js';
 import { CHEVRON_DOWN_ICON, SPARKLES_ICON, TAGS_ICON, TARGET_ARROW_ICON } from './icons.js';
 import { session } from './session.js';
 import { createTagPicker, labelOf } from './tag-picker.js';
 
 export const VIEW_HELP = {
-  tags: 'Pick the genres you feel like hearing today. The list starts from your own albums of those genres.',
-  best: 'The albums your collection and wishlist point to the most. Nothing is reloaded.',
-  surprise: `Reads new albums from your collection and picks ${DAILY_COUNT} from deeper in the ranking, away from the obvious.`,
+  tags: 'Pick the genres you want to hear today. Only close matches, found from your own albums of them.',
+  best: "Albums you don't have, drawn from what your collection, wishlist and Liked Songs point to most.",
+  surprise: 'Your taste, further from the obvious. Never repeats Best matches.',
 };
 
 // This page lives in an iframe as tall as its content: while the menu is open the page is kept tall enough to show all of it.

@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.2
+- New, shorter descriptions of the three lists (tooltips, opening screen, About, README and the store text): My tags, Best matches and
+  Surprise me.
+
 ## 0.14.1
 - The "next album" button is gone from the player bar. The "next" arrow next to the time already moves to the next album in "one song per
   album", and the album's next song in "full album".
