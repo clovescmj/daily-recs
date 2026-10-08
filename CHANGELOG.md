@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.12.1
+- The + of the player bar says "Add to Liked Songs" and, once the song is in the list, "Remove from Liked Songs" (a second click takes it out).
+  The same wording in the list and in the messages.
+
 ## 0.12.0
 - The playback choice is now a **"Playback" button** with the name of the mode ("One per album" / "Full album"), in the place the shuffle
   button was. It opens a short list upwards (with "One song per album" and "Full album", a tick on the one that is on); the list closes when

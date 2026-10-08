@@ -40,7 +40,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="save" href="#" title="Add this song to Liked" aria-label="Add this song to Liked">${svg(P.addCircle, 'ci', '', 'Add this song to Liked')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
+          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="save" href="#" title="Add to Liked Songs" aria-label="Add to Liked Songs">${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>
@@ -191,7 +191,7 @@
         q('.saved ol').innerHTML = s.savedList.length
           ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}"><span class="qlabel">${esc(it.label)}</span><span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
-            + action('save', true, '', 'Remove from Liked', P.addCircle, P.addCircle)
+            + action('save', true, '', 'Remove from Liked Songs', P.addCircle, P.addCircle)
             + '</span></li>').join('')
           : '<li class="empty">Nothing here yet. Tap the + on a song you like.</li>';
       }
@@ -205,7 +205,7 @@
         if (path.getAttribute('d') !== d) path.setAttribute('d', d);
       };
       paint('.wish', !!s.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn);
-      paint('.save', !!s.isSaved, 'Add this song to Liked', 'Remove this song from Liked', P.addCircle, P.addCircle);
+      paint('.save', !!s.isSaved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.addCircle);
       paint('.dislike', !!s.disliked, "Don't show music like this", 'Show this album again', P.block, P.block);
       setText(q('.trk-no'), s.trackNo && !s.msg ? `${s.trackNo}. ` : '');
       setText(q('.trk'), s.msg || s.track || '');
