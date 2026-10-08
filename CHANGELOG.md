@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.4
+- The toggle shows the option the user just chose (for example "My tags: ebm") as soon as the list starts loading, instead of
+  keeping the previous option highlighted until the list is ready. Same on the opening screen and on the list.
+
 ## 0.4.3
 - Opening the genre drop-down on the opening screen no longer pushes Bandcamp's footer down: that screen is always tall enough for
   the menu, which is also a little shorter.

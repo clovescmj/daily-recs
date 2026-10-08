@@ -44,12 +44,14 @@ async function chooseView(view, keys = []) {
     return;
   }
   session.pending = { view, keys, sawRunning: false };
+  await refreshView();   // the toggle already shows the new choice
   await send({ type: MSG.REFRESH, mode: view, tags: keys });
   scrollToTop();
 }
 
 /** "Start digging" on the opening screen: remember the choice for today and show the list. */
 async function startFromLanding(view, keys) {
+  session.pending = { view, keys, sawRunning: false };   // the toggle shows the choice right away, before the list is ready
   setLandingVisible(false);
   await refreshView();   // a run that is already going on now shows its progress
   await chooseView(view, keys);

@@ -15,21 +15,26 @@ export const VIEW_HELP = {
 const MENU_ROOM_PX = 480;
 let picker = null;
 
+/** What the toggle shows as chosen: the list being built (if the user just asked for one), otherwise the list on screen. */
+const shownChoice = () => (session.pending ? { view: session.pending.view, keys: session.pending.keys } : { view: session.view, keys: session.tagKeys });
+
 function tagsButtonText(state) {
-  if (session.view !== 'tags') return 'My tags';
-  const labels = session.tagKeys.map((key) => labelOf(state, key));
+  const { view, keys } = shownChoice();
+  if (view !== 'tags') return 'My tags';
+  const labels = keys.map((key) => labelOf(state, key));
   return labels.length > 2 ? `${labels.slice(0, 2).join(', ')} +${labels.length - 2}` : labels.join(', ');
 }
 
 /** Draws the three buttons: which one is active, and that they rest while a list is being built. */
 export function renderViewSwitch(state, status) {
   const busy = Boolean(status.running);
+  const chosen = shownChoice().view;
   const button = (id, view, icon, text, extra = '') => {
     const el = $(id);
     const html = `${icon}<span>${esc(text)}</span>${extra}`;
     if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; }
-    el.classList.toggle('is-active', session.view === view);
-    el.setAttribute('aria-pressed', String(session.view === view));
+    el.classList.toggle('is-active', chosen === view);
+    el.setAttribute('aria-pressed', String(chosen === view));
     el.title = VIEW_HELP[view];
     el.disabled = busy;
   };
