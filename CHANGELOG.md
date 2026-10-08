@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.8
+- New favicon (the small icon of the extension pages): the symbol from `design/favicon.png`, with its own margins, at 16 and 32 px.
+
 ## 0.4.7
 - The About page starts with the logo (symbol, "Daily Recs", "For Bandcamp"), aligned to the left, in place of the banner of 0.4.6.
 
