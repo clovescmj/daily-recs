@@ -9,7 +9,7 @@ export const BLOCK = 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52
 export const ADD_CIRCLE = 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z';
 export const CHECK_CIRCLE = 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM10.25 17.13L6.38 12.72 7.73 11.55l2.52 2.79 6.03-6.84 1.35 1.17z';
 export const wishlistLabel = (on) => (on ? 'Remove from wishlist' : 'Add to wishlist');
-export const saveLabel = (on) => (on ? 'Remove from Liked Songs' : 'Add to Liked Songs');
+export const saveLabel = (on) => (on ? 'Remove album from Liked Songs' : 'Add album to Liked Songs'); // on the cards: the whole album
 export const dislikeLabel = (on) => (on ? 'Show this album again' : "Don't show music like this");
 
 /** An icon that carries its own accessible name. */

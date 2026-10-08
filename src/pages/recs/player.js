@@ -92,13 +92,13 @@ export async function playAlbum(id, startIndex = null) {
   }
 }
 
-/** The song a card stands for (the one that plays first: the featured one, or the first), as the Liked list keeps it. */
-export async function albumSong(id) {
+/** The songs of an album, as the Liked list keeps them (up to MAX_ALBUM_SONGS). */
+const MAX_ALBUM_SONGS = 60;
+export async function albumSongs(id) {
   const album = await poolAlbum(id);
-  if (!album) return null;
+  if (!album) return [];
   const tracks = await fetchTracks(album);
-  const index = startingTrack(tracks);
-  return tracks[index] ? { id, i: index, title: tracks[index].title } : null;
+  return tracks.slice(0, MAX_ALBUM_SONGS).map((track, i) => ({ id, i, title: track.title }));
 }
 
 /** A track of the Liked list: its album, starting at that track (or at the same number if the track list changed). */

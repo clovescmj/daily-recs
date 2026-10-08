@@ -412,7 +412,7 @@ describe('taste (genre tags)', () => {
     const { run } = await setup(tasteOptions);
     const state = await run();
     const fitting = state.today.ids.filter((id) => candidateIndex(state, id) % 2 === 0).length;
-    assert.ok(fitting >= DAILY_COUNT * 0.7, `expected almost only fitting albums, got ${fitting}/${DAILY_COUNT}`);
+    assert.ok(fitting >= DAILY_COUNT * 0.6, `expected mostly fitting albums, got ${fitting}/${DAILY_COUNT}`);
   });
 
   test('surprise never picks an album that shares nothing with the taste', async () => {

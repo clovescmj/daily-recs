@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.11
+- The + on a card says **"Add album to Liked Songs"** (and "Remove album from Liked Songs"), and it adds **all the songs** of the album
+  (up to 60); taking it out removes them all. The + of the player bar says **"Add to Liked Songs"** and adds **only the song that is
+  playing**. (A test that depended on the draw was made steadier.)
+
 ## 0.14.10
 - The two icons of the Playback button (and of its list) are centred in their own box and have a similar size: the record box was
   bigger and heavier than the music note, so it is a little smaller and the note a little bigger.
