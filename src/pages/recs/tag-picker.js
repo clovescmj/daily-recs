@@ -48,10 +48,13 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
     if (typed && typedKey && !known.some((tag) => tag.key === typedKey) && !rows.some((row) => row.key === typedKey)) {
       rows.push({ key: typedKey, label: typed.toLowerCase(), count: null, typed: true });
     }
-    $in('.tags-list').innerHTML = rows.length ? rows.map((row) => `<li><label>
+    // A genre that was typed but isn't in the scanned list yet is added with "+ Add": it then shows up ticked, like the others.
+    $in('.tags-list').innerHTML = rows.length ? rows.map((row) => (row.typed
+      ? `<li><button type="button" class="tags-add-button" data-key="${esc(row.key)}" data-label="${esc(row.label)}">+ Add “${esc(row.label)}”</button></li>`
+      : `<li><label>
         <input type="checkbox" value="${esc(row.key)}" data-label="${esc(row.label)}"${selected.has(row.key) ? ' checked' : ''}>
-        <span class="tag-name">${row.typed ? `Look for “${esc(row.label)}” in your albums` : esc(row.label)}</span>
-        ${row.count ? `<span class="tag-count">${formatNumber(row.count)}</span>` : ''}</label></li>`).join('')
+        <span class="tag-name">${esc(row.label)}</span>
+        ${row.count ? `<span class="tag-count">${formatNumber(row.count)}</span>` : ''}</label></li>`)).join('')
       : '<li class="tags-empty">No genres yet. Type one to look for it in your albums.</li>';
     update();
   }
@@ -62,8 +65,15 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
   $in('.tags-input').addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    const first = $in('.tags-list input[type=checkbox]');
-    if (first && selected.size < MAX_PICKED_TAGS) { add(first.value, first.dataset.label); $in('.tags-input').value = ''; render(); }
+    const first = $in('.tags-list input[type=checkbox], .tags-list .tags-add-button');
+    if (first && selected.size < MAX_PICKED_TAGS) { add(first.value || first.dataset.key, first.dataset.label); $in('.tags-input').value = ''; render(); }
+  });
+  $in('.tags-list').addEventListener('click', (event) => {
+    const addButton = event.target.closest('.tags-add-button');
+    if (!addButton || selected.size >= MAX_PICKED_TAGS) return;
+    add(addButton.dataset.key, addButton.dataset.label);
+    $in('.tags-input').value = '';
+    render();
   });
   $in('.tags-list').addEventListener('change', (event) => {
     const box = event.target.closest('input[type=checkbox]');

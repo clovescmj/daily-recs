@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.13
+- In the genre picker, a genre that was typed but isn't in the list yet is offered as "+ Add “ebm”" (a button, not a check box); adding it
+  puts it in the list already ticked. Enter adds it too.
+
 ## 0.4.12
 - Fix: a replacement for a genre list no longer runs dry when every known album of that genre was used: more of the user's albums are
   scanned to find albums of the genre (found by repeating the test many times, where it sometimes found none).

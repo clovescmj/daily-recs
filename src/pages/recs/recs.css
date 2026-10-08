@@ -108,6 +108,8 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .tags-list label { display: flex; align-items: center; gap: 8px; padding: 5px 12px; font-size: var(--bc-font-size-100); cursor: pointer; }
 .tags-list label:hover { background: var(--transparency-dark-8); }
 .tags-list input { accent-color: var(--gray700); margin: 0; }
+.tags-add-button { display: block; width: 100%; padding: 6px 12px; font: inherit; font-size: var(--bc-font-size-100); text-align: left; color: var(--link); background: none; border: 0; cursor: pointer; }
+.tags-add-button:hover { background: var(--transparency-dark-8); text-decoration: underline; }
 .tag-count { margin-left: auto; color: var(--muted); }
 .tags-empty { padding: 8px 12px; font-size: var(--bc-font-size-100); color: var(--muted); }
 .tags-foot { padding: 10px 12px 12px; border-top: 1px solid var(--transparency-dark-8); }
