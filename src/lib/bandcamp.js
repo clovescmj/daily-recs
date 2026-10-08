@@ -137,8 +137,12 @@ const uniqueBy = (items, keyOf) => [...new Map(items.map((item) => [keyOf(item),
  * Snapshot of what the fan already has (collection + wishlist). Nothing in here may ever be recommended, and every
  * item doubles as a "source" whose "you may also like" section we read.
  */
-export async function loadLibrary(fetchFn, profileUrl, options) {
+export async function loadLibrary(fetchFn, profileUrl, options, previous = null, now = Date.now()) {
   const blob = parseProfileBlob(await fetchText(fetchFn, profileUrl, options));
+  // The profile page already says how many items there are and which are the newest: when that is what was saved (and the saved copy
+  // is not old), the rest of the library is not read again (one request instead of dozens).
+  const fingerprint = libraryFingerprint(blob);
+  if (previous && previous.fingerprint === fingerprint && now - (previous.loadedAt || 0) < MAX_LIBRARY_AGE_MS) return previous;
   const collection = uniqueBy(await fetchAllItems(fetchFn, blob, 'collection', options), (i) => stripQuery(i.item_url));
   const wishlist = await fetchAllItems(fetchFn, blob, 'wishlist', options);
   // Bandcamp lists newest first, so the position in each list tells how recent an item is (1 = newest, 0 = oldest).
@@ -154,7 +158,21 @@ export async function loadLibrary(fetchFn, profileUrl, options) {
     urls: [...new Set(items.map((i) => stripQuery(i.item_url)))],
     collectionCount: collection.length,
     wishlistCount: wishlist.length,
+    fingerprint,
+    loadedAt: now,
   };
+}
+
+const MAX_LIBRARY_AGE_MS = 7 * 86_400_000;   // the saved library is read again at least once a week
+
+/** What the profile page says about the library: its sizes and the newest item of each list. A purchase or a save changes it. */
+function libraryFingerprint(blob) {
+  const newest = (kind) => {
+    const first = Object.values((blob.item_cache && blob.item_cache[kind]) || {})[0];
+    return first ? stripQuery(first.item_url) : '';
+  };
+  const count = (kind) => (blob[`${kind}_data`] || {}).item_count || 0;
+  return [count('collection'), count('wishlist'), newest('collection'), newest('wishlist')].join('|');
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

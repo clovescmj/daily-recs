@@ -212,7 +212,7 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
     const keep = new Set([...state.liked, ...state.wishlisted, ...idsOfTodaysLists(state, today)]);
     state.pool = Object.fromEntries([...keep].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     await report({ phase: PHASE.LIBRARY });
-    state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing));
+    state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing), state.owned, now.getTime());
     state.fanId = fan.fanId;
     state.profileUrl = fan.profileUrl;
 

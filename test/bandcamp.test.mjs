@@ -136,6 +136,24 @@ describe('loadLibrary', () => {
     assert.ok(library.sources.every((s) => !s.url.includes('?')), 'query strings are stripped');
   });
 
+  test('does not read the library again when the profile page says nothing changed, but does when it did (or when the copy is old)', async () => {
+    const fake = createFakeBandcamp({ libraryCount: 250, wishlistCount: 130 });
+    const first = await loadLibrary(fake.fetch, fake.profileUrl, FAST, null, 1_000_000);
+    const calls = () => fake.calls.length;
+    const before = calls();
+    const again = await loadLibrary(fake.fetch, fake.profileUrl, FAST, first, 1_000_000 + 60_000);
+    assert.equal(again, first, 'the saved copy is used');
+    assert.equal(calls() - before, 1, 'one request: the profile page');
+
+    const bigger = createFakeBandcamp({ libraryCount: 251, wishlistCount: 130 });
+    const reloaded = await loadLibrary(bigger.fetch, bigger.profileUrl, FAST, first, 1_000_000 + 60_000);
+    assert.equal(reloaded.collectionCount, 251, 'a purchase makes it read everything again');
+
+    const old = await loadLibrary(fake.fetch, fake.profileUrl, FAST, first, 1_000_000 + 8 * 86_400_000);
+    assert.notEqual(old, first, 'a week later it is read again anyway');
+    assert.equal(await loadLibrary(fake.fetch, fake.profileUrl, FAST, { ...first, fingerprint: undefined }, 1_000_000).then((l) => l.sources.length), 380, 'a copy from an older version is read again');
+  });
+
   test('stops instead of looping forever when the pagination token never advances', async () => {
     const fake = createFakeBandcamp({ libraryCount: 150 });
     const fetchWithStuckToken = async (url, options) => {

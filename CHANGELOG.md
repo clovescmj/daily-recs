@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.7.2
+- Faster lists: the library (collection + wishlist) is no longer read page by page every time. The profile page already says how many
+  items there are and which are the newest, so when that is what was saved, the saved copy is used (one request instead of one per 100
+  items). A purchase or a save makes it read everything again, and so does a copy older than a week.
+
 ## 0.7.1
 - Faster lists: the genre tags of a candidate album are remembered (up to 1,500 albums, for 30 days), so the same album is not read again in
   the next list, the next day or in a genre list. The lists themselves do not change, they only need fewer requests to Bandcamp.
