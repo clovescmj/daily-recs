@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.15
+- A genre list aims for a full 50. When the user's own albums of the genre are used up and the list is still short, it goes on to the
+  albums of that genre that Bandcamp recommended (one step beyond the user's albums, never further): their "you may also like" is read,
+  and only albums that carry the genre are added. These come after the ones that come straight from the user's albums, up to three
+  extra batches of reads per list. Their tags are not added to the user's taste profile. The same fallback serves a replacement album.
+
 ## 0.4.14
 - The progress bar has a light grey track and Bandcamp's blue bar, so the progress is easy to see (it used to be dark grey on a dark track).
 

@@ -175,6 +175,23 @@ describe('lists built around genres the user picked', () => {
     assert.ok(state.today.ids.every((id) => state.pool[id]), 'the best list keeps its card data');
   });
 
+  test('with few albums of the genre, it goes on to the genre albums Bandcamp recommended, and lists them last', async () => {
+    const { store, runTags } = await setupTags({
+      libraryCount: 40, wishlistCount: 0, candidateCount: 600, recsPerPage: 10,
+      sourceTags: (n) => (n % 13 === 0 ? ['metal'] : ['pop']),                    // 4 metal albums in 40
+      candidateTags: (i) => (i % 2 === 0 ? ['metal'] : ['pop']),
+    });
+    const state = await runTags();
+    const ids = state.tagLists.metal.ids;
+    assert.equal(ids.length, DAILY_COUNT, 'always a full list');
+    assert.ok(ids.every((id) => candidateIndex(state, id) % 2 === 0), 'only metal albums');
+    const hops = ids.map((id) => Boolean(state.pool[id].hop));
+    assert.ok(hops.some(Boolean) && !hops.every(Boolean), 'some from the user\'s albums, the rest from recommended ones');
+    assert.equal(hops.indexOf(true), hops.length - hops.filter(Boolean).length, 'the recommended ones come after');
+    assert.ok(Object.keys(state.albumTags).length <= 40, 'their tags did not enter the taste profile');
+    assert.equal(store.getStatus().error, undefined);
+  });
+
   test('no list, and a clear reason, when none of the user\'s albums has the genre', async () => {
     const { store, runTags } = await setupTags({ ...metalOptions, sourceTags: () => ['pop'] });
     const state = await runTags();

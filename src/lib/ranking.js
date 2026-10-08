@@ -214,7 +214,8 @@ export function pickFocused(state, count, keys, exclude, { allowUnknown = true }
   const wanted = new Set(keys.map(normalizeTag));
   const ranked = rankedCandidates(state, exclude);
   const matches = (candidate) => (candidate.tags || []).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
-  const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => matches(b) - matches(a));
+  // what comes only from albums the user doesn't own (`hop`) goes after what comes from theirs
+  const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => Boolean(a.hop) - Boolean(b.hop) || matches(b) - matches(a));
   const unknown = allowUnknown ? ranked.filter((candidate) => !candidate.tags) : [];
   const artists = new Set();
   const picks = [];
