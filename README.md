@@ -1,6 +1,6 @@
 # Daily Recs for Bandcamp
 
-Every day, albums you've never heard, built from your own taste.
+New music every day, built from your own taste.
 
 A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fresh list of albums picked from what you own and what you've saved, never repeating and never showing what you already have.
 
