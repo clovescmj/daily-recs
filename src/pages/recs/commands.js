@@ -13,7 +13,6 @@ const COMMANDS = {
   toggle: () => player.togglePlay(),
   prev: () => player.previousTrack(),
   next: () => player.nextTrack(),
-  skip: () => player.skipAlbum(),
   pause: () => player.pause(),
   mode: (v) => player.setMode(v),
   mute: () => player.toggleMute(),

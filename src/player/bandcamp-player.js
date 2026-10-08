@@ -4,7 +4,6 @@
   const P = {
     vol: 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z',
     mute: 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
-    skip: 'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
     heart: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
     heartOn: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
     addCircle: 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
@@ -15,16 +14,6 @@
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // "Next album" icon: the record box from Bandcamp's menu (collection-outline-icon, minus the two top lines),
-  // with a notch in the bottom-right corner where the ▶| triangle sits.
-  const NEXT_ALBUM = `<svg class="x-icon x-wide" viewBox="3.75 3.9 22 22" fill="currentColor" stroke="none" role="img" aria-label="Next album">
-    <title>Next album</title><defs><mask id="dr-notch" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="40">
-      <rect width="40" height="40" fill="#fff"/><rect x="17.25" y="13.9" width="20" height="20" fill="#000"/></mask></defs>
-    <g mask="url(#dr-notch)">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M4.657 8.31c0-.7.567-1.269 1.268-1.269H18.91c.7 0 1.268.568 1.268 1.269v13.187c0 .7-.567 1.268-1.268 1.268H5.925c-.7 0-1.268-.568-1.268-1.268zm1.521.253v12.68h12.479V8.563z"/>
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M12.418 13.33c-.823 0-1.529.683-1.529 1.573s.706 1.573 1.529 1.573c.822 0 1.528-.682 1.528-1.573s-.706-1.573-1.528-1.573m-4.694 1.573c0-2.595 2.08-4.738 4.694-4.738s4.694 2.143 4.694 4.738-2.08 4.74-4.694 4.74-4.694-2.144-4.694-4.74"/>
-    </g>
-    <g transform="translate(18.72 15.37) scale(0.212)"><path d="M22.9043 13.2236V0.106445H28.2109V30.5322H22.9043V17.4141L0 30.6387V0L22.9043 13.2236Z"/></g></svg>`;
   // Icons of the two ways to play: a music note (one song per album), and Bandcamp's collection icon (the record box of the "next album"
   // button) turned 90° to the right (whole albums).
   const MODE_ICON = {
@@ -70,7 +59,6 @@
             <a href="#" class="pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"></span>${MODE_ICON.album}Full album</a>
           </div>
         </div>
-        <a href="#" class="x-btn x-skip" title="Next album" aria-label="Next album">${NEXT_ALBUM}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Today's queue" aria-label="Today's queue">${svg(P.queue, 'x-icon', '', 'Today\'s queue')}</a>
         <a href="#" class="x-btn x-saved" title="Liked songs" aria-label="Liked songs">${svg(P.bookmark, 'x-icon', '', 'Liked songs')}</a>
@@ -165,7 +153,6 @@
       if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'wish' ? track.id : track); } else onCmd('playTrack', track);
     });
     let queueSig = '', queueKey = '', queue = [];
-    q('.x-skip').addEventListener('click', (e) => { e.preventDefault(); onCmd('skip'); });
     q('.vol-icon-wrapper').addEventListener('click', () => onCmd('mute'));
 
     function update(s) {

@@ -133,7 +133,7 @@ export function nextTrack() {
   return next && playAlbum(next);
 }
 
-export function skipAlbum() {
+function skipAlbum() {
   if (!player.current.id) return startFirst();
   const next = nextAlbumId();
   return next && playAlbum(next);

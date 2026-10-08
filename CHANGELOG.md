@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.1
+- The "next album" button is gone from the player bar. The "next" arrow next to the time already moves to the next album in "one song per
+  album", and the album's next song in "full album".
+
 ## 0.14.0
 - **Liked Songs on the cards.** A + next to the heart on each card adds the song the album starts with (the featured one, or the first) to
   Liked Songs; it turns into a green check ring when a song of that album is in the list, and a second click takes the album's songs out.
