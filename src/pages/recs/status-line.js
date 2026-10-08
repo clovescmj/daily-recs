@@ -49,12 +49,12 @@ export function progressParts(status) {
     return { title: surprise ? 'Digging for surprises…' : 'Digging through your collection…', detail: `Reading ${what}`, count };
   }
   switch (status.phase) {
-    case PHASE.SIGNING_IN: return { title: 'Signing in to Bandcamp…', detail: '', count };
-    case PHASE.LIBRARY: return { title: 'Reading your collection and wishlist…', detail: '', count };
+    case PHASE.SIGNING_IN: return { title: 'Signing in to Bandcamp…', detail: 'Using the account you are already signed in with', count };
+    case PHASE.LIBRARY: return { title: 'Reading your collection and wishlist…', detail: 'To know what you already have', count };
     case PHASE.TASTE: return { title: 'Checking the candidates against your taste…', detail: 'Looking at the genres of each one', count };
-    case PHASE.RANKING: return { title: 'Ranking the candidates…', detail: `${formatNumber(status.candidates)} found`, count };
-    case PHASE.PICKING: return { title: surprise ? 'Digging below the obvious picks…' : `Picking your ${DAILY_COUNT}…`, detail: '', count };
-    default: return { title: 'Working…', detail: '', count };
+    case PHASE.RANKING: return { title: 'Ranking the candidates…', detail: `${formatNumber(status.candidates)} candidates found`, count };
+    case PHASE.PICKING: return { title: surprise ? 'Digging below the obvious picks…' : `Picking your ${DAILY_COUNT}…`, detail: 'Choosing the best of the candidates', count };
+    default: return { title: 'Working…', detail: 'Almost there', count };
   }
 }
 
@@ -89,7 +89,7 @@ export function renderStatus(status) {
     box.hidden = false;
     const { title, detail, count } = progressParts(status);
     box.classList.add('is-loading');
-    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>${count ? `<span class="loading-count">${esc(count)}</span>` : ''}</div>`
+    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong>${esc(title)}</strong><span>${esc(detail || '\u00a0')}</span></div>${count ? `<span class="loading-count">${esc(count)}</span>` : ''}</div>`
       + (determinate ? `<progress max="${Number(status.total)}" value="${Number(status.done) || 0}"></progress>` : '<progress></progress>');
   } else if (status.error === 'not_logged_in') {
     box.hidden = false;

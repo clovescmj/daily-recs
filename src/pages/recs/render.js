@@ -10,15 +10,23 @@ import { flushWishlistQueue } from './wishlist-actions.js';
 
 let renderedKey = '';   // signature of the album list currently in the grid
 
-const SKELETON_CARDS = 8;
-const skeletonCard = '<div class="skeleton" aria-hidden="true"><div class="skeleton-cover"></div><div class="skeleton-line wide"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>';
+const SKELETON_ROWS = 2;
+const skeletonCard = (index) => `<div class="skeleton" style="--i:${index}" aria-hidden="true"><div class="skeleton-cover"></div><div class="skeleton-line wide"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>`;
+
+/** As many placeholders as fill whole rows of the grid, whatever the width of the window (no half-empty last row). */
+function skeletonCount() {
+  const columns = getComputedStyle($('album-grid')).gridTemplateColumns.split(' ').filter(Boolean).length || 4;
+  return columns * SKELETON_ROWS;
+}
 
 /** While the list is being built: placeholders where the albums will be, so the page does not jump when they arrive. */
 function setSkeleton() {
-  if (renderedKey === 'skeleton') return;
-  $('album-grid').innerHTML = skeletonCard.repeat(SKELETON_CARDS);
-  renderedKey = 'skeleton';
+  const count = skeletonCount();
+  if (renderedKey === `skeleton:${count}`) return;
+  $('album-grid').innerHTML = Array.from({ length: count }, (_, index) => skeletonCard(index)).join('');
+  renderedKey = `skeleton:${count}`;
 }
+addEventListener('resize', () => { if (renderedKey.startsWith('skeleton')) setSkeleton(); }); // a narrower or wider window: whole rows again
 
 function setEmpty(message) {
   $('album-grid').innerHTML = message ? `<div class="empty-state">${message}</div>` : '';

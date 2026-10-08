@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.2
+- Loading: the placeholder cards fill whole rows of the grid (two rows, whatever the number of columns, and they follow the window if it
+  is resized), they come in one after the other, and the shimmer is easier to see.
+- Loading: the box keeps the same height all the time. It always has two lines (what is being done, and a short detail), so it no longer
+  starts with one line, grows to two and then pushes the page down.
+
 ## 0.15.1
 - Each item of the queue has the + for Liked Songs, between the heart and the ⊘: it adds the whole album (like on the cards), turns into
   the green check when a song of the album is in the list, and a second click takes the album out.
