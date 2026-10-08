@@ -59,7 +59,10 @@
       <div class="col col-4-15 controls-extra">
         <a href="#" class="x-btn x-shuf" title="Shuffle" aria-label="Shuffle">${svg(P.shuffle, 'x-icon', '', 'Shuffle')}</a>
         <a href="#" class="x-btn x-skip" title="Next album" aria-label="Next album">${NEXT_ALBUM}</a>
+        <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Today's queue" aria-label="Today's queue">${svg(P.queue, 'x-icon', '', 'Today\'s queue')}</a>
+        <a href="#" class="x-btn x-likes" title="Albums you like" aria-label="Albums you like">${svg(P.thumbUp, 'x-icon', '', 'Albums you like')}</a>
+        <span class="x-sep" aria-hidden="true"></span>
         <div class="vol">
           <div class="vol-icon-wrapper" role="button" tabindex="0" aria-label="Mute or unmute" title="Mute or unmute">${svg(P.vol, 'vol-icon', '', 'Volume')}</div>
           <div class="vol-slider" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div class="vol-amt"></div><div class="vol-bg"></div>
@@ -68,6 +71,10 @@
       </div></div>
       <div class="queue" role="dialog" aria-label="Now playing recommendations">
         <div class="queue-header"><h2>now playing <b>recommendations</b></h2><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
+        <ol></ol>
+      </div>
+      <div class="queue likes" role="dialog" aria-label="Albums you like">
+        <div class="queue-header"><h2>albums <b>you like</b></h2><span class="l-close" role="button" tabindex="0" aria-label="Close likes" title="Close likes">${svg(P.close, 'close-icon', '', 'Close likes')}</span></div>
         <ol></ol>
       </div>`;
     const q = (s) => el.querySelector(s);
@@ -114,8 +121,18 @@
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
     q('.like').addEventListener('click', (e) => { e.preventDefault(); onCmd('like'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
-    const setQueue = (on) => { q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
+    // the queue and the list of likes are two panels over the bar: opening one closes the other
+    const setQueue = (on) => { if (on) setLikes(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
+    const setLikes = (on) => { if (on) setQueue(false); q('.likes').classList.toggle('show', on); q('.x-likes').classList.toggle('active', on); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
+    q('.x-likes').addEventListener('click', (e) => { e.preventDefault(); setLikes(!q('.likes').classList.contains('show')); });
+    q('.l-close').addEventListener('click', () => setLikes(false));
+    q('.likes ol').addEventListener('click', (e) => {
+      const li = e.target.closest('li[data-id]');
+      if (!li) return;
+      const act = e.target.closest('[data-act]');
+      if (act) { e.preventDefault(); onCmd(act.dataset.act, li.dataset.id); } else onCmd('playAlbum', li.dataset.id);
+    });
     q('.q-close').addEventListener('click', () => setQueue(false));
     q('.queue ol').addEventListener('click', (e) => {
       const li = e.target.closest('li[data-id]');
@@ -152,6 +169,15 @@
           + action('like', it.liked, 'See more like this', 'Stop seeing more like this', P.thumbUp, P.thumbUpOn)
           + action('dislike', false, 'Hide this album', 'Show this album again', P.thumbDown, P.thumbDownOn)
           + '</span></li>').join('');
+      }
+      if (s.likes !== undefined) {
+        const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
+        q('.likes ol').innerHTML = s.likes.length
+          ? s.likes.map((it) => `<li data-id="${esc(it.id)}"><span class="qlabel">${esc(it.label)}</span><span class="qact">`
+            + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
+            + action('like', true, '', 'Remove from likes', P.thumbUp, P.thumbUpOn)
+            + '</span></li>').join('')
+          : '<li class="empty">No likes yet. Tap the thumbs up on an album you like.</li>';
       }
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart, thumbs up, thumbs down: each one has its own icon and label

@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.6.0
+- The player bar has a thumbs-up button that opens the list of albums you like (the most recent like first, not only today's). Each item
+  can be played, taken out of the likes (the green thumb) or added to / removed from the wishlist (the heart). It shares the space of the
+  queue: opening one closes the other.
+- The icons of the bar are grouped by thin separators: shuffle and next album, queue and likes, volume.
+
 ## 0.5.3
 - Fix: the pause icon in the queue showed a single thick bar; it shows two bars again.
 - Each item of the queue has the heart, the thumbs up and the thumbs down, and they act on that album (the heart and the thumbs up keep their colour).

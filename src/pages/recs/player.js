@@ -29,6 +29,8 @@ const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
 let queueSentKey = '';
+let likesCache = { key: '', items: [] };
+let likesSentKey = '';
 let recoveredAt = null;          // guards the one-shot recovery from an expired stream URL
 
 export const isPlaying = () => !audio.paused;
@@ -275,6 +277,21 @@ function queueItems() {
   return queueCache;
 }
 
+/** The albums the user likes, the most recent like first (not only today's: a like stays). */
+function likesItems() {
+  const state = session.state || {};
+  const when = (id) => parseInt(String((state.votes || {})[id] || '').split('.')[1] || '0', 36);
+  const ids = [...session.liked].filter((id) => state.pool && state.pool[id]).sort((a, b) => when(b) - when(a));
+  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}`).join(',');
+  if (key !== likesCache.key) {
+    likesCache = {
+      key,
+      items: ids.map((id) => ({ id, label: `${state.pool[id].artist} - ${state.pool[id].title}`, wished: session.wished.has(id) })),
+    };
+  }
+  return likesCache;
+}
+
 function snapshot() {
   const { current, album } = player;
   const track = current.tracks[current.index];
@@ -298,6 +315,8 @@ function snapshot() {
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;
+  const likes = likesItems();
+  if (likes.key !== likesSentKey) snap.likes = likes.items;
   return snap;
 }
 
@@ -309,6 +328,7 @@ export function emit(force = false) {
   const snap = snapshot();
   postToHost({ dr: 'now', ...snap });
   if (snap.queue) queueSentKey = queueCache.key;
+  if (snap.likes) likesSentKey = likesCache.key;
 }
 
 // ── Audio events and setup ──────────────────────────────────────────────────────────────────────────────────────
