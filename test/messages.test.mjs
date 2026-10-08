@@ -14,6 +14,9 @@ describe('parseMessage', () => {
     assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'tags', tags: ['metal'] }), { type: 'extend-list', view: 'tags', tags: ['metal'] });
     assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'x' }), { type: 'extend-list', view: 'best', tags: [] });
     assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '123', kind: 'dislike' }), { type: 'feedback', id: '123', kind: 'dislike' });
+    assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'save', index: 2, track: 'Song\nname' }), { type: 'feedback', id: '9', kind: 'save', index: 2, track: 'Song name' });
+    assert.equal(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'save', index: -1, track: 'x' }), null, 'a track needs its number');
+    assert.equal(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'unsave', track: 'x' }), null);
     assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'wish' }), { type: 'feedback', id: '9', kind: 'wish' });
     assert.deepEqual(parseMessage({ type: MSG.WISHLIST_OP, op: 'add', id: 5, bandId: '6' }), { type: 'wishlist-op', op: 'add', id: '5', bandId: '6' });
   });

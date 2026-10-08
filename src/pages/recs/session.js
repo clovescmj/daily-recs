@@ -15,6 +15,8 @@ export const session = {
   state: null,
   /** Albums disliked during this visit: they stay on the page (dimmed) so the dislike can be undone. */
   dislikedThisVisit: new Set(),
+  /** Tracks in the Liked list, as "albumId:trackNumber" (the + of the player bar). */
+  saved: new Set(),
   /** Albums the user put in the wishlist from here (the heart). */
   wished: new Set(),
   /** True when a list for today exists, which is when the player bar is shown even if nothing is playing. */

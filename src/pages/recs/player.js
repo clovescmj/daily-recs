@@ -29,6 +29,8 @@ const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
 let queueSentKey = '';
+let savedCache = { key: '', items: [] };
+let savedSentKey = '';
 let recoveredAt = null;          // guards the one-shot recovery from an expired stream URL
 
 export const isPlaying = () => !audio.paused;
@@ -72,8 +74,8 @@ function playTrack(index) {
   emit(true);
 }
 
-export async function playAlbum(id) {
-  if (player.current.id === id && audio.src) { togglePlay(); return; }
+export async function playAlbum(id, startIndex = null) {
+  if (startIndex === null && player.current.id === id && audio.src) { togglePlay(); return; }
   setShuffle(false);
   const album = await poolAlbum(id);
   if (!album) return;
@@ -84,7 +86,7 @@ export async function playAlbum(id) {
   try {
     const tracks = await fetchTracks(album);
     if (!tracks.length) throw new Error('no streamable tracks');
-    const first = startingTrack(tracks);
+    const first = startIndex !== null && startIndex < tracks.length ? startIndex : startingTrack(tracks);
     player.current = { id, tracks, index: first };
     send({ type: MSG.MARK_OPENED, id });
     playTrack(first);
@@ -93,6 +95,16 @@ export async function playAlbum(id) {
     player.message = `Couldn't play (${error.message}). Open it on Bandcamp.`;
     emit(true);
   }
+}
+
+/** A track of the Liked list: its album, starting at that track (or at the same number if the track list changed). */
+export const playSavedTrack = (id, index) => playAlbum(id, index);
+
+/** The track that is playing, as the Liked list keeps it. */
+export function currentTrack() {
+  const { current, album } = player;
+  const track = current.tracks[current.index];
+  return album && track ? { id: album.id, i: current.index, title: track.title } : null;
 }
 
 /** Where an album starts: the track the artist highlights on Bandcamp, or the first one when none is set. */
@@ -275,6 +287,22 @@ function queueItems() {
   return queueCache;
 }
 
+/** The Liked list, the most recent first: tracks, with the album each one is from (they stay until taken out). */
+function savedItems() {
+  const state = session.state || {};
+  const entries = [...(state.saved || [])].reverse().filter((entry) => session.saved.has(`${entry.id}:${entry.i}`) && state.pool && state.pool[entry.id]);
+  const key = entries.map((entry) => `${entry.id}:${entry.i}${session.wished.has(entry.id) ? 'w' : ''}`).join(',');
+  if (key !== savedCache.key) {
+    savedCache = {
+      key,
+      items: entries.map((entry) => ({
+        id: entry.id, i: entry.i, title: entry.title, label: `${entry.title || `Track ${entry.i + 1}`} · ${state.pool[entry.id].artist}`, wished: session.wished.has(entry.id),
+      })),
+    };
+  }
+  return savedCache;
+}
+
 function snapshot() {
   const { current, album } = player;
   const track = current.tracks[current.index];
@@ -291,12 +319,15 @@ function snapshot() {
     vol: audio.muted ? 0 : audio.volume, shuffle: player.shuffle,
     curId: current.id,
     wished: Boolean(album) && session.wished.has(album.id),
+    isSaved: Boolean(album && track) && session.saved.has(`${album.id}:${current.index}`),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     hasPrev: player.shuffle ? player.history.length > 1 : current.index > 0,
     hasNext: player.shuffle || current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;
+  const saved = savedItems();
+  if (saved.key !== savedSentKey) snap.savedList = saved.items;
   return snap;
 }
 
@@ -308,6 +339,7 @@ export function emit(force = false) {
   const snap = snapshot();
   postToHost({ dr: 'now', ...snap });
   if (snap.queue) queueSentKey = queueCache.key;
+  if (snap.savedList) savedSentKey = savedCache.key;
 }
 
 // ── Audio events and setup ──────────────────────────────────────────────────────────────────────────────────────

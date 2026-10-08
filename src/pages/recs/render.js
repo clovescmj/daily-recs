@@ -37,6 +37,7 @@ function renderGrid(state, status) {
   const ids = list ? visibleAlbumIds(state, list) : [];
   session.hasList = Boolean(list) && list.ids.some((id) => !hiddenIn(state, id, list));
   session.wished = new Set(state ? state.wishlisted || [] : []);
+  session.saved = new Set((state ? state.saved || [] : []).map((entry) => `${entry.id}:${entry.i}`)); // the Liked list: tracks
 
   if (!list) { setEmpty(status.running || status.error ? '' : 'Getting your recommendations ready…'); return; }
   if (!ids.length) { setEmpty('Nothing new for now. Come back tomorrow.'); return; }

@@ -1,6 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { refresh, refreshTags, extendList, applyFeedback, PHASE } from '../src/lib/recommender.js';
+import { createSourceWeigher } from '../src/lib/taste-profile.js';
 import { DAILY_COUNT } from '../src/lib/state.js';
 import { createFakeBandcamp } from './helpers/fake-bandcamp.js';
 import { createMemoryStore } from './helpers/memory-store.js';
@@ -148,6 +149,19 @@ describe('resilience', () => {
   });
 });
 
+describe('variety', () => {
+  test('two runs over the same library (a reinstall) do not return the same list: albums are drawn at random, from the whole library', async () => {
+    const options = { libraryCount: 600, wishlistCount: 100, candidateCount: 1500, recsPerPage: 10 };
+    const first = await (await setup(options)).run();
+    const second = await (await setup(options)).run();
+    const a = new Set(first.today.ids);
+    const same = second.today.ids.filter((id) => a.has(id)).length;
+    assert.ok(same < DAILY_COUNT * 0.8, `${same} of ${DAILY_COUNT} were the same`);
+    const read = (state) => Object.keys(state.sampled).filter((url) => /src(\d+)/.test(url)).map((url) => Number(url.match(/src(\d+)/)[1]));
+    assert.ok(new Set(read(first)).size > 0 && read(first).some((n) => n < 300) && read(first).some((n) => n >= 300), 'the albums read are spread over the whole library, not only the newest');
+  });
+});
+
 describe('tags of candidates', () => {
   test('are read once: the next list of the day finds them in the cache', async () => {
     const ctx = await setup({ libraryCount: 120, wishlistCount: 0, candidateCount: 300, recsPerPage: 10, candidateTags: (i) => (i % 2 ? ['pop'] : ['ebm']) });
@@ -249,6 +263,16 @@ describe('lists built around genres the user picked', () => {
     const mixed = await runTags({ tags: ['rock', 'metal'] });
     assert.deepEqual(Object.keys(mixed.tagLists), ['metal'], 'only the specific one is kept');
     assert.equal(store.getStatus().error, undefined);
+  });
+
+  test('a song in the Liked list counts as one of the user\'s own albums of its genre: a list can start from it', async () => {
+    const { store, fake, runTags, run } = await setupTags({ ...metalOptions, sourceTags: () => ['pop'] }); // nothing metal in the library
+    const state = await run();
+    const metalId = state.today.ids.find((id) => candidateIndex(state, id) % 2 === 0);
+    await applyFeedback({ fetch: fake.fetch, store, id: metalId, kind: 'save', index: 0, track: 'Song', tuning: TUNING });
+    const result = await runTags();
+    assert.equal(store.getStatus().error, undefined, 'no "no seeds" error');
+    assert.ok(result.tagLists.metal && result.tagLists.metal.ids.length > 0);
   });
 
   test('no list, and a clear reason, when none of the user\'s albums has the genre', async () => {
@@ -388,7 +412,7 @@ describe('taste (genre tags)', () => {
     const { run } = await setup(tasteOptions);
     const state = await run();
     const fitting = state.today.ids.filter((id) => candidateIndex(state, id) % 2 === 0).length;
-    assert.ok(fitting >= DAILY_COUNT * 0.85, `expected almost only fitting albums, got ${fitting}/${DAILY_COUNT}`);
+    assert.ok(fitting >= DAILY_COUNT * 0.7, `expected almost only fitting albums, got ${fitting}/${DAILY_COUNT}`);
   });
 
   test('surprise never picks an album that shares nothing with the taste', async () => {
@@ -511,6 +535,33 @@ describe('feedback', () => {
       assert.ok(!near.includes(id), 'not a neighbour');
       assert.notEqual(next.pool[id].artistId, artistId, 'not the same artist');
     }
+  });
+
+  test('the Liked list keeps tracks (not albums), asks for nothing in the votes, and can be added to and taken out of', async () => {
+    const ctx = await withList();
+    const before = await ctx.store.load();
+    const save = (id, index, track, kind = 'save') => applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id, kind, index, track, tuning: TUNING });
+    let state = await save(ctx.id, 2, 'Third song');
+    assert.deepEqual(state.saved, [{ id: ctx.id, i: 2, title: 'Third song' }]);
+    assert.deepEqual(state.votes, before.votes, 'no vote');
+    assert.deepEqual(state.dismissed, []);
+    state = await save(ctx.id, 0, 'First song');
+    assert.equal(state.saved.length, 2, 'two tracks of the same album are two items');
+    state = await save(ctx.id, 2, 'Third song');
+    assert.deepEqual(state.saved.map((entry) => entry.i), [0, 2], 'adding again moves it to the end, never twice');
+    state = await save(ctx.id, 0, '', 'unsave');
+    assert.deepEqual(state.saved, [{ id: ctx.id, i: 2, title: 'Third song' }]);
+  });
+
+  test('the albums of the Liked list feed the search: they are read as sources, are never recommended again, and weigh like the library', async () => {
+    const ctx = await withList();
+    const url = ctx.state.pool[ctx.id].url;
+    const state = await applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id: ctx.id, kind: 'save', index: 1, track: 'Song', tuning: TUNING });
+    assert.ok(state.sampled[url], 'its page was read right away (recommendations and tags)');
+    const next = await ctx.run({ mode: 'surprise', force: true });
+    assert.ok(next.pool[ctx.id], 'it stays in the pool');
+    assert.ok(!next.surprise.ids.includes(ctx.id), 'and is not recommended again');
+    assert.ok(createSourceWeigher(state)(url) > createSourceWeigher({ ...state, saved: [] })(url), 'it counts more than an ordinary source');
   });
 
   test('albums in the wishlist never come back in a list', async () => {

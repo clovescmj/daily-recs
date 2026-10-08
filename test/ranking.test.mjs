@@ -56,12 +56,15 @@ describe('pickBest', () => {
       candidate('7', '10', { s: 9 }),                 // disliked
     ]);
     state.shown = ['6']; state.dismissed = ['7'];
-    assert.deepEqual(pickBest(state, 2), ['3', '5']);
+    const picks = pickBest(state, 2);
+    assert.equal(picks.length, 2);
+    assert.ok(picks.every((id) => ['3', '4', '5'].includes(id)), 'never an owned, shown or disliked album');
+    assert.equal(new Set(picks.map((id) => state.pool[id].artistId)).size, 2, 'one per artist while there are alternatives');
   });
 
   test('completes with a repeated artist only when it has to', () => {
     const state = stateWith([candidate('3', '6', { s: 9, t: 9 }), candidate('4', '6', { s: 9 })]);
-    assert.deepEqual(pickBest(state, 2), ['3', '4']);
+    assert.deepEqual(pickBest(state, 2).sort(), ['3', '4']);
   });
 });
 
@@ -120,7 +123,10 @@ describe('pickFocused', () => {
       album(1, ['pop'], { s: 9, t: 9 }), album(2, ['metal'], { s: 1 }), album(3, ['metal', 'doom'], { s: 1 }),
       album(4, undefined, { s: 1 }), album(5, ['doom'], { s: 2 }),
     ]);
-    assert.deepEqual(pickFocused(state, 10, ['metal', 'doom']), ['3', '5', '2', '4']);
+    const picks = pickFocused(state, 10, ['metal', 'doom']);
+    assert.equal(picks[0], '3', 'the one with both genres first');
+    assert.deepEqual(picks.slice(1, 3).sort(), ['2', '5'], 'then those with one (their order between them is random)');
+    assert.equal(picks[3], '4', 'and the unknown last');
     assert.ok(!pickFocused(state, 10, ['metal']).includes('1'), 'an album of another genre is never picked');
   });
   test('one album per artist', () => {

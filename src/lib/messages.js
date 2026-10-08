@@ -14,7 +14,7 @@ export const MSG = Object.freeze({
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
 });
 
-export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish']);
+export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish', 'save', 'unsave']);
 export const WISHLIST_OPS = Object.freeze(['add', 'remove']);
 
 /** Returns the normalised message, or null if it isn't a well-formed message of ours. */
@@ -41,6 +41,11 @@ export function parseMessage(raw) {
       if (!id || !FEEDBACK_KINDS.includes(raw.kind)) return null;
       // a dislike made inside a genre list says which genres were selected: it is then scoped to them
       const tags = Array.isArray(raw.tags) ? raw.tags.filter((tag) => typeof tag === 'string' && /^[\p{L}\p{N}]{1,40}$/u.test(tag)).slice(0, 5) : [];
+      if (raw.kind === 'save' || raw.kind === 'unsave') { // the Liked list holds tracks: which one of the album
+        const index = Number.isInteger(raw.index) && raw.index >= 0 && raw.index < 1000 ? raw.index : -1;
+        const track = typeof raw.track === 'string' ? raw.track.replace(/[\u0000-\u001f]/g, ' ').slice(0, 200) : '';
+        return index < 0 ? null : { type: raw.type, id, kind: raw.kind, index, track };
+      }
       return tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
     }
     case MSG.WISHLIST_OP:

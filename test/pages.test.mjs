@@ -30,7 +30,7 @@ test('cardHtml escapes album text and exposes accessible names', () => {
   assert.ok(!html.includes('<b>"Title"</b>'), 'title must be escaped');
   assert.match(html, /aria-label="Add to wishlist: /);
   assert.match(html, /aria-label="Don't show music like this: |aria-label="Don&#39;t show music like this: /);
-  assert.ok(!/data-like|thumb/i.test(html), 'there is no like button');
+  assert.ok(!/data-like|data-save|thumb/i.test(html), 'there is no like or save button on a card: the + belongs to the song that plays');
   assert.ok(!/go to album/i.test(html), 'no "go to album" link: the cover and the title already open it');
   assert.match(html, /People who own “Other” also own/);
   assert.match(html, /3 fans in common/);

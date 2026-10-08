@@ -10,7 +10,7 @@
 import {
   NotLoggedInError, RateLimitedError, HttpError, fetchText, getFan, isBandcampUrl, loadLibrary, normalizeTag, parseRecommendations, parseTagLabels, parseTags, sleep,
 } from './bandcamp.js';
-import { GENERIC_GENRES, addTasteTags, createSourceWeigher, recordSourceRead, tagsOfAlbum } from './taste-profile.js';
+import { GENERIC_GENRES, addTasteTags, createSourceWeigher, recordSourceRead, savedAlbumIds, tagsOfAlbum } from './taste-profile.js';
 import { hashSource, recordVote, rebuildVoteLists, VOTE } from './taste-sync.js';
 import { DAILY_COUNT, emptyState, idsOfTodaysLists, migrateState, rollShownOver, tagListKey, todayKey } from './state.js';
 import { markShown, pickBest, pickFocused, pickSources, pickSurprise, rankedCandidates } from './ranking.js';
@@ -162,11 +162,11 @@ async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
 }
 
 /** Tag check with progress, then the choice itself: the order depends on the tags, so they come first. */
-async function pickWithTaste({ fetchFn, state, mode, count, report, pacing }) {
+async function pickWithTaste({ fetchFn, state, mode, count, report, pacing, avoidIds = [] }) {
   const limit = mode === 'surprise' ? TASTE_CHECK_SURPRISE : TASTE_CHECK_BEST;
   const total = await readCandidateTags(fetchFn, state, limit, (done, of) => report.throttled({ phase: PHASE.TASTE, done, total: of }), pacing);
   if (total) await report({ phase: PHASE.TASTE, done: total, total });
-  return chooser(mode)(state, count);
+  return chooser(mode)(state, count, { ids: avoidIds }); // "Surprise me" never repeats what "Best matches" already shows
 }
 
 /** Reads `sources`, publishing progress; `extra` is merged into every status update. */
@@ -209,7 +209,7 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
     const fan = await getFan(fetchFn);
     // No stockpile: every run fetches a fresh batch. Liked albums stay in the pool (they keep acting as sources), and so
     // do the albums of today's other lists (their cards still need their data).
-    const keep = new Set([...state.liked, ...state.wishlisted, ...idsOfTodaysLists(state, today)]);
+    const keep = new Set([...state.liked, ...state.wishlisted, ...savedAlbumIds(state), ...idsOfTodaysLists(state, today)]);
     state.pool = Object.fromEntries([...keep].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     await report({ phase: PHASE.LIBRARY });
     state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing), state.owned, now.getTime());
@@ -232,13 +232,14 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
 
     await report({ phase: PHASE.RANKING, candidates: Object.keys(state.pool).length });
     await sleep(pacing.stagePauseMs);
-    let ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing });
+    const avoidIds = mode === 'surprise' && state.today && state.today.date === today ? state.today.ids : [];
+    let ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing, avoidIds });
     await report({ phase: PHASE.PICKING });
     for (let top = 0; top < MAX_TOP_UPS && ids.length < DAILY_COUNT; top++) { // make sure the list is full
       const more = pickSources(state, TOP_UP_SAMPLES);
       if (!more.length) break;
       await readWithProgress(fetchFn, state, more, report, { ...info, picked: more.length }, pacing);
-      ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing });
+      ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing, avoidIds });
     }
     markShown(state, ids);
     if (mode === 'surprise') state.surprise = { date: today, ids };
@@ -271,7 +272,10 @@ const MAX_TAG_LISTS = 6;
 /** The user's albums that carry any of the tags, the ones with more of them first. */
 function seedsFor(state, keys) {
   const wanted = new Set(keys);
-  return (state.owned.sources || [])
+  const own = new Set((state.owned.sources || []).map((source) => source.url));
+  const liked = savedAlbumIds(state).map((id) => state.pool[id]).filter((album) => album && !own.has(album.url)) // the Liked list counts as the user's own albums
+    .map((album) => ({ url: album.url, title: album.title, artist: album.artist }));
+  return [...(state.owned.sources || []), ...liked]
     .filter((source) => isBandcampUrl(source.url))
     .map((source) => ({ source, matches: tagsOfAlbum(state, source.url).filter((tag) => wanted.has(tag)).length }))
     .filter(({ matches }) => matches > 0)
@@ -339,7 +343,7 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
       return state;
     }
 
-    state.pool = Object.fromEntries([...new Set([...state.liked, ...state.wishlisted, ...idsOfTodaysLists(state, today)])].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
+    state.pool = Object.fromEntries([...new Set([...state.liked, ...state.wishlisted, ...savedAlbumIds(state), ...idsOfTodaysLists(state, today)])].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     const read = new Set();
     const nextSeeds = (count) => {
       const fresh = seeds.filter((source) => !read.has(source.url)).slice(0, count);
@@ -476,7 +480,7 @@ async function neighboursOf(fetchFn, candidate, tuning) {
  * wishlist (the heart) is remembered apart from the like, and it is read the same way.
  * kind: 'like' | 'unlike' | 'dislike' | 'undislike' | 'wish' | 'unwish'
  */
-export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], tuning }) {
+export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], index = 0, track = '', tuning }) {
   const state = await store.load();
   const candidate = state && state.pool[id];
   if (!candidate) return state;
@@ -511,6 +515,12 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = []
     state.wishlisted.push(id);
     await store.save(state);
     await readOwnRecommendations();
+  } else if (kind === 'save') { // the Liked list: a track is added, and its album starts to feed the search like the library does
+    state.saved = [...state.saved.filter((entry) => !(entry.id === id && entry.i === index)), { id, i: index, title: track }];
+    await store.save(state);
+    await readOwnRecommendations();
+  } else if (kind === 'unsave') {
+    state.saved = state.saved.filter((entry) => !(entry.id === id && entry.i === index));
   } else if (kind === 'unwish') {
     state.wishlisted = state.wishlisted.filter((other) => other !== id);
   } else if (kind === 'unlike' && state.liked.includes(id)) {

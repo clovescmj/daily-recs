@@ -1,7 +1,7 @@
 // Pure ranking and selection logic (no I/O). Everything here works on the persisted state.
 import { hashSource } from './taste-sync.js';
 import { isBandcampUrl, normalizeTag } from './bandcamp.js';
-import { createSourceWeigher, tagFit, tagShare } from './taste-profile.js';
+import { createSourceWeigher, savedAlbumIds, tagFit, tagShare } from './taste-profile.js';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Ownership lookup: Sets are built once per `owned` snapshot instead of scanning arrays for every candidate.
@@ -81,7 +81,7 @@ export function shuffle(items) {
 export function rankedCandidates(state, exclude = {}) {
   const weigh = createSourceWeigher(state);
   // `exclude` ({ ids, artists }): albums already in the list being extended, so the new one is really new there
-  const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || []), ...(state.wishlisted || []), ...(exclude.ids || [])]);
+  const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || []), ...(state.wishlisted || []), ...savedAlbumIds(state), ...(exclude.ids || [])]);
   const seenArtists = new Set([...(state.shownArtists || []), ...(exclude.artists || [])]);
   // "Don't show music like this": the artist of a hidden album, and the albums Bandcamp pairs with it, never come back
   const avoided = new Set();
@@ -138,10 +138,22 @@ function pickInProportion(state, order, count, onPick = () => {}) {
   return picks;
 }
 
-/** "Best matches": the top candidates, one per artist, kept in proportion to the user's taste. */
+const SAMPLE_DEPTH = 3;   // "Best matches" draws from the top 3 × the list size, not only from the very top
+
+/**
+ * The best candidates in a slightly random order: the higher the rank the better the chance, but anything in the top
+ * `SAMPLE_DEPTH × count` can make it. So two runs over the same library give similar lists, not the same one.
+ */
+function sampleFromTop(ranked, count) {
+  const top = ranked.slice(0, count * SAMPLE_DEPTH);
+  const rank = new Map(top.map((candidate, index) => [candidate, index]));
+  return [...weightedShuffle(top, (candidate) => 1 / (1 + rank.get(candidate) / count)), ...ranked.slice(count * SAMPLE_DEPTH)];
+}
+
+/** "Best matches": good candidates drawn from the top of the ranking, one per artist, kept in proportion to the user's taste. */
 export function pickBest(state, count, exclude) {
   const ranked = rankedCandidates(state, exclude);
-  const picks = pickInProportion(state, ranked, count);
+  const picks = pickInProportion(state, sampleFromTop(ranked, count), count);
   for (const candidate of ranked) { // last resort: repeated artists
     if (picks.length >= count) break;
     if (!picks.includes(candidate.id)) picks.push(candidate.id);
@@ -195,18 +207,18 @@ function limitPerArtist(sources, limit) {
  *  5) no more than two albums per artist.
  */
 export function pickSources(state, count) {
-  const weigh = createSourceWeigher(state);
-  const likedAlbums = (state.liked || [])
+  const likedAlbums = [...(state.liked || []), ...savedAlbumIds(state)]
     .map((id) => state.pool[id]).filter(Boolean)
     .map((album) => ({ url: album.url, title: album.title, artist: album.artist }))
     .filter((source) => !state.sampled[source.url]);
   const eligible = state.owned.sources.filter((source) => isBandcampUrl(source.url) && sourceNet(state, source.url) > REJECTED_SOURCE_NET);
-  const boosted = weightedShuffle(eligible.filter((source) => sourceNet(state, source.url) > 0), (s) => weigh(s.url))
+  const boosted = shuffle(eligible.filter((source) => sourceNet(state, source.url) > 0))
     .slice(0, Math.ceil(count * BOOSTED_SOURCE_SHARE));
   const boostedUrls = new Set(boosted.map((source) => source.url));
   const rest = eligible.filter((source) => !boostedUrls.has(source.url));
-  const neverRead = weightedShuffle(rest.filter((source) => !state.sampled[source.url]), (s) => weigh(s.url));
-  const readBefore = weightedShuffle(rest.filter((source) => state.sampled[source.url]), (s) => weigh(s.url));
+  // Every album of the library has the same chance: not only the recent ones (they still weigh more in the taste profile)
+  const neverRead = shuffle(rest.filter((source) => !state.sampled[source.url]));
+  const readBefore = shuffle(rest.filter((source) => state.sampled[source.url]));
   return limitPerArtist([...likedAlbums, ...boosted, ...neverRead, ...readBefore], MAX_SOURCES_PER_ARTIST).slice(0, count);
 }
 
@@ -229,7 +241,7 @@ export function pickFocused(state, count, keys, exclude, { allowUnknown = true }
   const matches = (candidate) => (candidate.tags || []).slice(0, FOCUS_PRIMARY_TAGS).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
   // How many of the user's albums recommend it: the more that do, the closer it is to what they have of that genre.
   const supporters = (candidate) => Object.keys(candidate.srcs || {}).length;
-  const tagged = ranked.filter((candidate) => matches(candidate) > 0)
+  const tagged = shuffle(ranked.filter((candidate) => matches(candidate) > 0)) // ties are broken at random, so lists are not always the same
     .sort((a, b) => Boolean(a.hop) - Boolean(b.hop) || matches(b) - matches(a) || supporters(b) - supporters(a));
   const unknown = allowUnknown ? ranked.filter((candidate) => !candidate.tags) : [];
   const artists = new Set();

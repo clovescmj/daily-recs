@@ -12,6 +12,9 @@ export const WISHLISTED_BONUS = 1.2;   // ...and so, a little less, are the ones
 const RECENCY_FLOOR = 0.75;            // the oldest item still counts 75% as much as the newest
 const MAX_TASTE_TAGS = 300;
 
+/** Ids of the albums that have a track in the Liked list. */
+export const savedAlbumIds = (state) => [...new Set((state.saved || []).map((entry) => entry.id))];
+
 /** Returns `weigh(url)`: how much a source album counts (1 = a recent purchase). Built once per run/ranking. */
 export function createSourceWeigher(state) {
   const base = new Map();
@@ -20,7 +23,7 @@ export function createSourceWeigher(state) {
     base.set(source.url, kindWeight * (RECENCY_FLOOR + (1 - RECENCY_FLOOR) * (source.recent ?? 1)));
   }
   const urlsOf = (ids) => new Set((ids || []).map((id) => state.pool && state.pool[id] && state.pool[id].url).filter(Boolean));
-  const likedUrls = urlsOf(state.liked);
+  const likedUrls = urlsOf([...(state.liked || []), ...savedAlbumIds(state)]); // the Liked list weighs like the old likes did
   const wishlistedUrls = urlsOf(state.wishlisted);
   return (url) => (base.get(url) ?? 1) * (likedUrls.has(url) ? LIKED_BONUS : wishlistedUrls.has(url) ? WISHLISTED_BONUS : 1);
 }

@@ -21,6 +21,7 @@ export const emptyState = () => ({
   tagCache: {},          // albumId -> { t: "tag|tag", at: ms }: the genre tags of candidates already read (they don't change, so they are not read twice)
   scoped: {},            // albumId -> { keys, artistId, near }: albums hidden from a genre list, hidden again only in lists of those genres
   avoid: {},             // albumId -> { artistId, near: [ids] }: albums hidden with "don't show music like this", and the albums Bandcamp pairs with them
+  saved: [],             // the "Liked" list, newest last: tracks as { id (album), i (track number), title }. Their albums feed the search like the library does (kept on this computer)
   wishlisted: [],        // albums the user put in the Bandcamp wishlist from the extension (kept on this computer)
   dismissed: [],         // derived from `votes` (albums marked "don't show again")
   votes: {},             // albumId -> "<vote>.<time>" (see taste-sync.js)
@@ -47,6 +48,7 @@ export function migrateState(state) {
   state.scoped ||= {};
   delete state.focusDislikes;
   state.tagCache ||= {};
+  state.saved ||= [];
   state.wishlisted ||= [...(state.liked || [])]; // before the two were separated, a like was also a wishlist entry
   normalizeTasteTags(state);
   if (state.owned && state.owned.count !== undefined) { // legacy names

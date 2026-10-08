@@ -7,6 +7,8 @@
     skip: 'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
     heart: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
     heartOn: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+    addCircle: 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
+    bookmark: 'M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z',
     block: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z',
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
@@ -40,7 +42,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
+          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="save" href="#" title="Add this song to Liked" aria-label="Add this song to Liked">${svg(P.addCircle, 'ci', '', 'Add this song to Liked')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>
@@ -59,6 +61,7 @@
         <a href="#" class="x-btn x-skip" title="Next album" aria-label="Next album">${NEXT_ALBUM}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Today's queue" aria-label="Today's queue">${svg(P.queue, 'x-icon', '', 'Today\'s queue')}</a>
+        <a href="#" class="x-btn x-saved" title="Liked songs" aria-label="Liked songs">${svg(P.bookmark, 'x-icon', '', 'Liked songs')}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <div class="vol">
           <div class="vol-icon-wrapper" role="button" tabindex="0" aria-label="Mute or unmute" title="Mute or unmute">${svg(P.vol, 'vol-icon', '', 'Volume')}</div>
@@ -68,6 +71,10 @@
       </div></div>
       <div class="queue" role="dialog" aria-label="Now playing recommendations">
         <div class="queue-header"><h2>now playing <b>recommendations</b></h2><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
+        <ol></ol>
+      </div>
+      <div class="queue saved" role="dialog" aria-label="Liked">
+        <div class="queue-header"><h2>your <b>liked</b> songs</h2><span class="l-close" role="button" tabindex="0" aria-label="Close Liked" title="Close Liked">${svg(P.close, 'close-icon', '', 'Close Liked')}</span></div>
         <ol></ol>
       </div>`;
     const q = (s) => el.querySelector(s);
@@ -112,15 +119,27 @@
     q('.next-icon').addEventListener('click', (e) => { if (!e.target.classList.contains('disabled')) onCmd('next'); });
     q('.x-shuf').addEventListener('click', (e) => { e.preventDefault(); onCmd('shuf'); });
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
+    q('.save').addEventListener('click', (e) => { e.preventDefault(); onCmd('save'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
-    const setQueue = (on) => { q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
+    // the queue and the Liked list are two panels over the bar: opening one closes the other
+    const setQueue = (on) => { if (on) setSaved(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
+    const setSaved = (on) => { if (on) setQueue(false); q('.saved').classList.toggle('show', on); q('.x-saved').classList.toggle('active', on); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
+    q('.x-saved').addEventListener('click', (e) => { e.preventDefault(); setSaved(!q('.saved').classList.contains('show')); });
     q('.q-close').addEventListener('click', () => setQueue(false));
+    q('.l-close').addEventListener('click', () => setSaved(false));
     q('.queue ol').addEventListener('click', (e) => {
       const li = e.target.closest('li[data-id]');
       if (!li) return;
       const act = e.target.closest('[data-act]');
       if (act) { e.preventDefault(); onCmd(act.dataset.act, li.dataset.id); } else onCmd('playAlbum', li.dataset.id);
+    });
+    q('.saved ol').addEventListener('click', (e) => { // each item is a track: { id, i, title }
+      const li = e.target.closest('li[data-id]');
+      if (!li) return;
+      const track = { id: li.dataset.id, i: Number(li.dataset.i), title: li.dataset.title };
+      const act = e.target.closest('[data-act]');
+      if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'wish' ? track.id : track); } else onCmd('playTrack', track);
     });
     let queueSig = '', queueKey = '', queue = [];
     q('.x-skip').addEventListener('click', (e) => { e.preventDefault(); onCmd('skip'); });
@@ -151,6 +170,15 @@
           + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
           + '</span></li>').join('');
       }
+      if (s.savedList !== undefined) {
+        const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
+        q('.saved ol').innerHTML = s.savedList.length
+          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}"><span class="qlabel">${esc(it.label)}</span><span class="qact">`
+            + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
+            + action('save', true, '', 'Remove from Liked', P.addCircle, P.addCircle)
+            + '</span></li>').join('')
+          : '<li class="empty">Nothing here yet. Tap the + on a song you like.</li>';
+      }
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart and thumb down: each one has its own icon and label
       const paint = (selector, on, offLabel, onLabel, offPath, onPath) => {
@@ -161,6 +189,7 @@
         if (path.getAttribute('d') !== d) path.setAttribute('d', d);
       };
       paint('.wish', !!s.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn);
+      paint('.save', !!s.isSaved, 'Add this song to Liked', 'Remove this song from Liked', P.addCircle, P.addCircle);
       paint('.dislike', !!s.disliked, "Don't show music like this", 'Show this album again', P.block, P.block);
       setText(q('.trk-no'), s.trackNo && !s.msg ? `${s.trackNo}. ` : '');
       setText(q('.trk'), s.msg || s.track || '');

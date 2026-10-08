@@ -3,6 +3,16 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.10.0
+- **Liked list (songs).** A **+** next to the heart in the player bar adds the song that is playing to your Liked list (green when it is
+  there; a second click takes it out). A bookmark button in the bar opens the list: most recent first, each song can be played (it starts
+  that track), have its album added to the wishlist (heart) or be taken out (the green +). It is only on the player bar, not on the cards.
+- **It feeds the search.** The albums of the songs in the list count like the library: they are read for their recommendations and tags
+  at once, weigh in your taste, are used as the albums a genre list starts from, and never come back as recommendations.
+- **More variety.** Albums to read are now drawn at random from the whole library (the recent ones no longer have an edge), and "Best
+  matches" draws from the top 150 instead of always taking the top 50, so a fresh install (or a new day) gives a different list. In genre
+  lists, albums that tie are put in a random order. "Surprise me" never repeats an album of the best list.
+
 ## 0.9.2
 - Umbrella genres (the ones that cover many sub-genres: electronic, rock, pop, ambient, folk, jazz, classical, hip hop, dance, experimental,
   indie...) are ignored: they are not offered in "My tags", typing one does not offer to add it, a list is never built around one (or only

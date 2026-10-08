@@ -38,6 +38,15 @@ export async function setWish(id, on) {
   }
 }
 
+/** The +: adds a track to (or takes it out of) the Liked list. Its album then feeds the search like the library does. */
+export async function setSave({ id, i, title }, on) {
+  const key = `${id}:${i}`;
+  if (on) session.saved.add(key); else session.saved.delete(key);
+  emit(true);
+  toast(on ? 'Added to your Liked list' : 'Removed from your Liked list');
+  await send({ type: MSG.FEEDBACK, id, kind: on ? 'save' : 'unsave', index: i, track: String(title || '').slice(0, 200) });
+}
+
 export async function dislikeAlbum(id) {
   const ids = visibleCardIds();
   const nextId = ids[ids.indexOf(id) + 1];
