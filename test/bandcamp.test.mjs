@@ -153,6 +153,11 @@ import { parseTags as parseTagsFromPage } from '../src/lib/bandcamp.js';
 test('parseTags keeps genre tags and drops locations', () => {
   const tag = (name) => `<a class="tag" href="https://bandcamp.com/discover/${name}?from=tralbum&artist=1"\n   >${name}</a>`;
   const html = `${tag('electronic')}${tag('Techno')}${tag('Brooklyn')}<a class="tag" href="https://bandcamp.com/discover/x">Los Angeles, California</a>${tag('post-punk')}${tag('electronic')}<a class="tag" href="/other">nope</a>`;
-  assert.deepEqual(parseTagsFromPage(html), ['electronic', 'post-punk']);
+  assert.deepEqual(parseTagsFromPage(html), ['electronic', 'postpunk']);
   assert.deepEqual(parseTagsFromPage('<html></html>'), []);
+});
+
+test('parseTags counts different spellings of a genre as one', () => {
+  const tag = (name) => `<a class="tag" href="https://bandcamp.com/discover/x">${name}</a>`;
+  assert.deepEqual(parseTagsFromPage(['e.b.m', 'EBM'.toLowerCase(), 'electronic body music', 'dark wave', 'darkwave', 'cold wave'].map(tag).join('')), ['ebm', 'darkwave', 'coldwave']);
 });

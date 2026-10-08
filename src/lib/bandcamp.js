@@ -194,6 +194,13 @@ export function parseRecommendations(html) {
 
 const MAX_TAGS = 8;
 
+// The same genre is written many ways ("e.b.m", "EBM", "electronic body music"; "dark wave", "darkwave"): they must count as one.
+const TAG_ALIASES = Object.freeze({ electronicbodymusic: 'ebm' });
+export function normalizeTag(text) {
+  const key = String(text).toLowerCase().replace(/[\s._-]+/g, '');
+  return TAG_ALIASES[key] || key;
+}
+
 /**
  * Genre tags of an album page. Bandcamp writes genre tags in lower case and location tags ("Brooklyn",
  * "Los Angeles, California") with a capital letter; locations say nothing about taste, so they are dropped.
@@ -206,7 +213,8 @@ export function parseTags(html) {
     const [, href, label] = match;
     const text = decodeHtmlEntities(label).trim();
     if (!/\/discover\//.test(href) || !text || /^\p{Lu}/u.test(text) || text.includes(',') || text.length > 40) continue;
-    if (!tags.includes(text.toLowerCase())) tags.push(text.toLowerCase());
+    const tag = normalizeTag(text);
+    if (!tags.includes(tag)) tags.push(tag);
   }
   return tags;
 }

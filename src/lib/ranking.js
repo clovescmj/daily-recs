@@ -1,6 +1,7 @@
 // Pure ranking and selection logic (no I/O). Everything here works on the persisted state.
 import { hashSource } from './taste-sync.js';
-import { createSourceWeigher, tagFit } from './taste-profile.js';
+import { normalizeTag } from './bandcamp.js';
+import { createSourceWeigher, tagFit, tagShare } from './taste-profile.js';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Ownership lookup: Sets are built once per `owned` snapshot instead of scanning arrays for every candidate.
@@ -32,6 +33,10 @@ const TAG_WEIGHT = 60;             // a perfect tag match is worth about six sou
 const NO_OVERLAP_PENALTY = 0.3;    // share of TAG_WEIGHT lost by an album sharing no tag with the user's taste
 const BOOSTED_SOURCE_SHARE = 0.3;
 const REJECTED_SOURCE_NET = -2;
+const PRIMARY_TAGS = 4;            // an album's first tags say what genre it is; later ones are incidental
+const TAG_CAP_SLACK = 1.5;         // a genre may take up to 1.5x its share of the user's library in a list
+const MIN_TAG_CAP = 2;
+const BROAD_TAG_SHARE = 0.4;       // tags this common ("electronic") are not limited: they say little and don't distort a list
 const MAX_SOURCES_PER_ARTIST = 2;  // an artist's albums recommend the same things: more than two add nothing
 
 /** Net taste points of a source: likes that came from it minus dislikes that came from it. */
@@ -83,18 +88,49 @@ export function rankedCandidates(state) {
     .map(({ candidate }) => candidate);
 }
 
-/** "Best matches": the top candidates, one per artist (completing with repeated artists only as a last resort). */
-export function pickBest(state, count) {
-  const ranked = rankedCandidates(state);
+/**
+ * Keeps a list in proportion to the user's taste. Recommendations from Bandcamp tend to pile up in a few popular
+ * neighbourhoods (say, darkwave next to post-punk and EBM), so without a limit one of them can take a quarter of the
+ * list although it is a small part of the user's library. A genre may appear in at most `slack` times its share of the
+ * library (and at least MIN_TAG_CAP albums); only an album's first few tags count, and very common tags are not limited.
+ */
+function createTagLimiter(state, count) {
+  const used = new Map();
+  const primary = (candidate) => (candidate.tags || []).slice(0, PRIMARY_TAGS).map(normalizeTag);
+  const cap = (tag) => Math.max(MIN_TAG_CAP, Math.ceil(count * tagShare(state, tag) * TAG_CAP_SLACK));
+  return {
+    allows: (candidate) => primary(candidate).every((tag) => tagShare(state, tag) >= BROAD_TAG_SHARE || (used.get(tag) || 0) < cap(tag)),
+    take: (candidate) => primary(candidate).forEach((tag) => used.set(tag, (used.get(tag) || 0) + 1)),
+  };
+}
+
+/**
+ * Walks `order` and picks `count` albums, one per artist, keeping genres in proportion (see createTagLimiter). If that
+ * leaves the list short, the limit is relaxed rather than returning fewer albums.
+ */
+function pickInProportion(state, order, count, onPick = () => {}) {
+  const hasProfile = Object.keys(state.tasteTags || {}).length > 0;
+  const limiter = createTagLimiter(state, count);
   const artists = new Set();
   const picks = [];
-  for (const candidate of ranked) {
-    if (artists.has(candidate.artistId)) continue;
-    artists.add(candidate.artistId);
-    picks.push(candidate.id);
+  const take = (candidate) => { artists.add(candidate.artistId); picks.push(candidate.id); limiter.take(candidate); onPick(candidate); };
+  for (const candidate of order) {
     if (picks.length >= count) break;
+    if (artists.has(candidate.artistId) || (hasProfile && !limiter.allows(candidate))) continue;
+    take(candidate);
   }
-  for (const candidate of ranked) {
+  for (const candidate of order) { // relax the genre limit
+    if (picks.length >= count) break;
+    if (!artists.has(candidate.artistId)) take(candidate);
+  }
+  return picks;
+}
+
+/** "Best matches": the top candidates, one per artist, kept in proportion to the user's taste. */
+export function pickBest(state, count) {
+  const ranked = rankedCandidates(state);
+  const picks = pickInProportion(state, ranked, count);
+  for (const candidate of ranked) { // last resort: repeated artists
     if (picks.length >= count) break;
     if (!picks.includes(candidate.id)) picks.push(candidate.id);
   }
@@ -117,16 +153,7 @@ export function pickSurprise(state, count) {
   const deeper = shuffle(ranked.slice(count).filter(acceptable));
   const top = shuffle(ranked.slice(0, count).filter(acceptable)); // fallback when the deeper part is small
   const fillers = hasProfile ? shuffle(ranked.filter(unknown)) : [];
-  const artists = new Set();
-  const picks = [];
-  for (const candidate of [...deeper, ...top, ...fillers]) {
-    if (artists.has(candidate.artistId)) continue;
-    artists.add(candidate.artistId);
-    picks.push(candidate.id);
-    candidate.surprise = true;
-    if (picks.length >= count) break;
-  }
-  return picks;
+  return pickInProportion(state, [...deeper, ...top, ...fillers], count, (candidate) => { candidate.surprise = true; });
 }
 
 /** Random order where heavier items tend to come first (weighted sampling without replacement). */

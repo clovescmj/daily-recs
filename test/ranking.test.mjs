@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { emptyState } from '../src/lib/state.js';
+import { emptyState, migrateState } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { createSourceWeigher } from '../src/lib/taste-profile.js';
 import {
@@ -153,5 +153,50 @@ describe('how much each album counts', () => {
     state.owned = { ...owned, sources: Array.from({ length: 20 }, (_, i) => ({ url: `https://s${i}.bandcamp.com/a`, title: `T${i}`, artist: i < 10 ? 'same artist' : `artist ${i}` })) };
     const picked = pickSources(state, 20);
     assert.ok(picked.filter((s) => s.artist === 'same artist').length <= 2);
+  });
+});
+
+describe('lists stay in proportion to the user taste', () => {
+  const album = (n, tags, srcs) => ({ id: String(n), artistId: `a${n}`, title: `T${n}`, artist: `A${n}`, url: `https://c.bandcamp.com/album/${n}`, srcs, tags });
+
+  function crowdedState() {
+    const state = stateWith([]);
+    state.tasteTags = { electronic: 50, industrial: 40, ebm: 30, darkwave: 8 };      // darkwave is a small part of this library
+    for (let i = 0; i < 100; i++) state.sampled[`https://s${i}.bandcamp.com/a`] = 1; // 100 albums were read
+    // 25 darkwave albums that Bandcamp recommends a lot (they rank first), then 40 albums of the user's main genres
+    for (let i = 0; i < 25; i++) state.pool[`d${i}`] = album(`d${i}`, ['darkwave', 'electronic'], { s1: 9, s2: 9, s3: 9 });
+    for (let i = 0; i < 40; i++) state.pool[`m${i}`] = album(`m${i}`, i % 2 ? ['industrial', 'electronic'] : ['ebm', 'electronic'], { s1: 3 });
+    return state;
+  }
+  const withTag = (state, ids, tag) => ids.filter((id) => state.pool[id].tags.includes(tag)).length;
+
+  test('a small genre does not take over the list, even when it ranks first', () => {
+    const state = crowdedState();
+    const picks = pickBest(state, 30);
+    assert.equal(picks.length, 30);
+    assert.ok(withTag(state, picks, 'darkwave') <= 5, `darkwave: ${withTag(state, picks, 'darkwave')}`);
+  });
+
+  test('the limit is relaxed instead of returning a short list', () => {
+    const state = stateWith([]);
+    state.tasteTags = { electronic: 50, darkwave: 8 };
+    for (let i = 0; i < 100; i++) state.sampled[`https://s${i}.bandcamp.com/a`] = 1;
+    for (let i = 0; i < 10; i++) state.pool[`d${i}`] = album(`d${i}`, ['darkwave'], { s1: 3 });
+    assert.equal(pickBest(state, 8).length, 8);
+  });
+
+  test('without a taste profile nothing is limited', () => {
+    const state = stateWith([]);
+    for (let i = 0; i < 10; i++) state.pool[`d${i}`] = album(`d${i}`, ['darkwave'], { s1: 3 });
+    assert.equal(pickBest(state, 8).length, 8);
+  });
+
+  test('stored profiles merge old spellings of the same tag', () => {
+    const state = emptyState();
+    state.tasteTags = { 'e.b.m': 6, ebm: 29, 'electronic body music': 4, 'dark wave': 2, darkwave: 8 };
+    migrateState(state);
+    assert.equal(state.tasteTags.ebm, 39);
+    assert.equal(state.tasteTags.darkwave, 10);
+    assert.equal(Object.keys(state.tasteTags).length, 2);
   });
 });
