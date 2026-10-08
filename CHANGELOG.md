@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.12.2
+- Once a song is in Liked Songs, the + becomes a filled circle with a check mark (green), in the player bar and in the list.
+
 ## 0.12.1
 - The + of the player bar says "Add to Liked Songs" and, once the song is in the list, "Remove from Liked Songs" (a second click takes it out).
   The same wording in the list and in the messages.
