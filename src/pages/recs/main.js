@@ -51,6 +51,7 @@ async function chooseView(view, keys = []) {
 async function startFromLanding(view, keys) {
   await markPickedToday();
   setLandingVisible(false);
+  await refreshView();   // a run that is already going on now shows its progress
   await chooseView(view, keys);
 }
 

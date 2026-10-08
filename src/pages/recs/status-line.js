@@ -54,6 +54,8 @@ export function renderStatus(status) {
   const box = $('status');
   if (!(status.error === 'rate_limited' && status.retryAt)) clearInterval(countdownTimer);
   if (status.running) {
+    // On the opening screen the day's list is built in the background: nothing to show until the user picks something.
+    if (session.landing) { box.hidden = true; return; }
     const determinate = (status.phase === PHASE.SAMPLING || status.phase === PHASE.TASTE) && status.total;
     box.hidden = false;
     box.innerHTML = `<strong>${esc(progressText(status))}</strong>${determinate ? `<progress max="${Number(status.total)}" value="${Number(status.done) || 0}"></progress>` : '<progress></progress>'}`;
