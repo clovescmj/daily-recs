@@ -11,8 +11,8 @@
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
-  // The shuffle of Bandcamp's app (straight cut line ends, sharp arrow corners), drawn with strokes on a 810 × 620 grid.
-  const SHUFFLE = `<svg class="x-icon x-shuffle" viewBox="50 60 810 620" role="img" aria-label="Shuffle"><title>Shuffle</title><path d="M75 172H140C245 172 332 222 390 289"/><path d="M75 570H150C285 567 388 504 447 386C507 265 575 205 705 199H797"/><path d="M702 101L797 196L702 291"/><path d="M518 458C565 505 640 548 705 548H797"/><path d="M702 447L797 542L702 637"/></svg>`;
+  // The shuffle of Bandcamp's app (straight cut line ends, sharp arrow corners), drawn with strokes on a square 780 × 780 grid.
+  const SHUFFLE = `<svg class="x-icon x-shuffle" viewBox="63 -16 780 780" role="img" aria-label="Shuffle"><title>Shuffle</title><path d="M75 113H140C245 113 332 178 390 265"/><path d="M75 630H150C285 626 388 544 447 391C507 234 575 156 705 144H797"/><path d="M702 49L797 144L702 239"/><path d="M518 484C565 546 640 596 705 594H797"/><path d="M702 499L797 594L702 689"/></svg>`;
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
   // "Next album" icon: the record box from Bandcamp's menu (collection-outline-icon, minus the two top lines),
   // with a notch in the bottom-right corner where the ▶| triangle sits.

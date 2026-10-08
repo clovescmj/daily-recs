@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.2
+- The shuffle icon (page and player bar) is drawn on a square grid, so it fills the square button instead of looking flat: same shapes
+  as before (straight line ends, sharp arrow corners), just taller.
+
 ## 0.8.1
 - The "don't show music like this" icon no longer turns into a "+": it keeps the same icon, turns red while it is on, and a second click
   brings the album back (cards, queue and player bar).
