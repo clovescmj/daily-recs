@@ -5,7 +5,7 @@ import { MSG } from '../../lib/messages.js';
 import { findCard, paintDislike, paintLike, paintWish, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
-import { continueAfterRemoval, currentId, emit, playUpNextNow, setUpNext } from './player.js';
+import { continueAfterRemoval, currentId, emit, isShuffling, playAlbum } from './player.js';
 import { session } from './session.js';
 import { toast } from './toast.js';
 
@@ -62,24 +62,21 @@ export async function dislikeAlbum(id) {
   emit(true);
 }
 
-const WAIT_FOR_REPLACEMENT_MS = 3000;
-
-/** Asks for one new album at the end of the current list (in the background); it plays next. */
+/** Asks for one new album at the end of the current list, in the background: it can take a while, so nothing waits for it. */
 const requestReplacement = () => send({ type: MSG.EXTEND_LIST, view: session.view, tags: session.tagKeys })
   .then((reply) => (reply && reply.ok ? reply.id : null))
   .catch(() => null);
 
 /**
- * A hidden album is replaced by a new one at the end of the list, and that new album plays next. If the hidden album was
- * playing, the new one starts as soon as it arrives (waiting a few seconds at most, then the next card plays meanwhile).
+ * A hidden album is replaced by a new one at the end of the list (in shuffle it simply joins the albums that are left to
+ * play). Playback never waits for it: if the hidden album was playing, the next one starts right away. Only when the hidden
+ * album was the last one does the new album play, as soon as it arrives.
  */
 async function replaceHidden(wasPlaying, nextId) {
   const replacement = requestReplacement();
-  if (!wasPlaying) { replacement.then((id) => id && setUpNext(id)); return; }
-  const quick = await Promise.race([replacement, new Promise((resolve) => setTimeout(resolve, WAIT_FOR_REPLACEMENT_MS, undefined))]);
-  if (quick) { await playUpNextNow(quick); return; }
+  if (!wasPlaying) return;
   continueAfterRemoval(nextId);
-  replacement.then((id) => id && setUpNext(id));
+  if (!nextId && !isShuffling()) replacement.then((id) => id && playAlbum(id));
 }
 
 /** Back to neutral (the like that the dislike replaced is not restored). */

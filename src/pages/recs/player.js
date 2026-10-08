@@ -135,26 +135,6 @@ async function playRandomTrack() {
   emit(true);
 }
 
-// The album that took the place of one the user hid: it plays right after the current one (in shuffle: one of its tracks).
-let upNext = null;
-export const setUpNext = (id) => { upNext = id; };
-function takeUpNext() {
-  const id = upNext;
-  upNext = null;
-  return id && !session.dislikedThisVisit.has(id) ? id : null;
-}
-
-/** Plays the waiting album now (shuffle: one of its tracks). */
-export async function playUpNextNow(id) {
-  if (!player.shuffle) return playAlbum(id);
-  player.busy = true;
-  emit(true);
-  try {
-    if (await playShuffleFrom(id, await loadState(), { allowRepeat: true })) return undefined;
-  } catch { /* fall through */ }
-  return playRandomTrack();
-}
-
 // ── Transport ───────────────────────────────────────────────────────────────────────────────────────────────────
 
 const nextAlbumId = () => { const ids = visibleCardIds(); return ids[ids.indexOf(player.current.id) + 1]; };
@@ -168,16 +148,14 @@ export const pause = () => audio.pause();
 
 export function nextTrack() {
   if (!player.current.id) return startFirst();
-  if (player.shuffle) { const waiting = takeUpNext(); return waiting ? playUpNextNow(waiting) : playRandomTrack(); }
+  if (player.shuffle) return playRandomTrack();
   if (player.current.index + 1 < player.current.tracks.length) return playTrack(player.current.index + 1);
-  const next = takeUpNext() || nextAlbumId();   // the end of the album: the album that replaced a hidden one goes first
+  const next = nextAlbumId();
   return next && playAlbum(next);
 }
 
 export function skipAlbum() {
   if (!player.current.id) return startFirst();
-  const waiting = takeUpNext();
-  if (waiting) return playUpNextNow(waiting);
   if (player.shuffle) return playRandomTrack();
   const next = nextAlbumId();
   return next && playAlbum(next);
