@@ -192,6 +192,7 @@ export const toggleMute = () => { audio.muted = !audio.muted; };
 
 function setShuffle(on) {
   player.shuffle = on;
+  paintPlayAll();
   emit(true);
 }
 
@@ -245,6 +246,13 @@ function paintPlayAll() {
   const label = playing ? 'Pause' : 'Play';
   button.title = label;
   button.setAttribute('aria-label', label);
+  const shuffle = document.getElementById('shuffle-all');
+  if (!shuffle) return;
+  shuffle.classList.toggle('is-on', player.shuffle);
+  shuffle.setAttribute('aria-pressed', String(player.shuffle));
+  const shuffleLabel = player.shuffle ? 'Turn shuffle off' : 'Shuffle';
+  shuffle.title = shuffleLabel;
+  shuffle.setAttribute('aria-label', shuffleLabel);
 }
 
 export function markPlaying() {

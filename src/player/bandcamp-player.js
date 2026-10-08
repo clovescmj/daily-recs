@@ -4,7 +4,6 @@
   const P = {
     vol: 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z',
     mute: 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
-    shuffle: 'M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z',
     skip: 'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
     heart: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
     heartOn: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
@@ -15,6 +14,8 @@
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
+  // The shuffle of Bandcamp's app (straight cut line ends, sharp arrow corners), drawn with strokes on a 810 × 620 grid.
+  const SHUFFLE = `<svg class="x-icon x-shuffle" viewBox="50 60 810 620" role="img" aria-label="Shuffle"><title>Shuffle</title><path d="M75 172H140C245 172 332 222 390 289"/><path d="M75 570H150C285 567 388 504 447 386C507 265 575 205 705 199H797"/><path d="M702 101L797 196L702 291"/><path d="M518 458C565 505 640 548 705 548H797"/><path d="M702 447L797 542L702 637"/></svg>`;
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
   // "Next album" icon: the record box from Bandcamp's menu (collection-outline-icon, minus the two top lines),
   // with a notch in the bottom-right corner where the ▶| triangle sits.
@@ -57,7 +58,7 @@
         <div class="transport"><div class="prev"><div class="icon prev-icon" role="button" tabindex="0" aria-label="Previous track" title="Previous track"></div></div><div class="next"><div class="icon next-icon" role="button" tabindex="0" aria-label="Next track" title="Next track"></div></div></div>
       </div>
       <div class="col col-4-15 controls-extra">
-        <a href="#" class="x-btn x-shuf" title="Shuffle" aria-label="Shuffle">${svg(P.shuffle, 'x-icon', '', 'Shuffle')}</a>
+        <a href="#" class="x-btn x-shuf" title="Shuffle" aria-label="Shuffle">${SHUFFLE}</a>
         <a href="#" class="x-btn x-skip" title="Next album" aria-label="Next album">${NEXT_ALBUM}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Today's queue" aria-label="Today's queue">${svg(P.queue, 'x-icon', '', 'Today\'s queue')}</a>

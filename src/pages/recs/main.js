@@ -5,7 +5,7 @@ import { runCommand } from './commands.js';
 import { loadState, loadStatus, pickedToday, savePicked, send, watchStorage } from './data.js';
 import { $ } from './dom.js';
 import { listenToHost } from './host-bridge.js';
-import { initPlayer, playAlbum, togglePlay } from './player.js';
+import { initPlayer, playAlbum, toggleShuffle, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, refreshLanding, setLandingVisible } from './landing.js';
@@ -96,6 +96,7 @@ async function init() {
   initViewSwitch(chooseView);
   initLanding(startFromLanding);
   $('play-all').addEventListener('click', () => togglePlay());
+  $('shuffle-all').addEventListener('click', () => toggleShuffle());
   $('album-grid').addEventListener('click', onGridClick);
 
   initPlayer();

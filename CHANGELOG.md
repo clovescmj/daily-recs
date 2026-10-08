@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.6.1
+- A shuffle button next to the play button at the top of the page: it turns shuffle on and off like the one in the player bar (blue when
+  on), and both always show the same state. Both use the shuffle icon of Bandcamp's app: straight cut line ends and sharp arrow corners.
+
 ## 0.6.0
 - The player bar has a thumbs-up button that opens the list of albums you like (the most recent like first, not only today's). Each item
   can be played, taken out of the likes (the green thumb) or added to / removed from the wishlist (the heart). It shares the space of the
