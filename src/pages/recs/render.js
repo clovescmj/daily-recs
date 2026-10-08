@@ -1,6 +1,6 @@
 // Draws the page from the stored state and the run status.
 import { tagListKey, todayKey } from '../../lib/state.js';
-import { cardHtml, findCard, paintDislike, paintLike, paintWish } from './cards.js';
+import { cardHtml, findCard, paintDislike, paintWish } from './cards.js';
 import { $ } from './dom.js';
 import { emit, markPlaying } from './player.js';
 import { session } from './session.js';
@@ -37,17 +37,16 @@ function renderGrid(state, status) {
   const list = currentList(state);
   const ids = list ? visibleAlbumIds(state, list) : [];
   session.hasList = Boolean(list) && list.ids.some((id) => !(state.dismissed || []).includes(id));
-  session.liked = new Set(state ? state.liked || [] : []);
   session.wished = new Set(state ? state.wishlisted || [] : []);
 
   if (!list) { setEmpty(status.running || status.error ? '' : 'Getting your recommendations ready…'); return; }
   if (!ids.length) { setEmpty('Nothing new for now. Come back tomorrow.'); return; }
 
-  // Rebuild the cards only when the list itself changed; otherwise just sync the like/dislike controls.
+  // Rebuild the cards only when the list itself changed; otherwise just sync the wishlist / dislike controls.
   const key = ids.join(',');
   if (key !== renderedKey) {
     $('album-grid').innerHTML = ids.map((id) => cardHtml(state.pool[id], {
-      wished: session.wished.has(id), liked: session.liked.has(id), disliked: session.dislikedThisVisit.has(id),
+      wished: session.wished.has(id), disliked: session.dislikedThisVisit.has(id),
     })).join('');
     renderedKey = key;
   } else {
@@ -55,7 +54,6 @@ function renderGrid(state, status) {
       const card = findCard(id);
       if (!card) continue;
       paintWish(card, session.wished.has(id));
-      paintLike(card, session.liked.has(id));
       paintDislike(card, session.dislikedThisVisit.has(id));
     }
   }

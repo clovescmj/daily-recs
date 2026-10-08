@@ -83,8 +83,14 @@ export function rankedCandidates(state, exclude = {}) {
   // `exclude` ({ ids, artists }): albums already in the list being extended, so the new one is really new there
   const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || []), ...(state.wishlisted || []), ...(exclude.ids || [])]);
   const seenArtists = new Set([...(state.shownArtists || []), ...(exclude.artists || [])]);
+  // "Don't show music like this": the artist of a hidden album, and the albums Bandcamp pairs with it, never come back
+  const avoided = new Set();
+  for (const entry of Object.values(state.avoid || {})) {
+    if (entry.artistId) seenArtists.add(entry.artistId);
+    for (const id of entry.near) avoided.add(id);
+  }
   return Object.values(state.pool)
-    .filter((c) => !seen.has(c.id) && !seenArtists.has(c.artistId) && !isOwned(c, state.owned))
+    .filter((c) => !seen.has(c.id) && !avoided.has(c.id) && !seenArtists.has(c.artistId) && !isOwned(c, state.owned))
     .map((candidate) => ({ candidate, points: score(candidate, state, weigh) }))
     .sort((a, b) => b.points - a.points)
     .map(({ candidate }) => candidate);
@@ -211,30 +217,15 @@ export function markShown(state, ids) {
  * the ones with more of them first. Albums whose tags weren't read still come from the user's albums of that genre, so they
  * fill the end of the list.
  */
-/**
- * Tags to keep away from a genre list: the other tags of the albums the user hid from a list of those same genres. Hiding an
- * album there says it is further from what was asked for, so what it has besides the genre counts against it, in this context only.
- */
-function focusPenalties(state, wanted) {
-  const penalties = new Map();
-  for (const entry of Object.values(state.focusDislikes || {})) {
-    if (!entry.keys.some((key) => wanted.has(key))) continue;
-    for (const tag of entry.tags) if (!wanted.has(tag)) penalties.set(tag, (penalties.get(tag) || 0) + 1);
-  }
-  return penalties;
-}
-
 export function pickFocused(state, count, keys, exclude, { allowUnknown = true } = {}) {
   const wanted = new Set(keys.map(normalizeTag));
-  const penalties = focusPenalties(state, wanted);
-  const penalty = (candidate) => (candidate.tags || []).reduce((sum, tag) => sum + (penalties.get(normalizeTag(tag)) || 0), 0);
   const ranked = rankedCandidates(state, exclude);
   // The genre must be one of the album's first tags: a tag far down the list is incidental, and a list for a DJ needs close matches.
   const matches = (candidate) => (candidate.tags || []).slice(0, FOCUS_PRIMARY_TAGS).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
   // How many of the user's albums recommend it: the more that do, the closer it is to what they have of that genre.
   const supporters = (candidate) => Object.keys(candidate.srcs || {}).length;
   const tagged = ranked.filter((candidate) => matches(candidate) > 0)
-    .sort((a, b) => penalty(a) - penalty(b) || matches(b) - matches(a) || supporters(b) - supporters(a));
+    .sort((a, b) => matches(b) - matches(a) || supporters(b) - supporters(a));
   const unknown = allowUnknown ? ranked.filter((candidate) => !candidate.tags) : [];
   const artists = new Set();
   const picks = [];

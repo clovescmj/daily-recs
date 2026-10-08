@@ -422,13 +422,28 @@ async function rememberProfileUrl(fetchFn, state, store) {
 // Feedback: like / unlike / dislike / undislike
 // ---------------------------------------------------------------------------------------------------------------------
 
+const AVOID_MAX = 300;      // hidden albums whose neighbours are remembered (the oldest are forgotten first)
+
+/**
+ * The albums Bandcamp itself pairs with an album (its "you may also like"): what is closely tied to a hidden album. One request,
+ * and only when the album was hidden; if it fails the artist is still avoided.
+ */
+async function neighboursOf(fetchFn, candidate, tuning) {
+  if (!isBandcampUrl(candidate.url)) return [];
+  try {
+    return parseRecommendations(await fetchText(fetchFn, candidate.url, httpOptions(withDefaults(tuning)))).map((rec) => rec.id);
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Applies a vote. Votes move the thermometer points of the album's sources; a like also reads the liked album's own
  * recommendations right away, so the taste becomes new candidates without waiting for the next day. Putting an album in the
  * wishlist (the heart) is remembered apart from the like, and it is read the same way.
  * kind: 'like' | 'unlike' | 'dislike' | 'undislike' | 'wish' | 'unwish'
  */
-export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], tuning }) {
+export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning }) {
   const state = await store.load();
   const candidate = state && state.pool[id];
   if (!candidate) return state;
@@ -451,8 +466,8 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = []
 
   if (kind === 'like' && !state.liked.includes(id)) {
     if (state.dismissed.includes(id)) { // a like replaces the dislike
-      adjust(state.sourceDislikes, state.focusDislikes[id] ? -2 : -1);
-      delete state.focusDislikes[id];
+      adjust(state.sourceDislikes, -1);
+      delete state.avoid[id];
     }
     recordVote(state, id, VOTE.LIKE);
     adjust(state.sourceLikes, +1, 2);
@@ -473,18 +488,18 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = []
     if (state.liked.includes(id)) adjust(state.sourceLikes, -1, 2); // a dislike replaces the like
     recordVote(state, id, VOTE.DISLIKE);
     adjust(state.sourceDislikes, +1);
-    const keys = [...new Set((tags || []).map(normalizeTag).filter(Boolean))];
-    if (keys.length) { // hidden from a genre list: it counts twice, and what the album has besides the genre is held against it there
-      adjust(state.sourceDislikes, +1);
-      state.focusDislikes[id] = { keys, tags: [...new Set((candidate.tags || []).map(normalizeTag).filter(Boolean))] };
-    }
     rebuildVoteLists(state);
+    state.avoid[id] = { artistId: candidate.artistId || '', near: [] }; // the artist stops coming at once; the neighbours are found next
+    await store.save(state);
+    state.avoid[id].near = await neighboursOf(fetchFn, candidate, tuning);
   } else if (kind === 'undislike' && state.dismissed.includes(id)) {
     recordVote(state, id, VOTE.UNDISLIKE); // back to neutral: only undoes the points the dislike gave
     adjust(state.sourceDislikes, -1);
-    if (state.focusDislikes[id]) { adjust(state.sourceDislikes, -1); delete state.focusDislikes[id]; }
+    delete state.avoid[id];
     rebuildVoteLists(state);
   }
+  const hidden = Object.keys(state.avoid);
+  for (const old of hidden.slice(0, Math.max(0, hidden.length - AVOID_MAX))) delete state.avoid[old];
   await store.save(state);
   return state;
 }

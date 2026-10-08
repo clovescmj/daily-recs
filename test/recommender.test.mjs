@@ -441,20 +441,28 @@ describe('feedback', () => {
     assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0), 'and takes the dislike back');
   });
 
-  test('hidden from a genre list, a dislike weighs double and is held against what the album had besides the genre; undoing it undoes all of it', async () => {
+  test('"don\'t show music like this" remembers the artist and the albums Bandcamp pairs with it; undoing it forgets them', async () => {
     const ctx = await withList();
-    ctx.state.pool[ctx.id].tags = ['ebm', 'synthpop'];
-    await ctx.store.save(ctx.state);
+    const hidden = ctx.state.pool[ctx.id];
     let state = await apply(ctx, 'dislike');
-    const single = Object.values(state.sourceDislikes).reduce((a, b) => Math.max(a, b), 0);
-    await apply(ctx, 'undislike');
-    state = await applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id: ctx.id, kind: 'dislike', tags: ['ebm'], tuning: TUNING });
-    const double = Object.values(state.sourceDislikes).reduce((a, b) => Math.max(a, b), 0);
-    assert.equal(double, single * 2, 'counts twice');
-    assert.deepEqual(state.focusDislikes[ctx.id], { keys: ['ebm'], tags: ['ebm', 'synthpop'] });
+    assert.deepEqual(state.dismissed, [ctx.id]);
+    assert.equal(state.avoid[ctx.id].artistId, hidden.artistId);
+    assert.ok(state.avoid[ctx.id].near.length > 0, 'its neighbours were read from its page');
+    assert.ok(ctx.fake.calls.some((c) => c.url === hidden.url), 'one request to its page');
     state = await apply(ctx, 'undislike');
-    assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0), 'all of it is undone');
-    assert.deepEqual(state.focusDislikes, {});
+    assert.deepEqual(state.avoid, {});
+    assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0));
+  });
+
+  test('a hidden album is never replaced by its neighbours or by another album of its artist', async () => {
+    const ctx = await withList();
+    let state = await apply(ctx, 'dislike');
+    const { near, artistId } = state.avoid[ctx.id];
+    const next = await ctx.run({ mode: 'surprise', force: true });
+    for (const id of next.surprise.ids) {
+      assert.ok(!near.includes(id), 'not a neighbour');
+      assert.notEqual(next.pool[id].artistId, artistId, 'not the same artist');
+    }
   });
 
   test('albums in the wishlist never come back in a list', async () => {

@@ -29,8 +29,6 @@ const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
 let queueSentKey = '';
-let likesCache = { key: '', items: [] };
-let likesSentKey = '';
 let recoveredAt = null;          // guards the one-shot recovery from an expired stream URL
 
 export const isPlaying = () => !audio.paused;
@@ -268,8 +266,8 @@ export function markPlaying() {
 
 function queueItems() {
   const ids = visibleCardIds();
-  // the heart and the thumb of each item are part of the key, so the bar redraws when one of them changes
-  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${session.liked.has(id) ? 'l' : ''}`).join(',');
+  // the heart of each item is part of the key, so the bar redraws when one of them changes
+  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}`).join(',');
   if (key !== queueCache.key) {
     queueCache = {
       key,
@@ -277,27 +275,12 @@ function queueItems() {
         const card = findCard(id);
         return {
           id, label: `${card.querySelector('.album-artist').textContent} - ${card.querySelector('.album-title').textContent}`,
-          wished: session.wished.has(id), liked: session.liked.has(id),
+          wished: session.wished.has(id),
         };
       }),
     };
   }
   return queueCache;
-}
-
-/** The albums the user likes, the most recent like first (not only today's: a like stays). */
-function likesItems() {
-  const state = session.state || {};
-  const when = (id) => parseInt(String((state.votes || {})[id] || '').split('.')[1] || '0', 36);
-  const ids = [...session.liked].filter((id) => state.pool && state.pool[id]).sort((a, b) => when(b) - when(a));
-  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}`).join(',');
-  if (key !== likesCache.key) {
-    likesCache = {
-      key,
-      items: ids.map((id) => ({ id, label: `${state.pool[id].artist} - ${state.pool[id].title}`, wished: session.wished.has(id) })),
-    };
-  }
-  return likesCache;
 }
 
 function snapshot() {
@@ -316,15 +299,12 @@ function snapshot() {
     vol: audio.muted ? 0 : audio.volume, shuffle: player.shuffle,
     curId: current.id,
     wished: Boolean(album) && session.wished.has(album.id),
-    liked: Boolean(album) && session.liked.has(album.id),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     hasPrev: player.shuffle ? player.history.length > 1 : current.index > 0,
     hasNext: player.shuffle || current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;
-  const likes = likesItems();
-  if (likes.key !== likesSentKey) snap.likes = likes.items;
   return snap;
 }
 
@@ -336,7 +316,6 @@ export function emit(force = false) {
   const snap = snapshot();
   postToHost({ dr: 'now', ...snap });
   if (snap.queue) queueSentKey = queueCache.key;
-  if (snap.likes) likesSentKey = likesCache.key;
 }
 
 // ── Audio events and setup ──────────────────────────────────────────────────────────────────────────────────────

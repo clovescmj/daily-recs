@@ -169,16 +169,11 @@ describe('how much each album counts', () => {
     assert.deepEqual(state.tasteTags, before);
   });
 
-  test('in a genre list, what an album hidden from that same genre had besides the genre is held against the next ones', () => {
-    const withTags = (id, artistId, tags) => ({ ...candidate(id, artistId, { u: 3 }), tags });
-    const state = stateWith([withTags('a', 'a', ['ebm', 'synthpop']), withTags('b', 'b', ['ebm', 'darkwave']), withTags('c', 'c', ['ebm'])]);
-    assert.deepEqual(pickFocused(state, 3, ['ebm']).sort(), ['a', 'b', 'c']);
-    state.focusDislikes = { 99: { keys: ['ebm'], tags: ['ebm', 'synthpop'] } };
-    const picks = pickFocused(state, 3, ['ebm']);
-    assert.equal(picks.at(-1), 'a', 'the one with synthpop goes last');
-    assert.deepEqual(pickFocused(state, 3, ['metal']).length, 0, 'nothing of another genre list changes');
-    state.focusDislikes = { 99: { keys: ['metal'], tags: ['ebm', 'synthpop'] } };
-    assert.notEqual(pickFocused(state, 3, ['ebm']).at(-1), 'a', 'a dislike made in a list of other genres does not count here');
+  test('"don\'t show music like this": the artist of a hidden album and the albums Bandcamp pairs with it do not come back', () => {
+    const state = stateWith([candidate('a', 'x', { u: 3 }), candidate('b', 'y', { u: 3 }), candidate('c', 'z', { u: 3 }), candidate('d', 'x', { u: 3 })]);
+    assert.equal(pickBest(state, 4).length, 4);
+    state.avoid = { 99: { artistId: 'x', near: ['b'] } };
+    assert.deepEqual(pickBest(state, 4), ['c'], 'the artist x and the neighbour b are out');
   });
 
   test('in a genre list, an album recommended by more of the user\'s albums comes first', () => {

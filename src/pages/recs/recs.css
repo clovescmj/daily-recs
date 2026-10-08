@@ -30,7 +30,7 @@
   --link-dark: var(--blue500);
   --accent: var(--link-blue);
   --icon: #8a8f91;
-  --restore: var(--green500);       /* the thumb of an album the user likes */
+  --restore: var(--green500);       /* the "+" that brings a hidden album back */
   --danger: #d64541;                /* "don't show again", on white */
   --wishlist: #f7931e;              /* heart when the album is in the wishlist */
   --border-hover: #b4b4b4;
@@ -193,16 +193,16 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .album-card.is-disliked .cover-play { display: none; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
 
-/* ── Card actions: ♥ wishlist on the left · 👍 like and 👎 don't show again on the right ───────────────────────── */
+/* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
 .album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; }
 .album-actions a { color: var(--accent); display: inline-flex; align-items: center; }
 .album-actions a:hover { text-decoration: underline; }
-.album-actions .action-rate { margin-left: auto; display: inline-flex; gap: 10px; } /* the thumbs sit at the right edge of the card */
+.album-actions .action-dislike { margin-left: auto; } /* the "don't show" icon sits at the right edge of the card */
 .album-actions svg { width: 17px; height: 17px; fill: var(--icon); }
 .action-wishlist:hover svg { fill: var(--accent); }
 .action-wishlist.is-on svg, .action-wishlist.is-on:hover svg { fill: var(--wishlist); }
-.action-like:hover svg, .action-like.is-on svg, .action-like.is-on:hover svg { fill: var(--restore); } /* green: I like it */
-.action-dislike:hover svg, .action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--danger); } /* red: not for me */
+.action-dislike:hover svg { fill: var(--danger); }
+.action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--restore); } /* the "+" that brings it back */
 
 /* ── Footer and toast ───────────────────────────────────────────────────────────────────────────────────────────── */
 .page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); }

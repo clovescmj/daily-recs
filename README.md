@@ -14,7 +14,7 @@ A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fr
 - Starts from what you own and what you've saved on Bandcamp.
 - Finds albums that fans of those records love, and keeps the ones that fit your taste.
 - Shows only what's new to you: nothing you own, nothing repeated.
-- **Thumbs up** what you like, **thumbs down** what you don't, and the next list gets sharper. The **heart** adds the album to your Bandcamp wishlist.
+- The **heart** adds an album to your Bandcamp wishlist. The **⊘** says "don't show music like this": that album, its artist and the albums Bandcamp pairs with it stop coming.
 - **Surprise me** goes a little further from the obvious.
 
 ## Project layout
@@ -29,7 +29,7 @@ src/
     bandcamp.js          Bandcamp requests and HTML parsing (retry, rate limits, pagination)
     ranking.js           scoring, one-per-artist picking, surprise mode
     recommender.js       refresh / feedback use cases (store + fetch injected)
-    taste-sync.js        likes/dislikes <-> chrome.storage.sync (chunked, last-write-wins)
+    taste-sync.js        hidden albums <-> chrome.storage.sync (chunked, last-write-wins)
     state.js, messages.js, storage-keys.js, config.js
   background/            service worker (registers every listener synchronously at top level)
     service-worker.js    entry point
@@ -55,5 +55,5 @@ After changing `manifest.json`, reload the extension in `chrome://extensions`.
 ## Design notes
 - **Service worker:** listeners are registered synchronously at top level; long work is queued and never relies on in-memory state. Run progress lives in `chrome.storage.session`, so a worker killed mid-run can't leave the page "loading" forever.
 - **Messages:** every message is parsed strictly and the sender is checked: only the content script (on bandcamp.com) may ask for a wishlist change; everything else must come from the extension's own pages.
-- **Storage:** big state in `storage.local` (written twice per run); likes/dislikes in `storage.sync`, chunked to stay inside the quota.
+- **Storage:** big state in `storage.local` (written twice per run); hidden albums in `storage.sync`, chunked to stay inside the quota.
 - **Privacy:** see [PRIVACY.md](PRIVACY.md).

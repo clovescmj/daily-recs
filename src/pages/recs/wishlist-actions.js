@@ -1,8 +1,7 @@
-// Wishlist / like / dislike. The heart toggles the Bandcamp wishlist (the only control that changes the user's Bandcamp
-// account); the thumbs only teach the taste: the like asks for more like it, the dislike hides the album. Wishlist changes
-// are made by Bandcamp's own function, run inside the profile tab.
+// Wishlist / dislike. The heart toggles the Bandcamp wishlist (the only control that changes the user's Bandcamp account); the
+// thumb down says "don't show music like this". Wishlist changes are made by Bandcamp's own function, run inside the profile tab.
 import { MSG } from '../../lib/messages.js';
-import { findCard, paintDislike, paintLike, paintWish, visibleCardIds } from './cards.js';
+import { findCard, paintDislike, paintWish, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
 import { continueAfterRemoval, currentId, emit, isShuffling, playAlbum } from './player.js';
@@ -39,28 +38,17 @@ export async function setWish(id, on) {
   }
 }
 
-/** Thumbs up: "See more like this". Only teaches the taste; liking an album that was hidden brings it back first. */
-export async function setLike(id, on) {
-  if (on && session.dislikedThisVisit.has(id)) await undoDislike(id);
-  if (on) session.liked.add(id); else session.liked.delete(id);
-  const card = findCard(id);
-  if (card) paintLike(card, on);
-  emit(true);
-  await send({ type: MSG.FEEDBACK, id, kind: on ? 'like' : 'unlike' });
-}
-
 export async function dislikeAlbum(id) {
   const ids = visibleCardIds();
   const nextId = ids[ids.indexOf(id) + 1];
   const wasPlaying = currentId() === id;
-  session.liked.delete(id);
   session.dislikedThisVisit.add(id);
   const card = findCard(id);
   if (card) paintDislike(card, true);
   // Nothing below waits for the extension's background worker: it may be busy with a long job (a scan, a list being built) and
   // would only answer when it is done, and the music has to skip right now. The requests keep their order.
-  // Inside a genre list the genres go along: there, hiding an album weighs more. The wishlist is not touched: only the heart changes it.
-  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) }).catch(() => undefined);
+  // "Don't show music like this": the album, its artist and what is closely tied to it stop coming. The wishlist is not touched: only the heart changes it.
+  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike' }).catch(() => undefined);
   const replacement = requestReplacement();
   if (wasPlaying) {
     continueAfterRemoval(nextId);
@@ -78,7 +66,7 @@ const requestReplacement = () => send({ type: MSG.EXTEND_LIST, view: session.vie
   .then((reply) => (reply && reply.ok ? reply.id : null))
   .catch(() => null);
 
-/** Back to neutral (the like that the dislike replaced is not restored). */
+/** Back to neutral. */
 export async function undoDislike(id) {
   session.dislikedThisVisit.delete(id);
   const card = findCard(id);

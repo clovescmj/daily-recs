@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.0
+- Simpler feedback. The thumbs up and the list of liked albums are gone; the card has the **heart** (Bandcamp wishlist) and the **⊘**
+  (the icon is back). The ⊘ now means **"don't show music like this"**: the album stays hidden, and so do its artist and the albums
+  Bandcamp pairs with it ("you may also like" of that album, read once when you hide it). Undoing it brings everything back.
+- The hide made inside a genre list no longer counts double or penalises tags (0.6.2); the new rule above replaces it.
+- Albums liked in older versions keep working as before.
+
 ## 0.7.3
 - Faster genre lists: when a list comes out short, the genre tags of more candidates are read in steps of 50 (up to 300), and it stops
   after two steps that found no new album, instead of always reading all 300.

@@ -7,10 +7,8 @@
     skip: 'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
     heart: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
     heartOn: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
-    thumbUp: 'M9 21h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.58 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2zM9 9l4.34-4.34L12 10h9v2l-3 7H9V9zM1 9h4v12H1z',
-    thumbUpOn: 'M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z',
-    thumbDown: 'M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm0 12l-4.34 4.34L12 14H3v-2l3-7h9v10zm4-12h4v12h-4z',
-    thumbDownOn: 'M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z',
+    addCircle: 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
+    block: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z',
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
@@ -29,7 +27,7 @@
     <g transform="translate(18.72 15.37) scale(0.212)"><path d="M22.9043 13.2236V0.106445H28.2109V30.5322H22.9043V17.4141L0 30.6387V0L22.9043 13.2236Z"/></g></svg>`;
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.liked ? 'l' : ''}`).join(',');
+  const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}`).join(',');
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
   function create({ spriteUrl, busyUrl, onCmd }) {
@@ -43,7 +41,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="like" href="#" title="See more like this" aria-label="See more like this">${svg(P.thumbUp, 'ci', '', 'See more like this')}</a><a class="dislike" href="#" title='Hide this album' aria-label="Hide this album">${svg(P.thumbDown, 'ci', '', 'Hide this album')}</a></div></div>
+          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>
@@ -62,7 +60,6 @@
         <a href="#" class="x-btn x-skip" title="Next album" aria-label="Next album">${NEXT_ALBUM}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Today's queue" aria-label="Today's queue">${svg(P.queue, 'x-icon', '', 'Today\'s queue')}</a>
-        <a href="#" class="x-btn x-likes" title="Albums you like" aria-label="Albums you like">${svg(P.thumbUp, 'x-icon', '', 'Albums you like')}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <div class="vol">
           <div class="vol-icon-wrapper" role="button" tabindex="0" aria-label="Mute or unmute" title="Mute or unmute">${svg(P.vol, 'vol-icon', '', 'Volume')}</div>
@@ -72,10 +69,6 @@
       </div></div>
       <div class="queue" role="dialog" aria-label="Now playing recommendations">
         <div class="queue-header"><h2>now playing <b>recommendations</b></h2><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
-        <ol></ol>
-      </div>
-      <div class="queue likes" role="dialog" aria-label="Albums you like">
-        <div class="queue-header"><h2>albums <b>you like</b></h2><span class="l-close" role="button" tabindex="0" aria-label="Close likes" title="Close likes">${svg(P.close, 'close-icon', '', 'Close likes')}</span></div>
         <ol></ol>
       </div>`;
     const q = (s) => el.querySelector(s);
@@ -120,20 +113,9 @@
     q('.next-icon').addEventListener('click', (e) => { if (!e.target.classList.contains('disabled')) onCmd('next'); });
     q('.x-shuf').addEventListener('click', (e) => { e.preventDefault(); onCmd('shuf'); });
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
-    q('.like').addEventListener('click', (e) => { e.preventDefault(); onCmd('like'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
-    // the queue and the list of likes are two panels over the bar: opening one closes the other
-    const setQueue = (on) => { if (on) setLikes(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
-    const setLikes = (on) => { if (on) setQueue(false); q('.likes').classList.toggle('show', on); q('.x-likes').classList.toggle('active', on); };
+    const setQueue = (on) => { q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
-    q('.x-likes').addEventListener('click', (e) => { e.preventDefault(); setLikes(!q('.likes').classList.contains('show')); });
-    q('.l-close').addEventListener('click', () => setLikes(false));
-    q('.likes ol').addEventListener('click', (e) => {
-      const li = e.target.closest('li[data-id]');
-      if (!li) return;
-      const act = e.target.closest('[data-act]');
-      if (act) { e.preventDefault(); onCmd(act.dataset.act, li.dataset.id); } else onCmd('playAlbum', li.dataset.id);
-    });
     q('.q-close').addEventListener('click', () => setQueue(false));
     q('.queue ol').addEventListener('click', (e) => {
       const li = e.target.closest('li[data-id]');
@@ -167,21 +149,11 @@
         q('.queue ol').innerHTML = queue.map((it, i) =>
           `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span><span class="qlabel">${i + 1}. ${esc(it.label)}</span><span class="qact">`
           + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
-          + action('like', it.liked, 'See more like this', 'Stop seeing more like this', P.thumbUp, P.thumbUpOn)
-          + action('dislike', false, 'Hide this album', 'Show this album again', P.thumbDown, P.thumbDownOn)
+          + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.addCircle)
           + '</span></li>').join('');
       }
-      if (s.likes !== undefined) {
-        const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
-        q('.likes ol').innerHTML = s.likes.length
-          ? s.likes.map((it) => `<li data-id="${esc(it.id)}"><span class="qlabel">${esc(it.label)}</span><span class="qact">`
-            + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
-            + action('like', true, '', 'Remove from likes', P.thumbUp, P.thumbUpOn)
-            + '</span></li>').join('')
-          : '<li class="empty">No likes yet. Tap the thumbs up on an album you like.</li>';
-      }
       q('.queue').classList.toggle('audible', !!s.playing);
-      // wishlist heart, thumbs up, thumbs down: each one has its own icon and label
+      // wishlist heart and thumb down: each one has its own icon and label
       const paint = (selector, on, offLabel, onLabel, offPath, onPath) => {
         const el = q(selector); el.classList.toggle('on', on);
         const label = on ? onLabel : offLabel;
@@ -190,8 +162,7 @@
         if (path.getAttribute('d') !== d) path.setAttribute('d', d);
       };
       paint('.wish', !!s.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn);
-      paint('.like', !!s.liked, 'See more like this', 'Stop seeing more like this', P.thumbUp, P.thumbUpOn);
-      paint('.dislike', !!s.disliked, 'Hide this album', 'Show this album again', P.thumbDown, P.thumbDownOn);
+      paint('.dislike', !!s.disliked, "Don't show music like this", 'Show this album again', P.block, P.addCircle);
       setText(q('.trk-no'), s.trackNo && !s.msg ? `${s.trackNo}. ` : '');
       setText(q('.trk'), s.msg || s.track || '');
       setText(q('.pos'), mmss(s.cur)); setText(q('.dur'), mmss(s.dur));
