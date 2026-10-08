@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.3.4
+- New icon (the parallelogram with a sparkle cut out of it): toolbar icon in black and in white (white is the default and the one
+  used on dark toolbars), icon for the extensions page and the store (black on white, artwork at 75% as Chrome recommends),
+  promo tile and banner. The sources are in `store/assets/figma/symbol.svg` and `store/assets/variants/`.
+
 ## 0.3.3
 - The genre picker no longer offers things that aren't genres: formats and years (cassette, 2023…), generic words, names of
   labels and artists (tags that are part of the account name that released the albums), tags that are almost never among the
