@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.11.0
+- **Type of playback.** A new button in the player bar, next to "next album", switches between **one song per album** (the default: the song
+  the artist features, or the first one, of each album in the order of the list, the way Bandcamp's own lists play) and **whole albums**
+  (the way it used to be). The choice is remembered. It shows a note (blue) for one song per album and a disc for whole albums.
+- In one song per album, "next" and "previous" move between albums, a song that ends goes on to the next album's, and there is **no
+  shuffle** (its button is hidden). Shuffle is back when you switch to whole albums.
+
 ## 0.10.1
 - On the opening screen no option is selected to begin with ("Best matches" used to be). "Start digging" stays off until one is picked
   (and, for "My tags", until at least one genre is ticked).

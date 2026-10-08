@@ -12,6 +12,7 @@ const TRACKS_TTL_MS = 20 * 60 * 1000;      // stream URLs expire, so cached trac
 const SHUFFLE_TRIES = 6;
 const EMIT_MIN_INTERVAL_MS = 200;
 const VOLUME_KEY = 'dr-vol';
+const MODE_KEY = 'dr-mode';
 
 const audio = new Audio();
 audio.preload = 'none';
@@ -20,6 +21,7 @@ const player = {
   current: { id: null, tracks: [], index: 0 },
   album: null,          // candidate being played (for the bar and Media Session)
   shuffle: false,
+  mode: 'one',          // 'one': a song per album (its featured track, or the first), in the order of the list; 'album': whole albums
   busy: false,          // loading tracks
   message: '',          // error text for the bar
   history: [],          // shuffle history, for "previous"
@@ -160,6 +162,7 @@ export const pause = () => audio.pause();
 
 export function nextTrack() {
   if (!player.current.id) return startFirst();
+  if (player.mode === 'one') return skipAlbum(); // a song per album: the next one is the next album's
   if (player.shuffle) return playRandomTrack();
   if (player.current.index + 1 < player.current.tracks.length) return playTrack(player.current.index + 1);
   const next = nextAlbumId();
@@ -174,6 +177,13 @@ export function skipAlbum() {
 }
 
 export async function previousTrack() {
+  if (player.mode === 'one') { // back to the previous album's song (or to the start of this one, when it has been playing a while)
+    const ids = visibleCardIds();
+    const before = ids[ids.indexOf(player.current.id) - 1];
+    if (audio.currentTime > 3 || !before) { audio.currentTime = 0; return; }
+    playAlbum(before);
+    return;
+  }
   if (!player.shuffle) {
     if (audio.currentTime > 3 || player.current.index === 0) { audio.currentTime = 0; return; }
     playTrack(player.current.index - 1);
@@ -200,12 +210,21 @@ export function setVolume(value) {
 }
 export const toggleMute = () => { audio.muted = !audio.muted; };
 
+/** 'one' (a song per album, the way Bandcamp's own lists play) or 'album'. Shuffle only exists for whole albums. */
+export function toggleMode() {
+  player.mode = player.mode === 'one' ? 'album' : 'one';
+  if (player.mode === 'one') player.shuffle = false;
+  try { localStorage.setItem(MODE_KEY, player.mode); } catch { /* storage unavailable */ }
+  emit(true);
+}
+
 function setShuffle(on) {
   player.shuffle = on;
   emit(true);
 }
 
 export function toggleShuffle() {
+  if (player.mode === 'one') return undefined; // no shuffle while a song per album is played
   if (player.shuffle) { setShuffle(false); return undefined; }
   setShuffle(true);
   if (!player.current.id) return playRandomTrack(); // nothing playing yet: shuffle starts with a random track
@@ -321,8 +340,9 @@ function snapshot() {
     wished: Boolean(album) && session.wished.has(album.id),
     isSaved: Boolean(album && track) && session.saved.has(`${album.id}:${current.index}`),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
-    hasPrev: player.shuffle ? player.history.length > 1 : current.index > 0,
-    hasNext: player.shuffle || current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
+    mode: player.mode,
+    hasPrev: player.mode === 'one' ? albumIndex > 0 : player.shuffle ? player.history.length > 1 : current.index > 0,
+    hasNext: player.mode === 'one' ? albumIndex + 1 < queue.items.length : player.shuffle || current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;
@@ -369,6 +389,7 @@ async function recoverFromAudioError() {
 
 export function initPlayer() {
   try {
+    player.mode = localStorage.getItem(MODE_KEY) === 'album' ? 'album' : 'one';
     const saved = localStorage.getItem(VOLUME_KEY);
     if (saved !== null && Number.isFinite(+saved)) audio.volume = Math.max(0, Math.min(1, +saved));
   } catch { /* storage unavailable */ }

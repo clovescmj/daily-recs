@@ -16,6 +16,7 @@ const COMMANDS = {
   skip: () => player.skipAlbum(),
   pause: () => player.pause(),
   shuf: () => player.toggleShuffle(),
+  mode: () => player.toggleMode(),
   mute: () => player.toggleMute(),
   seek: (v) => isFraction(v) && player.seekTo(Math.max(0, Math.min(1, v))),
   seekBy: (v) => isFraction(v) && player.seekBy(Math.max(-60, Math.min(60, v))),
