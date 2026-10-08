@@ -1,4 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
-  <path id="parallelogram" d="M32 0 L128 0 L96 128 L0 128 Z" fill="#111111"/>
-  <path id="sparkle" d="M80,30 C84.8,60 90,65.2 120,70 C90,74.8 84.8,80 80,110 C75.2,80 70,74.8 40,70 C70,65.2 75.2,60 80,30 Z" fill="#FFFFFF"/>
-</svg>

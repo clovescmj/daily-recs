@@ -20,7 +20,10 @@ A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fr
 ## Project layout
 ```
 manifest.json            MV3 manifest (kept at the root: load this folder unpacked)
-icons/                   toolbar / store icons
+icons/                   extension icons: app-*.png (extensions page, favicon, store) and the toolbar pair
+                         icon-*.png (dark symbol) / dark/icon-*.png (white symbol, for dark toolbars)
+design/                  sources of the symbol (SVG); the icons and store images are generated from these
+store/                   Chrome Web Store: LISTING.md (texts to paste) and images/ (icon, promo tile, banner)
 src/
   lib/                   pure logic, no Chrome APIs except where noted
     bandcamp.js          Bandcamp requests and HTML parsing (retry, rate limits, pagination)
@@ -38,6 +41,7 @@ src/
     about/, shared/
   assets/                player sprite and busy animation
 test/                    node:test suites with an offline fake Bandcamp
+CHANGELOG.md, PRIVACY.md  history by version, and the privacy policy the store links to
 ```
 
 ## Development
