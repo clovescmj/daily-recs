@@ -57,7 +57,8 @@ export async function dislikeAlbum(id) {
   session.dislikedThisVisit.add(id);
   const card = findCard(id);
   if (card) paintDislike(card, true);
-  await send({ type: MSG.FEEDBACK, id, kind: 'dislike' }); // the wishlist is not touched: only the heart changes it
+  // inside a genre list the genres go along: there, hiding an album weighs more. The wishlist is not touched: only the heart changes it
+  await send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) });
   await replaceHidden(wasPlaying, nextId);
   emit(true);
 }

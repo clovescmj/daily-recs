@@ -210,12 +210,27 @@ export function markShown(state, ids) {
  * the ones with more of them first. Albums whose tags weren't read still come from the user's albums of that genre, so they
  * fill the end of the list.
  */
+/**
+ * Tags to keep away from a genre list: the other tags of the albums the user hid from a list of those same genres. Hiding an
+ * album there says it is further from what was asked for, so what it has besides the genre counts against it, in this context only.
+ */
+function focusPenalties(state, wanted) {
+  const penalties = new Map();
+  for (const entry of Object.values(state.focusDislikes || {})) {
+    if (!entry.keys.some((key) => wanted.has(key))) continue;
+    for (const tag of entry.tags) if (!wanted.has(tag)) penalties.set(tag, (penalties.get(tag) || 0) + 1);
+  }
+  return penalties;
+}
+
 export function pickFocused(state, count, keys, exclude, { allowUnknown = true } = {}) {
   const wanted = new Set(keys.map(normalizeTag));
+  const penalties = focusPenalties(state, wanted);
+  const penalty = (candidate) => (candidate.tags || []).reduce((sum, tag) => sum + (penalties.get(normalizeTag(tag)) || 0), 0);
   const ranked = rankedCandidates(state, exclude);
   const matches = (candidate) => (candidate.tags || []).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
   // what comes only from albums the user doesn't own (`hop`) goes after what comes from theirs
-  const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => Boolean(a.hop) - Boolean(b.hop) || matches(b) - matches(a));
+  const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => Boolean(a.hop) - Boolean(b.hop) || penalty(a) - penalty(b) || matches(b) - matches(a));
   const unknown = allowUnknown ? ranked.filter((candidate) => !candidate.tags) : [];
   const artists = new Set();
   const picks = [];

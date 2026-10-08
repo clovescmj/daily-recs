@@ -407,6 +407,22 @@ describe('feedback', () => {
     assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0), 'and takes the dislike back');
   });
 
+  test('hidden from a genre list, a dislike weighs double and is held against what the album had besides the genre; undoing it undoes all of it', async () => {
+    const ctx = await withList();
+    ctx.state.pool[ctx.id].tags = ['ebm', 'synthpop'];
+    await ctx.store.save(ctx.state);
+    let state = await apply(ctx, 'dislike');
+    const single = Object.values(state.sourceDislikes).reduce((a, b) => Math.max(a, b), 0);
+    await apply(ctx, 'undislike');
+    state = await applyFeedback({ fetch: ctx.fake.fetch, store: ctx.store, id: ctx.id, kind: 'dislike', tags: ['ebm'], tuning: TUNING });
+    const double = Object.values(state.sourceDislikes).reduce((a, b) => Math.max(a, b), 0);
+    assert.equal(double, single * 2, 'counts twice');
+    assert.deepEqual(state.focusDislikes[ctx.id], { keys: ['ebm'], tags: ['ebm', 'synthpop'] });
+    state = await apply(ctx, 'undislike');
+    assert.ok(Object.values(state.sourceDislikes).every((n) => n === 0), 'all of it is undone');
+    assert.deepEqual(state.focusDislikes, {});
+  });
+
   test('albums in the wishlist never come back in a list', async () => {
     const ctx = await withList();
     const [wished] = ctx.state.today.ids;

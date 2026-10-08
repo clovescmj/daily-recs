@@ -435,7 +435,7 @@ async function rememberProfileUrl(fetchFn, state, store) {
  * wishlist (the heart) is remembered apart from the like, and it is read the same way.
  * kind: 'like' | 'unlike' | 'dislike' | 'undislike' | 'wish' | 'unwish'
  */
-export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning }) {
+export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], tuning }) {
   const state = await store.load();
   const candidate = state && state.pool[id];
   if (!candidate) return state;
@@ -457,7 +457,10 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning })
   };
 
   if (kind === 'like' && !state.liked.includes(id)) {
-    if (state.dismissed.includes(id)) adjust(state.sourceDislikes, -1); // a like replaces the dislike
+    if (state.dismissed.includes(id)) { // a like replaces the dislike
+      adjust(state.sourceDislikes, state.focusDislikes[id] ? -2 : -1);
+      delete state.focusDislikes[id];
+    }
     recordVote(state, id, VOTE.LIKE);
     adjust(state.sourceLikes, +1, 2);
     rebuildVoteLists(state);
@@ -477,10 +480,16 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning })
     if (state.liked.includes(id)) adjust(state.sourceLikes, -1, 2); // a dislike replaces the like
     recordVote(state, id, VOTE.DISLIKE);
     adjust(state.sourceDislikes, +1);
+    const keys = [...new Set((tags || []).map(normalizeTag).filter(Boolean))];
+    if (keys.length) { // hidden from a genre list: it counts twice, and what the album has besides the genre is held against it there
+      adjust(state.sourceDislikes, +1);
+      state.focusDislikes[id] = { keys, tags: [...new Set((candidate.tags || []).map(normalizeTag).filter(Boolean))] };
+    }
     rebuildVoteLists(state);
   } else if (kind === 'undislike' && state.dismissed.includes(id)) {
     recordVote(state, id, VOTE.UNDISLIKE); // back to neutral: only undoes the points the dislike gave
     adjust(state.sourceDislikes, -1);
+    if (state.focusDislikes[id]) { adjust(state.sourceDislikes, -1); delete state.focusDislikes[id]; }
     rebuildVoteLists(state);
   }
   await store.save(state);

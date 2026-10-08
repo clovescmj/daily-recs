@@ -121,8 +121,8 @@ export const runExtend = ({ view, tags }) => enqueue(async () => {
   return extendList({ fetch: (...args) => fetch(...args), store, view, tags });
 });
 
-export const runFeedback = ({ id, kind }) => enqueue(async () => {
-  await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind });
+export const runFeedback = ({ id, kind, tags }) => enqueue(async () => {
+  await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags });
   await syncNow();
 });
 

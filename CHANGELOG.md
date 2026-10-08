@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.6.2
+- Hiding an album from a genre list now says more: it is further from the genres that were selected. The dislike counts twice for where the
+  album came from, and the other tags the album had besides the genre are held against the albums that come next in lists of those same
+  genres (they go to the end of the list; they are not removed). Nothing changes in other lists, and the taste profile is not touched.
+  Undoing the dislike undoes all of it.
+
 ## 0.6.1
 - A shuffle button next to the play button at the top of the page: it turns shuffle on and off like the one in the player bar (blue when
   on), and both always show the same state. Both use the shuffle icon of Bandcamp's app: straight cut line ends and sharp arrow corners.

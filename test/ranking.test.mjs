@@ -169,6 +169,18 @@ describe('how much each album counts', () => {
     assert.deepEqual(state.tasteTags, before);
   });
 
+  test('in a genre list, what an album hidden from that same genre had besides the genre is held against the next ones', () => {
+    const withTags = (id, artistId, tags) => ({ ...candidate(id, artistId, { u: 3 }), tags });
+    const state = stateWith([withTags('a', 'a', ['ebm', 'synthpop']), withTags('b', 'b', ['ebm', 'darkwave']), withTags('c', 'c', ['ebm'])]);
+    assert.deepEqual(pickFocused(state, 3, ['ebm']).sort(), ['a', 'b', 'c']);
+    state.focusDislikes = { 99: { keys: ['ebm'], tags: ['ebm', 'synthpop'] } };
+    const picks = pickFocused(state, 3, ['ebm']);
+    assert.equal(picks.at(-1), 'a', 'the one with synthpop goes last');
+    assert.deepEqual(pickFocused(state, 3, ['metal']).length, 0, 'nothing of another genre list changes');
+    state.focusDislikes = { 99: { keys: ['metal'], tags: ['ebm', 'synthpop'] } };
+    assert.notEqual(pickFocused(state, 3, ['ebm']).at(-1), 'a', 'a dislike made in a list of other genres does not count here');
+  });
+
   test('pickSources never picks pages the extension cannot read (labels on their own domain)', () => {
     const state = emptyState();
     state.owned = { ...owned, sources: [
