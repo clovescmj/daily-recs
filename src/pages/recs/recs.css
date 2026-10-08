@@ -130,7 +130,16 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .status-box p { margin: 8px 0 0; }
 .status-box .button { margin-top: 12px; }
 .status-box strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* always one line */
-.status-box progress { width: 100%; height: 6px; margin-top: 8px; accent-color: var(--link); }
+.status-box progress { display: block; width: 100%; height: 6px; margin-top: 8px; border: 0; border-radius: 3px; overflow: hidden; -webkit-appearance: none; appearance: none; background: var(--gray200); }
+.status-box progress::-webkit-progress-bar { background: var(--gray200); }                  /* a light track, so the bar is easy to see */
+.status-box progress::-webkit-progress-value { background: var(--blue400); transition: width .3s ease; }
+.status-box progress::-moz-progress-bar { background: var(--blue400); }
+/* no known total yet: a bar that slides along the track */
+.status-box progress:indeterminate::-webkit-progress-bar {
+  background: linear-gradient(90deg, var(--gray200) 0 35%, var(--blue400) 35% 65%, var(--gray200) 65% 100%) 0 0 / 300% 100%; animation: bar-slide 1.4s linear infinite;
+}
+@keyframes bar-slide { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .status-box progress:indeterminate::-webkit-progress-bar { animation: none; } }
 
 /* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
 .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }
