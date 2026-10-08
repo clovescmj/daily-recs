@@ -15,9 +15,9 @@ A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fr
 - Finds albums that fans of those records love, and keeps the ones that fit your taste.
 - Shows only what's new to you: nothing you own, nothing repeated.
 - The **heart** adds an album to your Bandcamp wishlist. The **⊘** says "don't show music like this": that album, its artist and the albums Bandcamp pairs with it stop coming.
-- **My tags:** pick the genres you want to hear today. Only close matches, found from your own albums of them.
-- **Best matches:** albums you don't have, drawn from what your collection, wishlist and Liked Songs point to most.
-- **Surprise me:** your taste, further from the obvious. Never repeats Best matches.
+- **My tags:** discover other music based on your favorite genres.
+- **Best matches:** discover new music based on your collection.
+- **Surprise me:** music that goes beyond your collection: explore similar music and genres.
 
 ## Project layout
 ```

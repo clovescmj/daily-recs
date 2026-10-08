@@ -5,9 +5,9 @@ import { session } from './session.js';
 import { createTagPicker, labelOf } from './tag-picker.js';
 
 export const VIEW_HELP = {
-  tags: 'Pick the genres you want to hear today. Only close matches, found from your own albums of them.',
-  best: "Albums you don't have, drawn from what your collection, wishlist and Liked Songs point to most.",
-  surprise: 'Your taste, further from the obvious. Never repeats Best matches.',
+  tags: 'Discover other music based on your favorite genres.',
+  best: 'Discover new music based on your collection.',
+  surprise: 'Music that goes beyond your collection: explore similar music and genres.',
 };
 
 // This page lives in an iframe as tall as its content: while the menu is open the page is kept tall enough to show all of it.
