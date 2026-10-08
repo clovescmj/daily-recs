@@ -42,7 +42,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="like" href="#" title="I like this album: show me more like it" aria-label="I like this album: show me more like it">${svg(P.thumbUp, 'ci', '', 'I like this album')}</a><a class="dislike" href="#" title="Don't show this album again" aria-label="Don't show this album again">${svg(P.thumbDown, 'ci', '', 'Don\'t show this album again')}</a></div></div>
+          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="like" href="#" title="See more like this" aria-label="See more like this">${svg(P.thumbUp, 'ci', '', 'See more like this')}</a><a class="dislike" href="#" title='Hide this album' aria-label="Hide this album">${svg(P.thumbDown, 'ci', '', 'Hide this album')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>
@@ -153,8 +153,8 @@
         if (path.getAttribute('d') !== d) path.setAttribute('d', d);
       };
       paint('.wish', !!s.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn);
-      paint('.like', !!s.liked, 'I like this album: show me more like it', 'Remove my like', P.thumbUp, P.thumbUpOn);
-      paint('.dislike', !!s.disliked, "Don't show this album again", 'Show this album again', P.thumbDown, P.thumbDownOn);
+      paint('.like', !!s.liked, 'See more like this', 'Stop seeing more like this', P.thumbUp, P.thumbUpOn);
+      paint('.dislike', !!s.disliked, 'Hide this album', 'Show this album again', P.thumbDown, P.thumbDownOn);
       setText(q('.trk-no'), s.trackNo && !s.msg ? `${s.trackNo}. ` : '');
       setText(q('.trk'), s.msg || s.track || '');
       setText(q('.pos'), mmss(s.cur)); setText(q('.dur'), mmss(s.dur));

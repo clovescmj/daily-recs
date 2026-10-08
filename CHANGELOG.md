@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.5.2
+- New wording for the thumbs: "See more like this" / "Stop seeing more like this" and "Hide this album" / "Show this album again".
+
 ## 0.5.1
 - Hiding the album that is playing no longer waits for its replacement: the next album (or the next shuffled track) starts right away. The
   replacement is added at the end of the list in the background and, in shuffle, joins the albums that are left to play. Only when the

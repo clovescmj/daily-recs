@@ -39,7 +39,7 @@ export async function setWish(id, on) {
   }
 }
 
-/** Thumbs up: "I like this album". Only teaches the taste; liking an album that was hidden brings it back first. */
+/** Thumbs up: "See more like this". Only teaches the taste; liking an album that was hidden brings it back first. */
 export async function setLike(id, on) {
   if (on && session.dislikedThisVisit.has(id)) await undoDislike(id);
   if (on) session.liked.add(id); else session.liked.delete(id);
