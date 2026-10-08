@@ -52,7 +52,7 @@ function renderChoice() {
     el.setAttribute('aria-checked', String(option.view === choice));
   }
   $('landing-go').disabled = !choice || (choice === 'tags' && !picker.getSelected().length);
-  $('landing-hint').textContent = choice ? VIEW_HELP[choice] : 'Pick one to start.';
+  $('landing-hint').textContent = choice ? VIEW_HELP[choice] : ''; // what the chosen list is, under the buttons
 }
 
 /** `onStart(view, keys)` runs when the user presses "Start digging". */

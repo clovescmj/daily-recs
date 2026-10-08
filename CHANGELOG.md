@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.14.6
+- Opening screen: "Pick one to start." now comes before the buttons (it replaces "Pick a mood, or let us pick for you."); under the buttons
+  there is only the description of the list you picked.
+
 ## 0.14.5
 - Fix: Best matches says "Perfect matches with your collection" (it said "for").
 
