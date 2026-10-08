@@ -3,12 +3,20 @@ import { $, esc, formatNumber, formatTime } from './dom.js';
 import { MSG } from '../../lib/messages.js';
 import { send } from './data.js';
 import { PHASE } from '../../lib/recommender.js';
+import { scanProgress } from '../../lib/taste-profile.js';
+import { session } from './session.js';
 import { DAILY_COUNT } from '../../lib/state.js';
 
 const SAMPLING_PHASES = new Set([PHASE.SAMPLING]);
 
 export function progressText(status) {
   const surprise = status.mode === 'surprise';
+  const genres = (status.tagLabels || []).join(' + ');
+  if (status.mode === 'tags') {
+    const count = `${formatNumber(status.done)}/${formatNumber(status.total)}`;
+    if (status.phase === PHASE.SCANNING) return `Looking for your ${genres} albums · ${count}`;
+    if (SAMPLING_PHASES.has(status.phase)) return `Digging into your ${genres} albums · ${count}`;
+  }
   if (SAMPLING_PHASES.has(status.phase)) {
     if (status.bootstrap) return `Learning your taste, first time only (takes a few minutes) · ${formatNumber(status.done)}/${formatNumber(status.total)}`;
     const liked = status.likedPicked ? ` (${status.likedPicked} you liked)` : '';
@@ -54,6 +62,11 @@ export function renderStatus(status) {
     box.innerHTML = `<strong>You're not signed in to Bandcamp.</strong><p>Sign in to your account and come back here.</p>
       <button type="button" id="login" class="button">Sign in to Bandcamp</button>`;
     $('login').addEventListener('click', () => send({ type: MSG.OPEN_MAIN }));
+  } else if (status.error === 'no_seeds') {
+    const { scanned, total } = session.state ? scanProgress(session.state) : { scanned: 0, total: 0 };
+    box.hidden = false;
+    box.innerHTML = `<strong>None of your albums has ${esc((status.tagLabels || []).join(' + ') || 'this genre')} yet.</strong>
+      <p>${total ? `${formatNumber(scanned)} of ${formatNumber(total)} albums scanned so far. The scan keeps going in the background: try again later, or pick another genre.` : 'Pick another genre.'}</p>`;
   } else if (status.error === 'rate_limited') {
     box.hidden = false;
     box.innerHTML = `<strong>Bandcamp asked us to slow down.</strong><p id="retry-countdown">${status.retryAt ? '' : 'Try again in a few minutes.'}</p>`;

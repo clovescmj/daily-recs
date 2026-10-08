@@ -12,16 +12,23 @@ export const emptyState = () => ({
   schemaVersion: SCHEMA_VERSION,
   pool: {},              // albumId -> candidate { id, title, artist, artistId, url, art, fans, via, srcs }
   sampled: {},           // source url -> timestamp of the last time its recommendations were read
-  shown: [],             // album ids already shown (they never repeat)
-  shownArtists: [],      // artist ids already shown (they don't come back with another album)
+  shown: [],             // album ids shown on previous days (they never repeat)
+  shownArtists: [],      // artist ids shown on previous days (they don't come back with another album)
+  shownToday: [],        // ...and shown today: they may appear again in another list of the same day
+  shownArtistsToday: [],
+  shownDate: '',         // the day shownToday refers to
   liked: [],             // derived from `votes`
   dismissed: [],         // derived from `votes` (albums marked "don't show again")
   votes: {},             // albumId -> "<vote>.<time>" (see taste-sync.js)
   tasteBootstrapped: false, // true once a run has read enough of the library to learn the genre profile
+  albumTags: {},         // hashed album url -> "tag|tag" for the user's albums that were read (see taste-profile.js)
+  tagLabels: {},         // tag key -> readable name
+  scanPausedUntil: 0,    // the background scan rests until this time (e.g. after Bandcamp asked to slow down)
   tasteTags: {},         // genre tag -> weight, built from the user's own albums (see taste-profile.js)
   sourceLikes: {},       // hashed source url -> likes that came from it
   sourceDislikes: {},    // hashed source url -> dislikes that came from it
   today: null,           // { date, ids } – best matches, built first
+  tagLists: {},          // "metal+noise" -> { date, ids, tags: [keys] }: lists built around the user's own genres
   surprise: null,        // { date, ids } – built only when asked; the best list stays saved next to it
   owned: null,           // snapshot of the user's library (see loadLibrary)
   wishQueue: [],         // wishlist operations waiting for the profile tab: [{ op, id, bandId }]
@@ -63,4 +70,35 @@ export function queueWishlistOp(state, { op, id, bandId }) {
 export function dequeueWishlistOp(state, id) {
   state.wishQueue = (state.wishQueue || []).filter((entry) => entry.id !== id);
   return state.wishQueue;
+}
+
+// ---- Several lists per day (best matches, surprise, one per set of genres) ----
+
+/** Stable key for a set of genre tags: "metal+noise". */
+export const tagListKey = (keys) => [...new Set(keys)].sort().join('+');
+
+/** Lists built today: [{ kind, key, list }]. */
+export function todaysLists(state, today = todayKey()) {
+  const lists = [];
+  if (state.today && state.today.date === today) lists.push({ kind: 'best', key: 'best', list: state.today });
+  if (state.surprise && state.surprise.date === today) lists.push({ kind: 'surprise', key: 'surprise', list: state.surprise });
+  for (const [key, list] of Object.entries(state.tagLists || {})) if (list.date === today) lists.push({ kind: 'tags', key, list });
+  return lists;
+}
+
+/** Album ids on any of today's lists (their cards need the candidate data kept in the pool). */
+export const idsOfTodaysLists = (state, today) => todaysLists(state, today).flatMap(({ list }) => list.ids);
+
+/**
+ * What was shown on earlier days never comes back; what was shown today may appear in another list of the same day. When
+ * the day changes, yesterday's "shown today" becomes "shown before".
+ */
+export function rollShownOver(state, today) {
+  if (state.shownDate === today) return;
+  state.shown.push(...(state.shownToday || []));
+  state.shownArtists = [...new Set([...(state.shownArtists || []), ...(state.shownArtistsToday || [])])];
+  state.shownToday = [];
+  state.shownArtistsToday = [];
+  state.shownDate = today;
+  state.tagLists = Object.fromEntries(Object.entries(state.tagLists || {}).filter(([, list]) => list.date === today)); // old lists go
 }

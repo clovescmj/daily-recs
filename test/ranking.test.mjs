@@ -1,10 +1,10 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { emptyState, migrateState } from '../src/lib/state.js';
+import { emptyState, migrateState, rollShownOver } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { createSourceWeigher } from '../src/lib/taste-profile.js';
 import {
-  candidateNet, isOwned, markShown, pickBest, pickSources, pickSurprise, score, sourceNet,
+  candidateNet, isOwned, markShown, pickBest, pickFocused, pickSources, pickSurprise, score, sourceNet,
 } from '../src/lib/ranking.js';
 
 const candidate = (id, artistId, srcs) => ({ id, artistId, title: `T${id}`, artist: `A${artistId}`, url: `https://c.bandcamp.com/album/${id}`, srcs });
@@ -101,11 +101,32 @@ describe('pickSources', () => {
   });
 });
 
-test('markShown remembers albums and their artists', () => {
+test('markShown remembers albums and their artists for today; tomorrow they are never shown again', () => {
   const state = stateWith([candidate('3', '6', { s: 1 })]);
   markShown(state, ['3']);
+  assert.deepEqual(state.shownToday, ['3']);
+  assert.deepEqual(state.shownArtistsToday, ['6']);
+  assert.ok(pickBest(state, 1).includes('3'), 'another list of the same day may show it again');
+  rollShownOver(state, '2026-10-09');
   assert.deepEqual(state.shown, ['3']);
   assert.deepEqual(state.shownArtists, ['6']);
+  assert.deepEqual(pickBest(state, 1), [], 'but not on the next day');
+});
+
+describe('pickFocused', () => {
+  const album = (n, tags, srcs = { s: 1 }) => ({ id: String(n), artistId: `a${n}`, title: `T${n}`, artist: `A${n}`, url: `https://c.bandcamp.com/album/${n}`, srcs, tags });
+  test('keeps albums of the chosen genres, more matching tags first, then albums whose tags are unknown', () => {
+    const state = stateWith([
+      album(1, ['pop'], { s: 9, t: 9 }), album(2, ['metal'], { s: 1 }), album(3, ['metal', 'doom'], { s: 1 }),
+      album(4, undefined, { s: 1 }), album(5, ['doom'], { s: 2 }),
+    ]);
+    assert.deepEqual(pickFocused(state, 10, ['metal', 'doom']), ['3', '5', '2', '4']);
+    assert.ok(!pickFocused(state, 10, ['metal']).includes('1'), 'an album of another genre is never picked');
+  });
+  test('one album per artist', () => {
+    const state = stateWith([album(1, ['metal']), { ...album(2, ['metal']), artistId: 'a1' }]);
+    assert.equal(pickFocused(state, 10, ['metal']).length, 1);
+  });
 });
 
 describe('how much each album counts', () => {
@@ -146,6 +167,15 @@ describe('how much each album counts', () => {
     const before = { ...state.tasteTags };
     state.sourceDislikes.x = 3;
     assert.deepEqual(state.tasteTags, before);
+  });
+
+  test('pickSources never picks pages the extension cannot read (labels on their own domain)', () => {
+    const state = emptyState();
+    state.owned = { ...owned, sources: [
+      { url: 'https://listen.20buckspin.com/album/x', title: 'T', artist: 'A' },
+      { url: 'https://ok.bandcamp.com/album/y', title: 'U', artist: 'B' },
+    ] };
+    assert.deepEqual(pickSources(state, 5).map((s) => s.url), ['https://ok.bandcamp.com/album/y']);
   });
 
   test('pickSources keeps at most two albums per artist', () => {

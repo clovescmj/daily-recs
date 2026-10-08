@@ -1,11 +1,11 @@
 // Draws the page from the stored state and the run status.
-import { DAILY_COUNT, todayKey } from '../../lib/state.js';
+import { tagListKey, todayKey } from '../../lib/state.js';
 import { cardHtml, findCard, paintDislike, paintLike } from './cards.js';
 import { $ } from './dom.js';
-import { SPARKLES_ICON, TARGET_ARROW_ICON } from './icons.js';
 import { emit, markPlaying } from './player.js';
 import { session } from './session.js';
 import { renderStatus } from './status-line.js';
+import { renderViewSwitch } from './views.js';
 import { flushWishlistQueue } from './wishlist-actions.js';
 
 let renderedKey = '';   // signature of the album list currently in the grid
@@ -17,12 +17,15 @@ function setEmpty(message) {
 
 const isFromToday = (list) => Boolean(list && list.date === todayKey());
 
-/** The list on screen: the surprise one when chosen and available, otherwise the best matches. */
-export function currentList(state, view = session.view) {
+/** Today's list for a view ('best', 'surprise', or 'tags' with its genres), or null when it hasn't been built. */
+export function listFor(state, view, keys = []) {
   if (!state) return null;
-  if (view === 'surprise' && isFromToday(state.surprise)) return state.surprise;
-  return isFromToday(state.today) ? state.today : null;
+  const list = view === 'surprise' ? state.surprise : view === 'tags' ? (state.tagLists || {})[tagListKey(keys)] : state.today;
+  return isFromToday(list) ? list : null;
 }
+
+/** The list on screen. */
+export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' ? null : listFor(state, 'best'));
 
 /** Albums of the current list that should be on the page: not dismissed (unless dismissed during this visit). */
 function visibleAlbumIds(state, list) {
@@ -58,28 +61,10 @@ function renderGrid(state, status) {
   markPlaying();
 }
 
-const TOGGLE_HELP = {
-  surprise: `Reads new albums from your collection and picks ${DAILY_COUNT} from deeper in the ranking, away from the obvious. Likes and dislikes still apply. Your best matches stay saved.`,
-  best: 'Back to your best matches, the albums your collection and wishlist point to the most. Nothing is reloaded.',
-};
-
-/** One button: "Surprise me" while looking at the best matches, "Best matches" while looking at the surprise list. */
-function renderModeToggle(state, status) {
-  const button = $('mode-toggle');
-  const target = session.view === 'surprise' && isFromToday(state && state.surprise) ? 'best' : 'surprise';
-  if (button.dataset.target !== target) { // only rewrite the button when it actually changes
-    button.dataset.target = target;
-    button.innerHTML = `${target === 'best' ? TARGET_ARROW_ICON : SPARKLES_ICON}<span>${target === 'best' ? 'Best matches' : 'Surprise me'}</span>`;
-  }
-  button.title = TOGGLE_HELP[target];
-  $('mode-help').textContent = TOGGLE_HELP[target];
-  button.disabled = Boolean(status.running);
-}
-
 export function render(state, status) {
   session.state = state;
   const running = Boolean(status.running);
-  renderModeToggle(state, status);
+  renderViewSwitch(state, status);
   renderStatus(status);
   renderGrid(state, status);
   $('play-all').hidden = !session.hasList;

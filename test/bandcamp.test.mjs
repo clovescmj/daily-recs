@@ -161,3 +161,26 @@ test('parseTags counts different spellings of a genre as one', () => {
   const tag = (name) => `<a class="tag" href="https://bandcamp.com/discover/x">${name}</a>`;
   assert.deepEqual(parseTagsFromPage(['e.b.m', 'EBM'.toLowerCase(), 'electronic body music', 'dark wave', 'darkwave', 'cold wave'].map(tag).join('')), ['ebm', 'darkwave', 'coldwave']);
 });
+
+import { isBandcampUrl, parseEmbeddedTracks, embeddedPlayerUrl } from '../src/lib/bandcamp.js';
+test('isBandcampUrl tells bandcamp.com pages from labels on their own domain', () => {
+  assert.ok(isBandcampUrl('https://artist.bandcamp.com/album/x'));
+  assert.ok(isBandcampUrl('https://bandcamp.com/sumof'));
+  assert.ok(!isBandcampUrl('https://listen.20buckspin.com/album/the-enduring-spirit'));
+  assert.ok(!isBandcampUrl('https://evilbandcamp.com/x'));
+  assert.ok(!isBandcampUrl('https://bandcamp.com.evil.example/x'));
+  assert.ok(!isBandcampUrl('http://artist.bandcamp.com/x'));
+});
+
+test('albums on a label domain are played from the embedded player page', () => {
+  assert.equal(embeddedPlayerUrl('2448143742'), 'https://bandcamp.com/EmbeddedPlayer/album=2448143742/size=large/tracklist=false/artwork=none/transparent=true/');
+  const data = { featured_track_id: 22, tracks: [
+    { id: 11, title: 'one', duration: 10, file: { 'mp3-128': 'https://t4.bcbits.com/stream/1' } },
+    { id: 22, title: 'two', duration: 20, file: { 'mp3-128': 'https://t4.bcbits.com/stream/2' } },
+    { id: 33, title: 'no file' },
+  ] };
+  const html = `<div data-player-data="${JSON.stringify(data).replace(/"/g, '&quot;')}"></div>`;
+  const tracks = parseEmbeddedTracks(html);
+  assert.deepEqual(tracks.map((t) => [t.title, t.featured]), [['one', false], ['two', true]]);
+  assert.deepEqual(parseEmbeddedTracks('<html></html>'), []);
+});

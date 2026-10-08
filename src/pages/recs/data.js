@@ -1,5 +1,6 @@
 // Reading from storage and talking to the service worker.
-import { STATE_KEY, STATUS_KEY, isStatusStale } from '../../lib/storage-keys.js';
+import { PICKED_KEY, STATE_KEY, STATUS_KEY, isStatusStale } from '../../lib/storage-keys.js';
+import { todayKey } from '../../lib/state.js';
 
 export const send = (message) => chrome.runtime.sendMessage(message);
 
@@ -12,6 +13,12 @@ export async function loadStatus() {
   // A run that stopped reporting (worker killed) must not keep the page in "loading" forever.
   return isStatusStale(status) ? { ...status, running: false } : status;
 }
+
+/** True when the user has already chosen what to hear today (so the opening screen is skipped). */
+export async function pickedToday() {
+  return (await chrome.storage.local.get(PICKED_KEY))[PICKED_KEY] === todayKey();
+}
+export const markPickedToday = () => chrome.storage.local.set({ [PICKED_KEY]: todayKey() });
 
 /** Calls `onChange` whenever the stored state or the run status changes. */
 export function watchStorage(onChange) {

@@ -1,6 +1,6 @@
 // Audio playback. This page (an iframe inside the Bandcamp profile) owns the <audio> element; the Bandcamp-style bar
 // (src/player, drawn by the content script in the Bandcamp page) only shows state and sends commands back.
-import { parseTracks } from '../../lib/bandcamp.js';
+import { embeddedPlayerUrl, isBandcampUrl, parseEmbeddedTracks, parseTracks } from '../../lib/bandcamp.js';
 import { findCard, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { session } from './session.js';
@@ -41,9 +41,11 @@ export const isShuffling = () => player.shuffle;
 async function fetchTracks(album, { fresh = false } = {}) {
   const cached = trackCache.get(album.id);
   if (!fresh && cached && Date.now() - cached.at < TRACKS_TTL_MS) return cached.tracks;
-  const response = await fetch(album.url, { credentials: 'include' });
+  // Albums on a label's own domain can't be read from here (CORS); Bandcamp's embedded player lists their tracks.
+  const onBandcamp = isBandcampUrl(album.url);
+  const response = await fetch(onBandcamp ? album.url : embeddedPlayerUrl(album.id), { credentials: 'include' });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const tracks = parseTracks(await response.text());
+  const tracks = (onBandcamp ? parseTracks : parseEmbeddedTracks)(await response.text());
   trackCache.set(album.id, { tracks, at: Date.now() });
   return tracks;
 }
@@ -96,33 +98,61 @@ export async function playAlbum(id) {
 /** Where an album starts: the track the artist highlights on Bandcamp, or the first one when none is set. */
 const startingTrack = (tracks) => Math.max(0, tracks.findIndex((track) => track.featured));
 
+/**
+ * Plays a shuffled track of one album. Normally an unplayed one; with `allowRepeat` (an album the user was waiting for) a
+ * random one even if the whole album was already played this round. Returns false when it couldn't.
+ */
+async function playShuffleFrom(id, state, { allowRepeat = false } = {}) {
+  const album = state.pool[id];
+  const tracks = await fetchTracks(album);
+  shuffler.setTrackCount(id, tracks.length);
+  let index = shuffler.pickTrack(id, tracks.length);
+  if (index === null && allowRepeat && tracks.length) index = Math.floor(Math.random() * tracks.length);
+  if (index === null) return false; // that album was already played completely (our guess of its size was off)
+  shuffler.markPlayed(id, index);
+  player.current = { id, tracks, index };
+  player.history.push({ id, i: index });
+  setAlbum(album);
+  send({ type: MSG.MARK_OPENED, id });
+  playTrack(index);
+  return true;
+}
+
 async function playRandomTrack() {
   player.busy = true;
   player.message = '';
   emit(true);
   const state = await loadState();
   for (let tries = 0; tries < SHUFFLE_TRIES; tries++) {
-    const ids = visibleCardIds();
-    const id = shuffler.pickAlbum(ids);
+    const id = shuffler.pickAlbum(visibleCardIds());
     if (id === null) break;
     try {
-      const album = state.pool[id];
-      const tracks = await fetchTracks(album);
-      shuffler.setTrackCount(id, tracks.length);
-      const index = shuffler.pickTrack(id, tracks.length);
-      if (index === null) continue; // that album was already played completely (our guess of its size was off)
-      shuffler.markPlayed(id, index);
-      player.current = { id, tracks, index };
-      player.history.push({ id, i: index });
-      setAlbum(album);
-      send({ type: MSG.MARK_OPENED, id });
-      playTrack(index);
-      return;
+      if (await playShuffleFrom(id, state)) return;
     } catch { /* try another album */ }
   }
   player.busy = false;
   player.message = 'None of these albums have streamable tracks.';
   emit(true);
+}
+
+// The album that took the place of one the user hid: it plays right after the current one (in shuffle: one of its tracks).
+let upNext = null;
+export const setUpNext = (id) => { upNext = id; };
+function takeUpNext() {
+  const id = upNext;
+  upNext = null;
+  return id && !session.dislikedThisVisit.has(id) ? id : null;
+}
+
+/** Plays the waiting album now (shuffle: one of its tracks). */
+export async function playUpNextNow(id) {
+  if (!player.shuffle) return playAlbum(id);
+  player.busy = true;
+  emit(true);
+  try {
+    if (await playShuffleFrom(id, await loadState(), { allowRepeat: true })) return undefined;
+  } catch { /* fall through */ }
+  return playRandomTrack();
 }
 
 // ── Transport ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -138,14 +168,16 @@ export const pause = () => audio.pause();
 
 export function nextTrack() {
   if (!player.current.id) return startFirst();
-  if (player.shuffle) return playRandomTrack();
+  if (player.shuffle) { const waiting = takeUpNext(); return waiting ? playUpNextNow(waiting) : playRandomTrack(); }
   if (player.current.index + 1 < player.current.tracks.length) return playTrack(player.current.index + 1);
-  const next = nextAlbumId();
+  const next = takeUpNext() || nextAlbumId();   // the end of the album: the album that replaced a hidden one goes first
   return next && playAlbum(next);
 }
 
 export function skipAlbum() {
   if (!player.current.id) return startFirst();
+  const waiting = takeUpNext();
+  if (waiting) return playUpNextNow(waiting);
   if (player.shuffle) return playRandomTrack();
   const next = nextAlbumId();
   return next && playAlbum(next);

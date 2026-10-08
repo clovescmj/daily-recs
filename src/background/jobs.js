@@ -1,7 +1,8 @@
 // Everything that reads or writes the state goes through one queue, so a like clicked during a refresh is never lost.
 // The service worker can be terminated at any time, so nothing here is kept only in memory in a way that matters:
 // the queue and the in-flight map are just coordination for the current worker instance.
-import { applyFeedback, refresh } from '../lib/recommender.js';
+import { applyFeedback, extendList, refresh, refreshTags } from '../lib/recommender.js';
+import { scanSources } from '../lib/scanner.js';
 import { dequeueWishlistOp, emptyState, queueWishlistOp } from '../lib/state.js';
 import { syncState } from '../lib/taste-sync.js';
 import { loadStatus, markOpened, store, todaySummary } from './storage.js';
@@ -82,26 +83,43 @@ export async function planRetry() {
 export async function retryAfterRateLimit() {
   const status = await loadStatus();
   if (!status || status.error !== 'rate_limited') return;
-  const mode = status.mode === 'surprise' ? 'surprise' : 'best';
-  await runRefresh({ mode });
+  const mode = ['surprise', 'tags'].includes(status.mode) ? status.mode : 'best';
+  await runRefresh({ mode, tags: status.tags || [] });
 }
 
 const inFlight = new Map();
 
 /** Identical refresh requests share one run; different ones (e.g. forced + surprise) run one after the other. */
-export function runRefresh({ force = false, mode = 'best' } = {}) {
-  const key = `${force}:${mode}`;
+export function runRefresh({ force = false, mode = 'best', tags = [] } = {}) {
+  const key = `${force}:${mode}:${tags.join('+')}`;
   if (inFlight.has(key)) return inFlight.get(key);
   const job = enqueue(async () => {
     if (await isCoolingDown()) return;
     await syncNow();
-    await refresh({ fetch: (...args) => fetch(...args), store, force, mode });
+    if (mode === 'tags') await refreshTags({ fetch: (...args) => fetch(...args), store, tags, force });
+    else await refresh({ fetch: (...args) => fetch(...args), store, force, mode });
     await planRetry();
     await updateBadge();
   }).finally(() => inFlight.delete(key));
   inFlight.set(key, job);
   return job;
 }
+
+/** Background scan of the user's albums for genre tags: a few pages per call, never while a run is in progress or cooling down. */
+export const runScan = () => enqueue(async () => {
+  const status = await loadStatus();
+  if ((status && status.running) || (await isCoolingDown())) return;
+  const state = await store.load();
+  if (!state || !state.owned) return;
+  const result = await scanSources({ fetch: (...args) => fetch(...args), state });
+  if (result.scanned || state.scanPausedUntil) await store.save(state);
+});
+
+/** One more album for the end of a list. Resolves with its id, or null. Never shown as progress: it happens in the background. */
+export const runExtend = ({ view, tags }) => enqueue(async () => {
+  if (await isCoolingDown()) return null;
+  return extendList({ fetch: (...args) => fetch(...args), store, view, tags });
+});
 
 export const runFeedback = ({ id, kind }) => enqueue(async () => {
   await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind });

@@ -33,6 +33,7 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
       case MSG.WISHLIST_QUEUE: await jobs.runWishlistQueue(message); break;
       case MSG.WISHLIST_DONE: await jobs.runWishlistDone(message.id); break;
       case MSG.OPEN_MAIN: await openMain(); break;
+      case MSG.EXTEND_LIST: return { ok: true, id: await jobs.runExtend(message) };
       case MSG.COLOR_SCHEME: await setScheme(message.dark); break;
       case MSG.MARK_OPENED: await jobs.runMarkOpened(message.id); break;
       case MSG.WISHLIST_OP: return runInPage(sender.tab.id, message);

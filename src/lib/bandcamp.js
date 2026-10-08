@@ -202,10 +202,11 @@ export function normalizeTag(text) {
 }
 
 /**
- * Genre tags of an album page. Bandcamp writes genre tags in lower case and location tags ("Brooklyn",
+ * Genre tags of an album page, as { key, label }: `key` is the normalised form (see normalizeTag), `label` the text as the
+ * artist wrote it. Bandcamp writes genre tags in lower case and location tags ("Brooklyn",
  * "Los Angeles, California") with a capital letter; locations say nothing about taste, so they are dropped.
  */
-export function parseTags(html) {
+export function parseTagLabels(html) {
   const tags = [];
   const pattern = /<a class="tag"\s+href="([^"]*)"\s*>([^<]*)<\/a>/g;
   let match;
@@ -213,10 +214,39 @@ export function parseTags(html) {
     const [, href, label] = match;
     const text = decodeHtmlEntities(label).trim();
     if (!/\/discover\//.test(href) || !text || /^\p{Lu}/u.test(text) || text.includes(',') || text.length > 40) continue;
-    const tag = normalizeTag(text);
-    if (!tags.includes(tag)) tags.push(tag);
+    const key = normalizeTag(text);
+    if (!tags.some((tag) => tag.key === key)) tags.push({ key, label: text.toLowerCase() });
   }
   return tags;
+}
+
+/** Same as parseTagLabels, keys only. */
+export const parseTags = (html) => parseTagLabels(html).map((tag) => tag.key);
+
+/**
+ * True for pages the extension is allowed to read (bandcamp.com and its subdomains). Some labels use their own domain
+ * (e.g. listen.20buckspin.com): the browser blocks reading those from the extension, so they are skipped or read through
+ * Bandcamp's embedded player instead.
+ */
+export const isBandcampUrl = (url) => /^https:\/\/([a-z0-9-]+\.)*bandcamp\.com(\/|$)/i.test(String(url));
+
+/** Address of Bandcamp's embedded player page for an album: it lists the tracks of any album, whatever its own domain. */
+export const embeddedPlayerUrl = (albumId) =>
+  `${BANDCAMP_ORIGIN}/EmbeddedPlayer/album=${toNumericId(albumId)}/size=large/tracklist=false/artwork=none/transparent=true/`;
+
+/** Same result as parseTracks, from the embedded player page. */
+export function parseEmbeddedTracks(html) {
+  const match = html.match(/data-player-data="([^"]+)"/);
+  if (!match) return [];
+  const data = JSON.parse(decodeHtmlEntities(match[1]));
+  return (data.tracks || [])
+    .map((track) => ({
+      title: toLabel(track.title),
+      src: toHttpsUrl(track.file && track.file['mp3-128']),
+      duration: track.duration,
+      featured: Boolean(data.featured_track_id) && String(track.id) === String(data.featured_track_id),
+    }))
+    .filter((track) => track.src);
 }
 
 /**

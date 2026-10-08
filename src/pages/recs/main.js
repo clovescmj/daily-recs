@@ -2,44 +2,56 @@
 import { reportBugUrl, supportUrl } from '../../lib/config.js';
 import { MSG } from '../../lib/messages.js';
 import { runCommand } from './commands.js';
-import { loadState, loadStatus, send, watchStorage } from './data.js';
+import { loadState, loadStatus, markPickedToday, pickedToday, send, watchStorage } from './data.js';
 import { $ } from './dom.js';
 import { listenToHost } from './host-bridge.js';
 import { initPlayer, playAlbum, togglePlay } from './player.js';
-import { currentList, render } from './render.js';
+import { listFor, render } from './render.js';
 import { session } from './session.js';
+import { initLanding, refreshLanding, setLandingVisible } from './landing.js';
+import { initViewSwitch } from './views.js';
 import { dislikeAlbum, setLike, undoDislike } from './wishlist-actions.js';
 
-/** Switches to the surprise list the moment a run that was started with "Surprise me" has produced it. */
-function resolvePendingSurprise(state, status) {
-  const pending = session.pendingSurprise;
+/** Switches to a list the moment the run that was asked for has produced it. */
+function resolvePending(state, status) {
+  const pending = session.pending;
   if (!pending) return;
   if (status.running) { pending.sawRunning = true; return; }
-  if (currentList(state, 'surprise') !== currentList(state, 'best')) { // the surprise list exists now
-    session.view = 'surprise';
-    session.pendingSurprise = null;
+  if (listFor(state, pending.view, pending.keys)) {
+    session.view = pending.view;
+    session.tagKeys = pending.keys;
+    session.pending = null;
   } else if (pending.sawRunning) {
-    session.pendingSurprise = null; // the run ended without a list (error): the status box explains why
+    session.pending = null; // the run ended without a list (an error, or no album of that genre): the status box says why
   }
 }
 
 async function refreshView() {
   const [state, status] = [await loadState(), (await loadStatus()) || {}];
-  resolvePendingSurprise(state, status);
+  resolvePending(state, status);
   render(state, status);
+  refreshLanding();
 }
 
-async function onModeToggle() {
-  if (session.view === 'surprise') { session.view = 'best'; await refreshView(); return; }
+/** The user picked a list: show it if it exists today, otherwise ask for it and switch when it is ready. */
+async function chooseView(view, keys = []) {
   const state = await loadState();
-  if (currentList(state, 'surprise') !== currentList(state, 'best')) { // already built today: just show it
-    session.view = 'surprise';
+  if (listFor(state, view, keys)) {
+    session.view = view;
+    session.tagKeys = keys;
     await refreshView();
     return;
   }
-  session.pendingSurprise = { sawRunning: false };
-  await send({ type: MSG.REFRESH, mode: 'surprise' });
+  session.pending = { view, keys, sawRunning: false };
+  await send({ type: MSG.REFRESH, mode: view, tags: keys });
   scrollToTop();
+}
+
+/** "Start digging" on the opening screen: remember the choice for today and show the list. */
+async function startFromLanding(view, keys) {
+  await markPickedToday();
+  setLandingVisible(false);
+  await chooseView(view, keys);
 }
 
 const scrollToTop = () => $('album-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -75,13 +87,15 @@ async function init() {
   $('feedback-link').href = supportUrl(chrome.runtime.id);
   $('bug-link').href = reportBugUrl(chrome.runtime.getManifest().version, navigator.userAgent);
 
-  $('mode-toggle').addEventListener('click', onModeToggle);
+  initViewSwitch(chooseView);
+  initLanding(startFromLanding);
   $('play-all').addEventListener('click', () => togglePlay());
   $('album-grid').addEventListener('click', onGridClick);
 
   initPlayer();
   listenToHost(runCommand);
 
+  setLandingVisible(!(await pickedToday()));   // once a day: the first time the tab is opened
   watchStorage(refreshView);
   await refreshView();
   send({ type: MSG.REFRESH }); // builds today's list if it doesn't exist yet

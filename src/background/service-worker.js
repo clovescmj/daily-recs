@@ -6,12 +6,14 @@
 //    worker is detected and cleared on startup (see clearStaleStatus).
 import { registerMenu } from './menu.js';
 import { registerMessageHandler } from './messages.js';
-import { RETRY_ALARM, enqueue, retryAfterRateLimit, runRefresh, syncNow, updateBadge } from './jobs.js';
+import { RETRY_ALARM, enqueue, retryAfterRateLimit, runRefresh, runScan, syncNow, updateBadge } from './jobs.js';
 import { restoreToolbarIcon, startColorSchemeWatcher } from './icon.js';
 import { continueAfterLogin, forgetLoginTab, openMainPage } from './navigation.js';
 import { clearStaleStatus } from './storage.js';
 
 const DAILY_ALARM = 'daily';
+const SCAN_ALARM = 'scan';
+const SCAN_PERIOD_MINUTES = 30;   // a few albums at a time: see lib/scanner.js
 const ALARM_PERIOD_MINUTES = 360; // checked every 6 h; a new list is only built when the day has changed
 
 registerMessageHandler();
@@ -22,6 +24,9 @@ enqueue(clearStaleStatus).then(updateBadge);
 restoreToolbarIcon();
 startColorSchemeWatcher();
 
+// Alarms survive restarts, but not always updates: make sure the scan alarm exists whenever the worker wakes up.
+chrome.alarms.get(SCAN_ALARM).then((alarm) => { if (!alarm) chrome.alarms.create(SCAN_ALARM, { delayInMinutes: 5, periodInMinutes: SCAN_PERIOD_MINUTES }); });
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create(DAILY_ALARM, { delayInMinutes: 1, periodInMinutes: ALARM_PERIOD_MINUTES });
 });
@@ -29,6 +34,7 @@ chrome.runtime.onStartup.addListener(() => { enqueue(syncNow); runRefresh(); });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === DAILY_ALARM) runRefresh();
   else if (alarm.name === RETRY_ALARM) retryAfterRateLimit();
+  else if (alarm.name === SCAN_ALARM) runScan();
 });
 chrome.action.onClicked.addListener(openMainPage);
 // After the toolbar icon sent a signed-out user to Bandcamp's login page, take that tab on to "daily recs" once they're in.

@@ -8,8 +8,11 @@ const EXT_URL = `chrome-extension://${EXT_ID}/`;
 
 describe('parseMessage', () => {
   test('accepts well-formed messages and normalises them', () => {
-    assert.deepEqual(parseMessage({ type: MSG.REFRESH, force: true, mode: 'surprise', junk: 1 }), { type: 'refresh', force: true, mode: 'surprise' });
-    assert.deepEqual(parseMessage({ type: MSG.REFRESH, mode: 'whatever' }), { type: 'refresh', force: false, mode: 'best' });
+    assert.deepEqual(parseMessage({ type: MSG.REFRESH, force: true, mode: 'surprise', junk: 1 }), { type: 'refresh', force: true, mode: 'surprise', tags: [] });
+    assert.deepEqual(parseMessage({ type: MSG.REFRESH, mode: 'whatever' }), { type: 'refresh', force: false, mode: 'best', tags: [] });
+    assert.deepEqual(parseMessage({ type: MSG.REFRESH, mode: 'tags', tags: ['metal', 'post punk!', 42, 'noise'] }), { type: 'refresh', force: false, mode: 'tags', tags: ['metal', 'noise'] });
+    assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'tags', tags: ['metal'] }), { type: 'extend-list', view: 'tags', tags: ['metal'] });
+    assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'x' }), { type: 'extend-list', view: 'best', tags: [] });
     assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '123', kind: 'dislike' }), { type: 'feedback', id: '123', kind: 'dislike' });
     assert.deepEqual(parseMessage({ type: MSG.WISHLIST_OP, op: 'add', id: 5, bandId: '6' }), { type: 'wishlist-op', op: 'add', id: '5', bandId: '6' });
   });

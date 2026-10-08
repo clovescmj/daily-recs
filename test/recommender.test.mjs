@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { refresh, applyFeedback, PHASE } from '../src/lib/recommender.js';
+import { refresh, refreshTags, extendList, applyFeedback, PHASE } from '../src/lib/recommender.js';
 import { DAILY_COUNT } from '../src/lib/state.js';
 import { createFakeBandcamp } from './helpers/fake-bandcamp.js';
 import { createMemoryStore } from './helpers/memory-store.js';
@@ -56,12 +56,15 @@ describe('refresh', () => {
     assert.deepEqual(second.today.ids, first.today.ids);
   });
 
-  test('"Refresh" (force) brings a new batch that never repeats the previous one', async () => {
+  test('what was shown on an earlier day never comes back, but lists of the same day may share albums', async () => {
     const { run } = await setup();
-    const first = await run();
-    const second = await run({ force: true });
-    assert.equal(second.today.ids.length, DAILY_COUNT);
-    assert.equal(second.today.ids.filter((id) => first.today.ids.includes(id)).length, 0);
+    const monday = await run({ now: new Date(2026, 9, 7, 12) });
+    const surprise = await run({ mode: 'surprise', now: new Date(2026, 9, 7, 12) });
+    assert.equal(surprise.surprise.ids.length, DAILY_COUNT);
+    const tuesday = await run({ now: new Date(2026, 9, 8, 12) });
+    assert.equal(tuesday.today.ids.length, DAILY_COUNT);
+    const seenBefore = new Set([...monday.today.ids, ...surprise.surprise.ids]);
+    assert.equal(tuesday.today.ids.filter((id) => seenBefore.has(id)).length, 0);
   });
 
   test('"surprise" is built next to the best list, which stays saved and untouched', async () => {
@@ -86,12 +89,13 @@ describe('refresh', () => {
     assert.deepEqual(again.surprise.ids, first.surprise.ids);
   });
 
-  test('a new best list invalidates the surprise one', async () => {
+  test('a rebuilt best list keeps the surprise list of the day (and the data of its cards)', async () => {
     const { run } = await setup();
     await run();
-    await run({ mode: 'surprise' });
+    const surprise = await run({ mode: 'surprise' });
     const state = await run({ force: true });
-    assert.equal(state.surprise, null);
+    assert.deepEqual(state.surprise.ids, surprise.surprise.ids);
+    assert.ok(state.surprise.ids.every((id) => state.pool[id]));
   });
 
   test('keeps the pool small: only liked albums survive into the next run', async () => {
@@ -144,6 +148,109 @@ describe('resilience', () => {
   });
 });
 
+describe('lists built around genres the user picked', () => {
+  const metalOptions = {
+    libraryCount: 120, wishlistCount: 0, candidateCount: 600,
+    sourceTags: (n) => (n % 4 === 0 ? ['metal', 'doom'] : ['pop']),             // a quarter of the user's albums are metal
+    candidateTags: (i) => (i % 2 === 0 ? ['metal'] : ['pop']),
+  };
+  const setupTags = async (options = metalOptions) => {
+    const ctx = await setup(options);
+    const runTags = (extra = {}) => refreshTags({ fetch: ctx.fake.fetch, store: ctx.store, tags: ['metal'], tuning: TUNING, now: NOW, ...extra });
+    return { ...ctx, runTags };
+  };
+  const candidateIndex = (state, id) => Number(state.pool[id].url.match(/cand(\d+)/)[1]);
+
+  test('starts from the user\'s own albums of that genre: scans for them, then lists only albums of the genre', async () => {
+    const { store, runTags, run } = await setupTags();
+    await run(); // today's best list exists first, with its own data
+    store.statusLog.length = 0;
+    const state = await runTags();
+    const list = state.tagLists.metal;
+    assert.equal(list.ids.length, DAILY_COUNT);
+    assert.ok(list.ids.every((id) => candidateIndex(state, id) % 2 === 0), 'only metal albums');
+    assert.ok(store.statusLog.some((s) => s.phase === PHASE.SCANNING) || Object.keys(state.albumTags).length > 0);
+    assert.equal(store.getStatus().error, undefined);
+    assert.equal(store.getStatus().mode, 'tags');
+    assert.ok(state.today.ids.every((id) => state.pool[id]), 'the best list keeps its card data');
+  });
+
+  test('no list, and a clear reason, when none of the user\'s albums has the genre', async () => {
+    const { store, runTags } = await setupTags({ ...metalOptions, sourceTags: () => ['pop'] });
+    const state = await runTags();
+    assert.equal(state.tagLists.metal, undefined);
+    assert.equal(store.getStatus().error, 'no_seeds');
+    assert.deepEqual(store.getStatus().tagLabels, ['metal']);
+  });
+
+  test('asking again the same day is free; the next day brings a list that never repeats', async () => {
+    const { fake, runTags } = await setupTags();
+    const first = await runTags();
+    const calls = fake.calls.length;
+    const again = await runTags();
+    assert.equal(fake.calls.length, calls, 'no network calls');
+    assert.deepEqual(again.tagLists.metal.ids, first.tagLists.metal.ids);
+    const next = await runTags({ now: new Date(2026, 9, 8, 12) });
+    assert.equal(next.tagLists.metal.date, '2026-10-08');
+    assert.equal(next.tagLists.metal.ids.filter((id) => first.tagLists.metal.ids.includes(id)).length, 0);
+  });
+
+  test('different genre sets keep their own lists on the same day', async () => {
+    const { runTags } = await setupTags();
+    await runTags({ tags: ['metal'] });
+    const state = await runTags({ tags: ['doom', 'metal'] });
+    assert.deepEqual(Object.keys(state.tagLists).sort(), ['doom+metal', 'metal']);
+  });
+});
+
+describe('one more album for a list', () => {
+  const extend = (ctx, extra = {}) => extendList({ fetch: ctx.fake.fetch, store: ctx.store, tuning: TUNING, now: NOW, ...extra });
+
+  test('adds a new album at the end of the best list, one that is not in it yet', async () => {
+    const ctx = await setup();
+    const state = await ctx.run();
+    const before = [...state.today.ids];
+    const id = await extend(ctx);
+    const after = (await ctx.store.load()).today.ids;
+    assert.ok(id && !before.includes(id));
+    assert.deepEqual(after, [...before, id], 'at the end, the rest untouched');
+    const saved = await ctx.store.load();
+    assert.ok(saved.pool[id], 'with the data of its card');
+    const artists = after.map((a) => saved.pool[a].artistId);
+    assert.equal(new Set(artists).size, artists.length, 'still one album per artist');
+  });
+
+  test('works for the surprise list and for a genre list too', async () => {
+    const ctx = await setup({ libraryCount: 120, wishlistCount: 0, candidateCount: 600, sourceTags: (n) => (n % 4 === 0 ? ['metal'] : ['pop']), candidateTags: (i) => (i % 2 === 0 ? ['metal'] : ['pop']) });
+    await ctx.run();
+    await ctx.run({ mode: 'surprise' });
+    await refreshTags({ fetch: ctx.fake.fetch, store: ctx.store, tags: ['metal'], tuning: TUNING, now: NOW });
+    const surpriseId = await extend(ctx, { view: 'surprise' });
+    assert.ok(surpriseId);
+    const tagId = await extend(ctx, { view: 'tags', tags: ['metal'] });
+    const saved = await ctx.store.load();
+    assert.ok(tagId && saved.tagLists.metal.ids.at(-1) === tagId);
+    assert.ok(Number(saved.pool[tagId].url.match(/cand(\d+)/)[1]) % 2 === 0, 'a metal album');
+  });
+
+  test('keeps finding new albums, reading a few more of the user\'s albums when the run\'s leftovers are used up', async () => {
+    const ctx = await setup({ libraryCount: 100, wishlistCount: 0, candidateCount: 120, recsPerPage: 6 });
+    await ctx.run();
+    const found = [];
+    for (let i = 0; i < 25; i++) { const id = await extend(ctx); if (id) found.push(id); }
+    assert.ok(found.length >= 20, `found ${found.length}`);
+    assert.equal(new Set(found).size, found.length, 'never the same album twice');
+    assert.ok(sourcePageCalls(ctx.fake) > 80, 'it did read more albums');
+  });
+
+  test('answers null when there is no list of that kind today', async () => {
+    const ctx = await setup();
+    await ctx.run();
+    assert.equal(await extend(ctx, { view: 'surprise' }), null);
+    assert.equal(await extend(ctx, { now: new Date(2026, 9, 9, 12) }), null, 'or if the list is from another day');
+  });
+});
+
 describe('taste bootstrap', () => {
   test('the first run reads many more albums to learn the genre profile, once', async () => {
     const { fake, store, run } = await setup({ libraryCount: 400, wishlistCount: 0, sourceTags: () => ['metal'] });
@@ -163,7 +270,7 @@ describe('taste bootstrap', () => {
     saved.tasteBootstrapped = false; // what a state saved by the previous version looks like
     await store.save(saved);
     const second = await run();
-    assert.notDeepEqual(second.today.ids, first.today.ids);
+    assert.equal(second.today.ids.length, first.today.ids.length);
     assert.ok(second.tasteBootstrapped);
     const third = await run();
     assert.deepEqual(third.today.ids, second.today.ids, 'and not again');

@@ -3,10 +3,14 @@
 export const HOST_ORIGIN = 'https://bandcamp.com';
 
 export const session = {
-  /** Which saved list is on screen: 'best' (always on open) or 'surprise'. Switching costs nothing once both exist. */
+  /** Which saved list is on screen: 'best' (always on open), 'surprise' or 'tags'. Switching costs nothing once a list exists. */
   view: 'best',
-  /** Set while a "Surprise me" run is loading, so the page switches to it as soon as it is ready. */
-  pendingSurprise: null,
+  /** Genres of the 'tags' list on screen (normalised keys). */
+  tagKeys: [],
+  /** True while the opening screen ("What do you want to hear today?") is showing. */
+  landing: false,
+  /** A list that is being built: { view, keys, sawRunning }. The page switches to it as soon as it is ready. */
+  pending: null,
   /** Latest `state` read from storage (null until loaded). */
   state: null,
   /** Albums disliked during this visit: they stay on the page (dimmed) so the dislike can be undone. */

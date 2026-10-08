@@ -9,6 +9,7 @@ export const MSG = Object.freeze({
   WISHLIST_QUEUE: 'wishlist-queue',  // remember an operation for later (a failure)
   WISHLIST_DONE: 'wishlist-done',
   MARK_OPENED: 'mark-opened',
+  EXTEND_LIST: 'extend-list',        // one more album at the end of a list (when the user hides one)
   COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
 });
@@ -22,7 +23,15 @@ export function parseMessage(raw) {
   const id = toNumericId(raw.id);
   switch (raw.type) {
     case MSG.REFRESH:
-      return { type: raw.type, force: raw.force === true, mode: raw.mode === 'surprise' ? 'surprise' : 'best' };
+      return {
+        type: raw.type, force: raw.force === true, mode: ['surprise', 'tags'].includes(raw.mode) ? raw.mode : 'best',
+        tags: Array.isArray(raw.tags) ? raw.tags.filter((tag) => typeof tag === 'string' && /^[\p{L}\p{N}]{1,40}$/u.test(tag)).slice(0, 5) : [],
+      };
+    case MSG.EXTEND_LIST:
+      return {
+        type: raw.type, view: ['surprise', 'tags'].includes(raw.view) ? raw.view : 'best',
+        tags: Array.isArray(raw.tags) ? raw.tags.filter((tag) => typeof tag === 'string' && /^[\p{L}\p{N}]{1,40}$/u.test(tag)).slice(0, 5) : [],
+      };
     case MSG.COLOR_SCHEME:
       return { type: raw.type, dark: raw.dark === true };
     case MSG.OPEN_MAIN:

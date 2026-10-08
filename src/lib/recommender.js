@@ -8,12 +8,13 @@
 //     setStatus(status):       Promise<void>      – publishes progress (small, frequent, not part of the state)
 //   }
 import {
-  NotLoggedInError, RateLimitedError, HttpError, fetchText, getFan, loadLibrary, parseRecommendations, parseTags, sleep,
+  NotLoggedInError, RateLimitedError, HttpError, fetchText, getFan, isBandcampUrl, loadLibrary, normalizeTag, parseRecommendations, parseTagLabels, parseTags, sleep,
 } from './bandcamp.js';
-import { addTasteTags, createSourceWeigher } from './taste-profile.js';
+import { addTasteTags, createSourceWeigher, recordSourceRead, tagsOfAlbum } from './taste-profile.js';
 import { hashSource, recordVote, rebuildVoteLists, VOTE } from './taste-sync.js';
-import { DAILY_COUNT, emptyState, migrateState, todayKey } from './state.js';
-import { markShown, pickBest, pickSources, pickSurprise, rankedCandidates } from './ranking.js';
+import { DAILY_COUNT, emptyState, idsOfTodaysLists, migrateState, rollShownOver, tagListKey, todayKey } from './state.js';
+import { markShown, pickBest, pickFocused, pickSources, pickSurprise, rankedCandidates } from './ranking.js';
+import { scanSources } from './scanner.js';
 
 const SAMPLES_PER_RUN = 60;
 const FIRST_RUN_EXTRA_SAMPLES = 20;   // the very first run reads more albums so it can fill the list right away
@@ -35,6 +36,7 @@ export const PHASE = Object.freeze({
   SAMPLING: 'sampling',
   RANKING: 'ranking',
   TASTE: 'taste',
+  SCANNING: 'scanning',   // reading more of the user's albums to find the ones of a genre
   PICKING: 'picking',
 });
 
@@ -90,7 +92,8 @@ async function readSources(fetchFn, state, sources, onProgress = () => {}, pacin
       try {
         const html = await fetchText(fetchFn, source.url, httpOptions(pacing));
         addCandidates(state, source, parseRecommendations(html));
-        if (!state.sampled[source.url]) addTasteTags(state, parseTags(html), weigh(source.url)); // each source counts once
+        const tags = parseTagLabels(html);
+        recordSourceRead(state, source.url, tags, weigh(source.url)); // tags of this album, and (once) its share of the profile
         state.sampled[source.url] = Date.now();
         consecutiveFailures = 0;
       } catch (error) {
@@ -116,7 +119,7 @@ async function readSources(fetchFn, state, sources, onProgress = () => {}, pacin
  * Tags are optional: a page that fails to load just keeps its score without them.
  */
 async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
-  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => !candidate.tags);
+  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => !candidate.tags && isBandcampUrl(candidate.url));
   const total = queue.length;
   let done = 0;
   let consecutiveFailures = 0;
@@ -169,6 +172,7 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
   const pacing = withDefaults(tuning);
   const state = migrateState((await store.load()) || emptyState());
   const today = todayKey(now);
+  rollShownOver(state, today);
 
   const existing = mode === 'surprise' ? state.surprise : state.today;
   // A best list built before the taste profile existed is rebuilt once, so the new ranking applies right away.
@@ -183,9 +187,8 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
   try {
     const fan = await getFan(fetchFn);
     // No stockpile: every run fetches a fresh batch. Liked albums stay in the pool (they keep acting as sources), and so
-    // does today's best list when building the surprise one (its cards still need their data).
-    const keep = new Set(state.liked);
-    if (mode === 'surprise' && state.today && state.today.date === today) state.today.ids.forEach((id) => keep.add(id));
+    // do the albums of today's other lists (their cards still need their data).
+    const keep = new Set([...state.liked, ...idsOfTodaysLists(state, today)]);
     state.pool = Object.fromEntries([...keep].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     await report({ phase: PHASE.LIBRARY });
     state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing));
@@ -217,12 +220,8 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
       ids = await pickWithTaste({ fetchFn, state, mode, count: DAILY_COUNT, report, pacing });
     }
     markShown(state, ids);
-    if (mode === 'surprise') {
-      state.surprise = { date: today, ids };
-    } else {
-      state.today = { date: today, ids };
-      state.surprise = null;
-    }
+    if (mode === 'surprise') state.surprise = { date: today, ids };
+    else state.today = { date: today, ids };
     state.tasteBootstrapped = true;
     await store.save(state);
     await store.setStatus({ running: false, finishedAt: Date.now(), scope: 'list' });
@@ -230,6 +229,145 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
     await store.setStatus({ running: false, error: errorCode(error), scope: 'list' });
   }
   return state;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// A list built around genres the user picked ("what do I want to hear today?")
+// ---------------------------------------------------------------------------------------------------------------------
+
+const MIN_SEEDS = 12;               // fewer albums of the genre than this: look for more of them first
+const SCAN_FOR_SEEDS = 60;          // how many unread albums are read to find them
+const SEED_READS = 60;              // albums of the genre whose "you may also like" is read
+const TASTE_CHECK_FOCUSED = 150;
+const MAX_TAGS_PER_LIST = 5;
+const MAX_TAG_LISTS = 6;
+
+/** The user's albums that carry any of the tags, the ones with more of them first. */
+function seedsFor(state, keys) {
+  const wanted = new Set(keys);
+  return (state.owned.sources || [])
+    .filter((source) => isBandcampUrl(source.url))
+    .map((source) => ({ source, matches: tagsOfAlbum(state, source.url).filter((tag) => wanted.has(tag)).length }))
+    .filter(({ matches }) => matches > 0)
+    .sort((a, b) => b.matches - a.matches)
+    .map(({ source }) => source);
+}
+
+/**
+ * Builds today's list for a set of genres, starting from the user's own albums with those tags (bought or saved): their
+ * "you may also like" sections are read, and what comes out keeps only albums of the genre. If the user has few albums
+ * of that genre scanned so far, more of their albums are read first. Without a single one, no list is made.
+ */
+export async function refreshTags({ fetch: fetchFn, store, tags, force = false, now = new Date(), tuning }) {
+  const pacing = withDefaults(tuning);
+  const keys = [...new Set((tags || []).map(normalizeTag).filter(Boolean))].slice(0, MAX_TAGS_PER_LIST).sort();
+  const state = migrateState((await store.load()) || emptyState());
+  if (!keys.length) return state;
+  const today = todayKey(now);
+  rollShownOver(state, today);
+  const listKey = tagListKey(keys);
+  const labels = keys.map((key) => (state.tagLabels || {})[key] || key);
+  if (!force && state.tagLists[listKey] && state.tagLists[listKey].date === today) return state;
+
+  const report = createReporter(store, { mode: 'tags', scope: 'list', tagLabels: labels, tags: keys });
+  await report({ phase: PHASE.SIGNING_IN });
+  try {
+    if (!state.owned) {
+      const fan = await getFan(fetchFn);
+      await report({ phase: PHASE.LIBRARY });
+      state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing));
+      state.fanId = fan.fanId;
+      state.profileUrl = fan.profileUrl;
+    }
+    let seeds = seedsFor(state, keys);
+    if (seeds.length < MIN_SEEDS) { // not enough albums of this genre known yet: read more of the user's albums
+      await report({ phase: PHASE.SCANNING, done: 0, total: SCAN_FOR_SEEDS });
+      await scanSources({ fetch: fetchFn, state, count: SCAN_FOR_SEEDS, tuning: pacing, now: now.getTime(), onProgress: (done, total) => report.throttled({ phase: PHASE.SCANNING, done, total }) });
+      await store.save(state); // what was learned is kept even if nothing comes out of this list
+      seeds = seedsFor(state, keys);
+    }
+    if (!seeds.length) {
+      await store.setStatus({ running: false, error: 'no_seeds', scope: 'list', mode: 'tags', tagLabels: labels });
+      return state;
+    }
+
+    state.pool = Object.fromEntries([...new Set([...state.liked, ...idsOfTodaysLists(state, today)])].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
+    const read = new Set();
+    const nextSeeds = (count) => {
+      const fresh = seeds.filter((source) => !read.has(source.url)).slice(0, count);
+      fresh.forEach((source) => read.add(source.url));
+      return fresh;
+    };
+    const first = nextSeeds(SEED_READS);
+    const info = { library: state.owned.sources.length, picked: first.length, likedPicked: 0 };
+    await readWithProgress(fetchFn, state, first, report, info, pacing);
+    await store.save(state);
+
+    await report({ phase: PHASE.RANKING, candidates: Object.keys(state.pool).length });
+    const pick = async () => {
+      await readCandidateTags(fetchFn, state, TASTE_CHECK_FOCUSED, (done, total) => report.throttled({ phase: PHASE.TASTE, done, total }), pacing);
+      return pickFocused(state, DAILY_COUNT, keys);
+    };
+    let ids = await pick();
+    await report({ phase: PHASE.PICKING });
+    for (let top = 0; top < MAX_TOP_UPS && ids.length < DAILY_COUNT; top++) { // more seeds if the list came out short
+      const more = nextSeeds(TOP_UP_SAMPLES);
+      if (!more.length) break;
+      await readWithProgress(fetchFn, state, more, report, { ...info, picked: more.length }, pacing);
+      ids = await pick();
+    }
+    markShown(state, ids);
+    state.tagLists[listKey] = { date: today, ids, tags: keys };
+    const lists = Object.entries(state.tagLists).filter(([, list]) => list.date === today); // keep the latest few
+    for (const [key] of lists.slice(0, Math.max(0, lists.length - MAX_TAG_LISTS))) delete state.tagLists[key];
+    await store.save(state);
+    await store.setStatus({ running: false, finishedAt: Date.now(), scope: 'list', mode: 'tags', tagLabels: labels });
+  } catch (error) {
+    await store.setStatus({ running: false, error: errorCode(error), scope: 'list', mode: 'tags', tagLabels: labels, tags: keys });
+  }
+  return state;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// One more album for a list (when the user hides one, a new one takes its place at the end)
+// ---------------------------------------------------------------------------------------------------------------------
+
+const EXTEND_READS = 25;   // when the candidates left over from the run are used up: read this many more albums, quietly
+const quiet = Object.assign(() => Promise.resolve(), { throttled: () => undefined });
+
+/**
+ * Adds one new album to the end of today's list for `view` ('best', 'surprise' or 'tags'), chosen like the others (same rules,
+ * nothing that is already in that list). It uses what the run left over; if nothing is left it reads a few more of the user's
+ * albums, without touching the progress status. Returns the id of the new album, or null.
+ */
+export async function extendList({ fetch: fetchFn, store, view = 'best', tags = [], now = new Date(), tuning }) {
+  const pacing = withDefaults(tuning);
+  const state = migrateState((await store.load()) || emptyState());
+  const today = todayKey(now);
+  const keys = [...new Set((tags || []).map(normalizeTag).filter(Boolean))].sort();
+  const list = view === 'surprise' ? state.surprise : view === 'tags' ? state.tagLists[tagListKey(keys)] : state.today;
+  if (!list || list.date !== today || !state.owned) return null;
+  const exclude = () => ({ ids: list.ids, artists: list.ids.map((id) => state.pool[id] && state.pool[id].artistId).filter(Boolean) });
+  const pick = () => (view === 'surprise' ? pickSurprise : view === 'tags' ? (s, n, e) => pickFocused(s, n, keys, e) : pickBest)(state, 1, exclude());
+
+  try {
+    let [id] = pick();
+    if (!id) { // nothing left from the run: read a few more albums
+      const sources = view === 'tags' ? seedsFor(state, keys).filter((source) => !state.sampled[source.url]).slice(0, EXTEND_READS) : pickSources(state, EXTEND_READS);
+      if (sources.length) {
+        await readWithProgress(fetchFn, state, sources, quiet, {}, pacing);
+        await readCandidateTags(fetchFn, state, TASTE_CHECK_FOCUSED, () => {}, pacing);
+        [id] = pick();
+      }
+    }
+    if (!id) { await store.save(state); return null; }
+    list.ids.push(id);
+    markShown(state, [id]);
+    await store.save(state);
+    return id;
+  } catch {
+    return null;
+  }
 }
 
 async function rememberProfileUrl(fetchFn, state, store) {
@@ -268,7 +406,7 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tuning })
     adjust(state.sourceLikes, +1, 2);
     rebuildVoteLists(state);
     await store.save(state);
-    if (!state.sampled[candidate.url]) {
+    if (!state.sampled[candidate.url] && isBandcampUrl(candidate.url)) {
       try { await readSources(fetchFn, state, [{ url: candidate.url, title: candidate.title }], undefined, withDefaults(tuning)); } catch { /* the vote itself is already recorded */ }
     }
   } else if (kind === 'unlike' && state.liked.includes(id)) {

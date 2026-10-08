@@ -1,6 +1,6 @@
 // Pure ranking and selection logic (no I/O). Everything here works on the persisted state.
 import { hashSource } from './taste-sync.js';
-import { normalizeTag } from './bandcamp.js';
+import { isBandcampUrl, normalizeTag } from './bandcamp.js';
 import { createSourceWeigher, tagFit, tagShare } from './taste-profile.js';
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -77,10 +77,11 @@ export function shuffle(items) {
 // ---------------------------------------------------------------------------------------------------------------------
 
 /** Candidates that may still be shown, best first: not owned, not seen, not voted on, and from a new artist. */
-export function rankedCandidates(state) {
+export function rankedCandidates(state, exclude = {}) {
   const weigh = createSourceWeigher(state);
-  const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || [])]);
-  const seenArtists = new Set(state.shownArtists || []);
+  // `exclude` ({ ids, artists }): albums already in the list being extended, so the new one is really new there
+  const seen = new Set([...state.shown, ...state.dismissed, ...(state.liked || []), ...(exclude.ids || [])]);
+  const seenArtists = new Set([...(state.shownArtists || []), ...(exclude.artists || [])]);
   return Object.values(state.pool)
     .filter((c) => !seen.has(c.id) && !seenArtists.has(c.artistId) && !isOwned(c, state.owned))
     .map((candidate) => ({ candidate, points: score(candidate, state, weigh) }))
@@ -127,8 +128,8 @@ function pickInProportion(state, order, count, onPick = () => {}) {
 }
 
 /** "Best matches": the top candidates, one per artist, kept in proportion to the user's taste. */
-export function pickBest(state, count) {
-  const ranked = rankedCandidates(state);
+export function pickBest(state, count, exclude) {
+  const ranked = rankedCandidates(state, exclude);
   const picks = pickInProportion(state, ranked, count);
   for (const candidate of ranked) { // last resort: repeated artists
     if (picks.length >= count) break;
@@ -141,8 +142,8 @@ export function pickBest(state, count) {
  * "Surprise me": picks from deeper in the ranking (beyond what "Best matches" would show), skipping anything the
  * thermometer rejected. Marks the chosen candidates as surprises and returns their ids.
  */
-export function pickSurprise(state, count) {
-  const ranked = rankedCandidates(state);
+export function pickSurprise(state, count, exclude) {
+  const ranked = rankedCandidates(state, exclude);
   // Surprising is not random: it must share something with the user's taste, and not come from rejected sources.
   // Albums whose tags are unknown only fill in when there aren't enough known ones.
   const notRejected = (candidate) => candidateNet(candidate, state) >= 0;
@@ -188,7 +189,7 @@ export function pickSources(state, count) {
     .map((id) => state.pool[id]).filter(Boolean)
     .map((album) => ({ url: album.url, title: album.title, artist: album.artist }))
     .filter((source) => !state.sampled[source.url]);
-  const eligible = state.owned.sources.filter((source) => sourceNet(state, source.url) > REJECTED_SOURCE_NET);
+  const eligible = state.owned.sources.filter((source) => isBandcampUrl(source.url) && sourceNet(state, source.url) > REJECTED_SOURCE_NET);
   const boosted = weightedShuffle(eligible.filter((source) => sourceNet(state, source.url) > 0), (s) => weigh(s.url))
     .slice(0, Math.ceil(count * BOOSTED_SOURCE_SHARE));
   const boostedUrls = new Set(boosted.map((source) => source.url));
@@ -198,8 +199,30 @@ export function pickSources(state, count) {
   return limitPerArtist([...likedAlbums, ...boosted, ...neverRead, ...readBefore], MAX_SOURCES_PER_ARTIST).slice(0, count);
 }
 
-/** Remembers that these albums (and their artists) were shown, so they never come back. */
+/** Remembers that these albums (and their artists) were shown today: from tomorrow on they never come back. */
 export function markShown(state, ids) {
-  state.shown.push(...ids);
-  state.shownArtists = [...new Set([...(state.shownArtists || []), ...ids.map((id) => state.pool[id].artistId)])];
+  state.shownToday = [...new Set([...(state.shownToday || []), ...ids])];
+  state.shownArtistsToday = [...new Set([...(state.shownArtistsToday || []), ...ids.map((id) => state.pool[id].artistId)])];
+}
+
+/**
+ * List for a set of genres the user picked ("what do I want to hear today?"): albums that carry at least one of those tags,
+ * the ones with more of them first. Albums whose tags weren't read still come from the user's albums of that genre, so they
+ * fill the end of the list.
+ */
+export function pickFocused(state, count, keys, exclude) {
+  const wanted = new Set(keys.map(normalizeTag));
+  const ranked = rankedCandidates(state, exclude);
+  const matches = (candidate) => (candidate.tags || []).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
+  const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => matches(b) - matches(a));
+  const unknown = ranked.filter((candidate) => !candidate.tags);
+  const artists = new Set();
+  const picks = [];
+  for (const candidate of [...tagged, ...unknown]) {
+    if (picks.length >= count) break;
+    if (artists.has(candidate.artistId)) continue;
+    artists.add(candidate.artistId);
+    picks.push(candidate.id);
+  }
+  return picks;
 }

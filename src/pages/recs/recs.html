@@ -17,10 +17,28 @@
       </div>
     </div>
     <div class="page-actions">
-      <button type="button" id="mode-toggle" class="button button--ghost" aria-describedby="mode-help"><svg class="icon-stroke" viewBox="0 0 24 24" aria-hidden="true" focusable="false"></svg><span>Surprise me</span></button>
-      <span id="mode-help" class="sr-only"></span>
+      <div class="view-switch" role="group" aria-label="Choose a list">
+        <div class="tags-picker">
+          <button type="button" id="view-tags" class="view-button" aria-haspopup="true" aria-expanded="false" aria-controls="tags-menu"></button>
+          <div id="tags-menu" class="tags-menu" hidden></div>
+        </div>
+        <button type="button" id="view-best" class="view-button"></button>
+        <button type="button" id="view-surprise" class="view-button"></button>
+      </div>
     </div>
   </header>
+  <section id="landing" class="landing" hidden>
+    <h2 class="landing-title">What do you want to hear today?</h2>
+    <p class="landing-subtitle">Pick a mood, or let us pick for you.</p>
+    <div class="view-switch landing-options" role="radiogroup" aria-label="What do you want to hear today?">
+      <button type="button" id="landing-tags-option" class="view-button" role="radio" aria-checked="false" data-view="tags"></button>
+      <button type="button" id="landing-best-option" class="view-button is-active" role="radio" aria-checked="true" data-view="best"></button>
+      <button type="button" id="landing-surprise-option" class="view-button" role="radio" aria-checked="false" data-view="surprise"></button>
+    </div>
+    <div id="landing-tags" class="tags-inline" hidden></div>
+    <p id="landing-hint" class="landing-hint"></p>
+    <button type="button" id="landing-go" class="button button--large">Start digging</button>
+  </section>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <section id="status" class="status-box" hidden></section>
   <section id="album-grid" class="album-grid" aria-label="Today's recommendations"></section>
