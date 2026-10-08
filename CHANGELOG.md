@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.8.8
+- In the player bar, the name of the album and the artist are underlined when you hover over them (both together, like on the cards).
+
 ## 0.8.7
 - The shuffle button at the top of the page is gone; shuffle is only in the player bar.
 

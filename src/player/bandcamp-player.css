@@ -20,6 +20,7 @@
 #dr-player .now-playing .title { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
   font-size: 14px; line-height: 16px; }
 #dr-player .now-playing .artist { max-width: 200px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 12px; }
+#dr-player .now-playing .np-link:hover :is(.title, .artist) { text-decoration: underline; } /* the name of the album and the artist underline together, like on the cards */
 
 #dr-player .progress-transport, #dr-player .controls-extra { display: flex; margin-top: 10px; }
 #dr-player .progress-transport * { box-sizing: content-box; }
