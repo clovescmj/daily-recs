@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.0
+- **New loading.** While a list is being built, the grey box with one line is replaced by a box with an animated equalizer, what is being
+  done ("Digging through your collection…"), a detail line ("Reading 60 of your 1,605 albums"), a counter (24 / 60) and a thin progress
+  bar, and the grid shows placeholder cards that shimmer where the albums will be, so the page does not jump when they arrive. With "reduce
+  motion" on, nothing moves.
+
 ## 0.14.15
 - Under the "Find music" button of the genre menu there is now a caption (Bandcamp's small text size): "This will refresh your list with a new
   search." The page keeps a little more room (540 px) for the menu, which is now taller.

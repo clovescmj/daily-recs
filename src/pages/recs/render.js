@@ -10,6 +10,16 @@ import { flushWishlistQueue } from './wishlist-actions.js';
 
 let renderedKey = '';   // signature of the album list currently in the grid
 
+const SKELETON_CARDS = 8;
+const skeletonCard = '<div class="skeleton" aria-hidden="true"><div class="skeleton-cover"></div><div class="skeleton-line wide"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>';
+
+/** While the list is being built: placeholders where the albums will be, so the page does not jump when they arrive. */
+function setSkeleton() {
+  if (renderedKey === 'skeleton') return;
+  $('album-grid').innerHTML = skeletonCard.repeat(SKELETON_CARDS);
+  renderedKey = 'skeleton';
+}
+
 function setEmpty(message) {
   $('album-grid').innerHTML = message ? `<div class="empty-state">${message}</div>` : '';
   renderedKey = '';
@@ -42,7 +52,8 @@ function renderGrid(state, status) {
   session.wished = new Set(state ? state.wishlisted || [] : []);
   session.saved = new Set((state ? state.saved || [] : []).map((entry) => `${entry.id}:${entry.i}`)); // the Liked list: tracks
 
-  if (!list) { setEmpty(status.running || status.error ? '' : 'Getting your recommendations ready…'); return; }
+  if (!list && status.running && !session.landing) { setSkeleton(); return; }
+  if (!list) { setEmpty(status.error ? '' : 'Getting your recommendations ready…'); return; }
   if (!ids.length) { setEmpty('Nothing new for now. Come back tomorrow.'); return; }
 
   // Rebuild the cards only when the list itself changed; otherwise just sync the wishlist / dislike controls.

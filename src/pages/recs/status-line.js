@@ -33,6 +33,34 @@ export function progressText(status) {
   }
 }
 
+/**
+ * The same progress, split for the loading box: a title (what is being done), a detail line and a counter.
+ * `count` is empty while there is nothing to count.
+ */
+export function progressParts(status) {
+  const surprise = status.mode === 'surprise';
+  const genres = (status.tagLabels || []).join(' + ');
+  const count = status.total ? `${formatNumber(status.done)} / ${formatNumber(status.total)}` : '';
+  if (status.mode === 'tags' && status.phase === PHASE.SCANNING) return { title: `Looking for your ${genres} albums…`, detail: 'Reading more of your albums to find them', count };
+  if (status.mode === 'tags' && SAMPLING_PHASES.has(status.phase)) return { title: `Digging into your ${genres} albums…`, detail: 'Reading what fans of them also own', count };
+  if (SAMPLING_PHASES.has(status.phase)) {
+    if (status.bootstrap) return { title: 'Learning your taste…', detail: 'First time only: it takes a few minutes', count };
+    const what = `${formatNumber(status.picked)} ${status.library ? `of your ${formatNumber(status.library)} albums` : 'random albums'}`;
+    return { title: surprise ? 'Digging for surprises…' : 'Digging through your collection…', detail: `Reading ${what}`, count };
+  }
+  switch (status.phase) {
+    case PHASE.SIGNING_IN: return { title: 'Signing in to Bandcamp…', detail: '', count };
+    case PHASE.LIBRARY: return { title: 'Reading your collection and wishlist…', detail: '', count };
+    case PHASE.TASTE: return { title: 'Checking the candidates against your taste…', detail: 'Looking at the genres of each one', count };
+    case PHASE.RANKING: return { title: 'Ranking the candidates…', detail: `${formatNumber(status.candidates)} found`, count };
+    case PHASE.PICKING: return { title: surprise ? 'Digging below the obvious picks…' : `Picking your ${DAILY_COUNT}…`, detail: '', count };
+    default: return { title: 'Working…', detail: '', count };
+  }
+}
+
+/** Five bars that dance (an equalizer): CSS does the dancing, and stops it for people who asked for less motion. */
+const EQUALIZER = '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>';
+
 let countdownTimer = null;
 
 /** Counts down to `retryAt`, then says it is trying again (the service worker restarts the run by itself). */
@@ -52,13 +80,17 @@ function startCountdown(retryAt) {
 /** Draws the box for the given status. "Load more" shows its own spinner instead of a box. */
 export function renderStatus(status) {
   const box = $('status');
+  box.classList.remove('is-loading');
   if (!(status.error === 'rate_limited' && status.retryAt)) clearInterval(countdownTimer);
   if (status.running) {
     // On the opening screen the day's list is built in the background: nothing to show until the user picks something.
     if (session.landing) { box.hidden = true; return; }
     const determinate = (status.phase === PHASE.SAMPLING || status.phase === PHASE.TASTE) && status.total;
     box.hidden = false;
-    box.innerHTML = `<strong>${esc(progressText(status))}</strong>${determinate ? `<progress max="${Number(status.total)}" value="${Number(status.done) || 0}"></progress>` : '<progress></progress>'}`;
+    const { title, detail, count } = progressParts(status);
+    box.classList.add('is-loading');
+    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong>${esc(title)}</strong>${detail ? `<span>${esc(detail)}</span>` : ''}</div>${count ? `<span class="loading-count">${esc(count)}</span>` : ''}</div>`
+      + (determinate ? `<progress max="${Number(status.total)}" value="${Number(status.done) || 0}"></progress>` : '<progress></progress>');
   } else if (status.error === 'not_logged_in') {
     box.hidden = false;
     box.innerHTML = `<strong>You're not signed in to Bandcamp.</strong><p>Sign in to your account and come back here.</p>

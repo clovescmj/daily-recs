@@ -141,6 +141,30 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 @keyframes bar-slide { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .status-box progress:indeterminate::-webkit-progress-bar { animation: none; } }
 
+/* While a list is being built: an equalizer, what is going on, a counter, a thin bar, and placeholders for the albums */
+.status-box.is-loading { padding: 0; margin-bottom: 20px; }
+.loading { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+.loading-text { flex: 1; min-width: 0; }
+.loading-text strong { font-size: var(--bc-font-size-200); }
+.loading-text span { display: block; margin-top: 2px; font-size: var(--bc-font-size-100); color: var(--muted); }
+.loading-count { font-size: var(--bc-font-size-100); color: var(--muted); white-space: nowrap; }
+.status-box.is-loading progress { height: 3px; margin: 0; border-radius: 0; }
+.eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 24px; flex: none; }
+.eq i { display: block; width: 4px; border-radius: 1px; background: var(--blue400); animation: eq-dance 1s ease-in-out infinite; }
+.eq i:nth-child(1) { height: 10px; animation-delay: -.2s; } .eq i:nth-child(2) { height: 22px; animation-delay: -.5s; }
+.eq i:nth-child(3) { height: 15px; animation-delay: -.1s; } .eq i:nth-child(4) { height: 24px; animation-delay: -.7s; }
+.eq i:nth-child(5) { height: 9px; animation-delay: -.35s; }
+@keyframes eq-dance { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+.eq i { transform-origin: bottom; }
+.skeleton-cover, .skeleton-line {
+  background: linear-gradient(90deg, var(--gray100, #ededed) 0, #f7f7f7 50%, var(--gray100, #ededed) 100%) 0 0 / 600px 100%; animation: shimmer 1.4s linear infinite;
+}
+.skeleton-cover { aspect-ratio: 1; margin-bottom: 10px; }
+.skeleton-line { height: 10px; width: 45%; margin-bottom: 7px; border-radius: 2px; }
+.skeleton-line.wide { width: 70%; } .skeleton-line.short { width: 30%; }
+@keyframes shimmer { from { background-position: -300px 0; } to { background-position: 300px 0; } }
+@media (prefers-reduced-motion: reduce) { .eq i, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
+
 /* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
 .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }
 .album-card { display: flex; flex-direction: column; padding: 10px; border: 1px dotted transparent; background: #fff; }
