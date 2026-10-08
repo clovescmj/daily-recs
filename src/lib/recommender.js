@@ -79,7 +79,7 @@ function addCandidates(state, source, recommendations) {
 }
 
 /** Reads the "you may also like" section of each source into the candidate pool. Throws if Bandcamp keeps failing. */
-async function readSources(fetchFn, state, sources, onProgress = () => {}, pacing = withDefaults(), { learn = true } = {}) {
+async function readSources(fetchFn, state, sources, onProgress = () => {}, pacing = withDefaults()) {
   const queue = [...sources];
   const weigh = createSourceWeigher(state);
   let done = 0;
@@ -92,7 +92,7 @@ async function readSources(fetchFn, state, sources, onProgress = () => {}, pacin
       try {
         const html = await fetchText(fetchFn, source.url, httpOptions(pacing));
         addCandidates(state, source, parseRecommendations(html));
-        if (learn) recordSourceRead(state, source.url, parseTagLabels(html), weigh(source.url)); // tags of this album, and (once) its share of the profile
+        recordSourceRead(state, source.url, parseTagLabels(html), weigh(source.url)); // tags of this album, and (once) its share of the profile
         state.sampled[source.url] = Date.now();
         consecutiveFailures = 0;
       } catch (error) {
@@ -148,13 +148,13 @@ async function pickWithTaste({ fetchFn, state, mode, count, report, pacing }) {
 }
 
 /** Reads `sources`, publishing progress; `extra` is merged into every status update. */
-async function readWithProgress(fetchFn, state, sources, report, extra, pacing, options) {
+async function readWithProgress(fetchFn, state, sources, report, extra, pacing) {
   const total = sources.length;
   await report({ phase: PHASE.SAMPLING, done: 0, total, ...extra });
   await readSources(fetchFn, state, sources, (done) => {
     const patch = { phase: PHASE.SAMPLING, done, total, ...extra };
     return done === total ? report(patch) : report.throttled(patch);
-  }, pacing, options);
+  }, pacing);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -238,8 +238,7 @@ const MIN_SEEDS = 12;               // fewer albums of the genre than this: look
 const SCAN_FOR_SEEDS = 60;          // how many unread albums are read to find them
 const SEED_READS = 60;              // albums of the genre whose "you may also like" is read
 const TASTE_CHECK_FOCUSED = 150;
-const HOP_BATCH = 40;               // short list and no more albums of the user's: read this many recommended albums of the genre
-const MAX_HOP_BATCHES = 3;          // ...at most three times per list (one level beyond the user's albums, no further)
+const STRICT_TAG_CHECK = 300;       // a list that came out short: the genre tags of this many candidates are read (never more than that)
 const MAX_TAGS_PER_LIST = 5;
 const MAX_TAG_LISTS = 6;
 
@@ -252,28 +251,6 @@ function seedsFor(state, keys) {
     .filter(({ matches }) => matches > 0)
     .sort((a, b) => b.matches - a.matches)
     .map(({ source }) => source);
-}
-
-/** Recommended albums that carry the genre and were not read yet, the best-ranked first: they stand in for the user's own albums. */
-function hopSeeds(state, keys, count) {
-  const wanted = new Set(keys);
-  return rankedCandidates(state)
-    .filter((c) => !c.hop && isBandcampUrl(c.url) && !state.sampled[c.url] && (c.tags || []).some((tag) => wanted.has(normalizeTag(tag))))
-    .slice(0, count)
-    .map((c) => ({ url: c.url, title: c.title }));
-}
-
-/**
- * Reads the recommendations of genre albums that are not the user's, without learning their tags into the taste profile. What
- * comes only from them is marked `hop`, so a list shows it after what comes straight from the user's own albums.
- */
-async function readHop(fetchFn, state, sources, report, extra, pacing) {
-  await readWithProgress(fetchFn, state, sources, report, extra, pacing, { learn: false });
-  const via = new Set(sources.map((source) => source.url));
-  for (const candidate of Object.values(state.pool)) {
-    const urls = Object.keys(candidate.srcs);
-    if (candidate.hop === undefined && urls.length && urls.every((url) => via.has(url))) candidate.hop = true;
-  }
 }
 
 /**
@@ -329,7 +306,7 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
     await report({ phase: PHASE.RANKING, candidates: Object.keys(state.pool).length });
     const pick = async (depth = TASTE_CHECK_FOCUSED) => {
       await readCandidateTags(fetchFn, state, depth, (done, total) => report.throttled({ phase: PHASE.TASTE, done, total }), pacing);
-      return pickFocused(state, DAILY_COUNT, keys);
+      return pickFocused(state, DAILY_COUNT, keys, undefined, { allowUnknown: false }); // only albums whose genre was checked
     };
     let ids = await pick();
     await report({ phase: PHASE.PICKING });
@@ -339,12 +316,7 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
       await readWithProgress(fetchFn, state, more, report, { ...info, picked: more.length }, pacing);
       ids = await pick();
     }
-    for (let hops = 0; hops < MAX_HOP_BATCHES && ids.length < DAILY_COUNT; hops++) { // the user's albums of this genre are used up
-      const more = hopSeeds(state, keys, HOP_BATCH);
-      if (!more.length) break;
-      await readHop(fetchFn, state, more, report, { ...info, picked: more.length }, pacing);
-      ids = await pick(TASTE_CHECK_FOCUSED * (hops + 2)); // the pool has grown: look deeper for albums of the genre
-    }
+    if (ids.length < DAILY_COUNT) ids = await pick(STRICT_TAG_CHECK); // short: the genre of more candidates is checked, but the list is never filled with albums that don't match
     markShown(state, ids);
     state.tagLists[listKey] = { date: today, ids, tags: keys };
     const lists = Object.entries(state.tagLists).filter(([, list]) => list.date === today); // keep the latest few
@@ -395,14 +367,7 @@ export async function extendList({ fetch: fetchFn, store, view = 'best', tags = 
         await scanSources({ fetch: fetchFn, state, count: EXTEND_SCAN, tuning: pacing, now: now.getTime() });
         sources = unreadSeeds();
       }
-      if (view === 'tags' && !sources.length) { // still none: albums of the genre that Bandcamp recommended stand in for them
-        const hop = hopSeeds(state, keys, EXTEND_READS);
-        if (hop.length) {
-          await readHop(fetchFn, state, hop, quiet, {}, pacing);
-          await readCandidateTags(fetchFn, state, TASTE_CHECK_FOCUSED, () => {}, pacing);
-          [id] = pick();
-        }
-      } else if (sources.length) {
+      if (sources.length) {
         await readWithProgress(fetchFn, state, sources, quiet, {}, pacing);
         await readCandidateTags(fetchFn, state, TASTE_CHECK_FOCUSED, () => {}, pacing);
         [id] = pick();

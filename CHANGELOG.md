@@ -3,6 +3,15 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.7.0
+- Lists built around genres now only hold close matches, for any genre you pick (think of a DJ digging for a sound):
+  - the genre must be one of the album's **first three tags**; a tag far down the list no longer counts;
+  - the list is **not filled up to 50** any more: it has as many albums as match (the extra reads of recommended albums that 0.4.15 added
+    are gone, and albums whose genre was never checked are left out);
+  - the albums that more of **your** albums of that genre recommend come first, and with several genres picked, the ones that match more
+    of them come first.
+- The daily lists ("Best matches" and "Surprise me") are not changed: they are still 50 long.
+
 ## 0.6.3
 - Fix: hiding the album that is playing sometimes took a while to skip. The page waited for the background worker to confirm the dislike
   before moving on, and the worker answers only after the job it is busy with (a scan, a list being built). Now the next album (or the

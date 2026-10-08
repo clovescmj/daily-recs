@@ -33,6 +33,7 @@ const TAG_WEIGHT = 60;             // a perfect tag match is worth about six sou
 const NO_OVERLAP_PENALTY = 0.3;    // share of TAG_WEIGHT lost by an album sharing no tag with the user's taste
 const BOOSTED_SOURCE_SHARE = 0.3;
 const REJECTED_SOURCE_NET = -2;
+const FOCUS_PRIMARY_TAGS = 3;     // in a genre list the chosen genre must be among an album's first three tags
 const PRIMARY_TAGS = 4;            // an album's first tags say what genre it is; later ones are incidental
 const TAG_CAP_SLACK = 1.5;         // a genre may take up to 1.5x its share of the user's library in a list
 const MIN_TAG_CAP = 2;
@@ -228,9 +229,12 @@ export function pickFocused(state, count, keys, exclude, { allowUnknown = true }
   const penalties = focusPenalties(state, wanted);
   const penalty = (candidate) => (candidate.tags || []).reduce((sum, tag) => sum + (penalties.get(normalizeTag(tag)) || 0), 0);
   const ranked = rankedCandidates(state, exclude);
-  const matches = (candidate) => (candidate.tags || []).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
-  // what comes only from albums the user doesn't own (`hop`) goes after what comes from theirs
-  const tagged = ranked.filter((candidate) => matches(candidate) > 0).sort((a, b) => Boolean(a.hop) - Boolean(b.hop) || penalty(a) - penalty(b) || matches(b) - matches(a));
+  // The genre must be one of the album's first tags: a tag far down the list is incidental, and a list for a DJ needs close matches.
+  const matches = (candidate) => (candidate.tags || []).slice(0, FOCUS_PRIMARY_TAGS).map(normalizeTag).filter((tag) => wanted.has(tag)).length;
+  // How many of the user's albums recommend it: the more that do, the closer it is to what they have of that genre.
+  const supporters = (candidate) => Object.keys(candidate.srcs || {}).length;
+  const tagged = ranked.filter((candidate) => matches(candidate) > 0)
+    .sort((a, b) => penalty(a) - penalty(b) || matches(b) - matches(a) || supporters(b) - supporters(a));
   const unknown = allowUnknown ? ranked.filter((candidate) => !candidate.tags) : [];
   const artists = new Set();
   const picks = [];

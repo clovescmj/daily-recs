@@ -181,6 +181,13 @@ describe('how much each album counts', () => {
     assert.notEqual(pickFocused(state, 3, ['ebm']).at(-1), 'a', 'a dislike made in a list of other genres does not count here');
   });
 
+  test('in a genre list, an album recommended by more of the user\'s albums comes first', () => {
+    const one = { ...candidate('a', 'a', { u: 3 }), tags: ['ebm'] };
+    const three = { ...candidate('b', 'b', { u: 3, v: 3, w: 3 }), tags: ['ebm'] };
+    const state = stateWith([one, three]);
+    assert.deepEqual(pickFocused(state, 2, ['ebm']), ['b', 'a']);
+  });
+
   test('pickSources never picks pages the extension cannot read (labels on their own domain)', () => {
     const state = emptyState();
     state.owned = { ...owned, sources: [
