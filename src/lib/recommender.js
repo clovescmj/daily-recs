@@ -333,7 +333,8 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const EXTEND_TAG_CHECK = 400;   // how deep into the leftovers the tags are read when none of the checked ones is left
-const EXTEND_READS = 25;   // when the candidates left over from the run are used up: read this many more albums, quietly
+const EXTEND_READS = 25;
+const EXTEND_SCAN = 40;    // for a genre list: how many more of the user's albums are scanned to find albums of that genre   // when the candidates left over from the run are used up: read this many more albums, quietly
 const quiet = Object.assign(() => Promise.resolve(), { throttled: () => undefined });
 
 /**
@@ -359,7 +360,12 @@ export async function extendList({ fetch: fetchFn, store, view = 'best', tags = 
       [id] = pick();
     }
     if (!id) { // nothing left from the run: read a few more albums
-      const sources = view === 'tags' ? seedsFor(state, keys).filter((source) => !state.sampled[source.url]).slice(0, EXTEND_READS) : pickSources(state, EXTEND_READS);
+      const unreadSeeds = () => seedsFor(state, keys).filter((source) => !state.sampled[source.url]).slice(0, EXTEND_READS);
+      let sources = view === 'tags' ? unreadSeeds() : pickSources(state, EXTEND_READS);
+      if (view === 'tags' && !sources.length) { // every known album of the genre was used: look for more of them among the user's albums
+        await scanSources({ fetch: fetchFn, state, count: EXTEND_SCAN, tuning: pacing, now: now.getTime() });
+        sources = unreadSeeds();
+      }
       if (sources.length) {
         await readWithProgress(fetchFn, state, sources, quiet, {}, pacing);
         await readCandidateTags(fetchFn, state, TASTE_CHECK_FOCUSED, () => {}, pacing);

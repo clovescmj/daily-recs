@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.4.12
+- Fix: a replacement for a genre list no longer runs dry when every known album of that genre was used: more of the user's albums are
+  scanned to find albums of the genre (found by repeating the test many times, where it sometimes found none).
+
 ## 0.4.11
 - Fix: the album that takes the place of a hidden one in a genre list is now really of that genre. Albums whose tags were never read are
   no longer taken on trust: the tags of more of the leftovers are read and checked first, and if none fits there is no replacement.
