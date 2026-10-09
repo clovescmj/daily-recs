@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.9
+- One size for the icons: every icon is now in a 20 px box (token `--dr-icon-size`, which was 18 px): the heart, the + and the block icon of the cards, the queue and the
+  player bar, besides the list buttons, the queue, Liked Songs, volume and play mode icons that already were. The big play and pause (28 px), the previous and next arrows,
+  and the small arrow of the genre button keep their own sizes.
+
 ## 1.1.8
 - New filled icons (Material Symbols, made solid from the outline files): the list buttons (My tags, Best matches, Surprise me) in a 20 px box, the same as the icons of the
   player; the play and pause of the page header and of the player bar (a 28 px box, since the glyph takes about half of it); and the volume icon. The heart, the + and the
