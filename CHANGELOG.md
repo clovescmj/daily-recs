@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.5
+- The full stop at the end of sentences stays only in the two lines at the top of the genre menu. The "first time only" note, the toasts (wishlist and Liked Songs) and
+  the note in the footer of Liked Songs are back to how they were, without it.
+
 ## 1.1.4
 - The genre menu is wider (340 px instead of 300 px), so its first line no longer breaks in two.
 - Texts that are sentences now end with a full stop: the genre menu lines, the "first time only" note while learning your taste, the toasts (wishlist and Liked Songs)

@@ -29,7 +29,7 @@ export async function setWish(id, on) {
       toast("Couldn't add it to your wishlist. Try again.");
       return;
     }
-    toast(result.ok ? (on ? 'Added to your wishlist. Reload the page to see it there.' : 'Removed from your wishlist.') : "Couldn't confirm the wishlist removal.");
+    toast(result.ok ? (on ? 'Added to your wishlist. Reload the page to see it there.' : 'Removed from your wishlist') : "Couldn't confirm the wishlist removal.");
     if (on) session.wished.add(id); else session.wished.delete(id);
     send({ type: MSG.FEEDBACK, id, kind: on ? 'wish' : 'unwish' });
     emit(true);
@@ -40,7 +40,7 @@ export async function setWish(id, on) {
 
 /** The + of the player bar: adds a song to (or takes it out of) Liked Songs. Its album then feeds the search like the library does. */
 export async function setSave({ id, i, title }, on) {
-  await setSongs([{ id, i, title }], on, on ? 'Added to Liked Songs.' : 'Removed from Liked Songs.');
+  await setSongs([{ id, i, title }], on, on ? 'Added to Liked Songs' : 'Removed from Liked Songs');
 }
 
 async function setSongs(songs, on, message) {
@@ -59,12 +59,12 @@ export async function saveAlbumSong(id) {
     const keys = [...session.saved].filter((key) => key.startsWith(`${id}:`));
     const saved = ((await loadState()) || {}).saved || [];
     const songs = keys.map((key) => Number(key.split(':')[1])).map((i) => ({ id, i, title: (saved.find((item) => item.id === id && item.i === i) || {}).title }));
-    await setSongs(songs, false, 'Removed album from Liked Songs.');
+    await setSongs(songs, false, 'Removed album from Liked Songs');
     return;
   }
   const songs = await albumSongs(id).catch(() => []);
   if (!songs.length) { toast("Couldn't read this album's songs. Try again."); return; }
-  await setSongs(songs.map((song) => ({ ...song, all: true })), true, 'Added album to Liked Songs.');
+  await setSongs(songs.map((song) => ({ ...song, all: true })), true, 'Added album to Liked Songs');
 }
 
 export async function dislikeAlbum(id) {

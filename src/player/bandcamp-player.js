@@ -80,7 +80,7 @@
       <div class="queue saved" role="dialog" aria-label="Liked Songs">
         <div class="queue-header"><h2>Liked Songs</h2><span class="l-count"></span><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
         <ol>${EMPTY_LIKED}</ol>
-        <div class="queue-foot"><span>Stored on this computer.</span></div>
+        <div class="queue-foot"><span>Stored on this computer</span></div>
       </div>`;
     const q = (s) => el.querySelector(s);
     /** The cover of a song just added: it shows above the icon and shrinks into it (see .liked-fly). It lives in the bar, not in the button, so it does not get the button's fade. */
