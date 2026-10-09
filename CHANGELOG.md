@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.4
+- The genre menu is wider (340 px instead of 300 px), so its first line no longer breaks in two.
+- Texts that are sentences now end with a full stop: the genre menu lines, the "first time only" note while learning your taste, the toasts (wishlist and Liked Songs)
+  and the note in the footer of Liked Songs. Tooltips, titles and short labels stay as they were.
+
 ## 1.1.3
 - Play mode icons: Shuffle is now Material's own icon (it looked too big), and Full album is a disc inside Material's empty square. Both use the same 960 box as the other Material icons.
 

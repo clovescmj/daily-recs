@@ -35,8 +35,8 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
     const state = session.state;
     const { scanned, total } = state ? scanProgress(state) : { scanned: 0, total: 0 };
     $in('.tags-coverage').textContent = total
-      ? `Tags found so far · ${formatNumber(scanned)} of ${formatNumber(total)} albums scanned`
-      : 'Your tags will show up as your albums are scanned';
+      ? `Tags found so far · ${formatNumber(scanned)} of ${formatNumber(total)} albums scanned.`
+      : 'Your tags will show up as your albums are scanned.';
     const typed = $in('.tags-input').value.trim();
     const typedKey = normalizeTag(typed);
     const known = state ? selectableTags(state) : [];

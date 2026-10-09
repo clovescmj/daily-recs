@@ -21,7 +21,7 @@ export function progressParts(status) {
   if (status.mode === 'tags' && status.phase === PHASE.SCANNING) return { title: `Finding your ${genres} albums`, detail: albums };
   if (status.mode === 'tags' && SAMPLING_PHASES.has(status.phase)) return { title: `Digging into ${genres}`, detail: albums };
   if (SAMPLING_PHASES.has(status.phase)) {
-    if (status.bootstrap) return { title: 'Learning your taste', detail: 'First time only, takes a few minutes' };
+    if (status.bootstrap) return { title: 'Learning your taste', detail: 'First time only, takes a few minutes.' };
     return { title: surprise ? 'Digging for surprises' : 'Sampling your collection', detail: albums };
   }
   switch (status.phase) {
