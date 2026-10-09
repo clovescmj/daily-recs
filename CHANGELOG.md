@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.12
+- The queue and Liked Songs panels have the same border, corners, shadow and distance from the bar as the Playback and genre menus.
+
 ## 0.15.11
 - The Liked Songs icon now jumps and wobbles from side to side, like a bell, when a song is added (instead of the two bumps).
 

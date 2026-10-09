@@ -99,8 +99,8 @@
 }
 
 /* queue ("now playing albums"): Bandcamp's .queue rules, opening upwards from the bar */
-#dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: #FFF;
-  display: none; box-shadow: 0 0 3px 0 rgba(0,0,0,0.2); border-radius: 5px 5px 0 0; }
+#dr-player .queue { position: absolute; right: 0; bottom: calc(100% + 6px); width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: #FFF;
+  display: none; border: 1px solid rgb(34 34 34 / 32%); box-shadow: 0 4px 16px rgb(34 34 34 / 16%); border-radius: 4px; box-sizing: border-box; } /* same border, corners, shadow and gap as the other menus */
 #dr-player .queue.show { display: block; }
 #dr-player .queue-header { margin: 16px 16px 10px; display: flex; justify-content: space-between; }
 #dr-player .queue-header h2 { margin: 0; font-size: 18px; font-weight: 500; }
