@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.5
+- Player bar: the play button, the title with its progress bar, and the previous / next arrows are now centred on the cover (the play button was 3 px high, and the
+  progress block 1 px low). The buttons on the right (Playback, queue, Liked Songs, volume) sit on the same centre; the arrows stay on the line of the progress bar.
+
 ## 1.0.4
 - Your Liked Songs are safer. They now live under a storage key of their own (`likedSongs`), apart from the big state, and they only change when you add or take out a
   song: a search, an update of the extension or a state that has to be rebuilt can no longer touch them. They are also written the moment you click the +, straight from
