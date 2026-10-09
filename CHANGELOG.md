@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.10
+- The icons are back to the sizes of 1.1.8: the heart, the + and the block icon are 18 px again (1.1.9 had made them 20 px). The rest is as it was.
+
 ## 1.1.9
 - One size for the icons: every icon is now in a 20 px box (token `--dr-icon-size`, which was 18 px): the heart, the + and the block icon of the cards, the queue and the
   player bar, besides the list buttons, the queue, Liked Songs, volume and play mode icons that already were. The big play and pause (28 px), the previous and next arrows,
