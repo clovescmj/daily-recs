@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.9
+- Liked Songs has an empty state: the list icon, "No liked songs yet" and "Tap the + on an album or in the player to save songs here.", with the same + icon
+  as the cards (the grey one, before it turns green). It also shows from the start; before, the empty panel was blank until a song was added and removed.
+
 ## 0.18.8
 - Opening screen: the line under the options ("Perfect matches with your collection.") always has its line reserved, so it appearing no longer pushes the Start digging button down.
   Opening the genre menu no longer scrolls the page to its search field.
