@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.11
+- The Liked Songs icon now jumps and wobbles from side to side, like a bell, when a song is added (instead of the two bumps).
+
 ## 0.15.10
 - The bump of the Liked Songs icon is bigger (10 px and 5 px, with a little zoom) and the icon turns the accent blue while it jumps.
 
