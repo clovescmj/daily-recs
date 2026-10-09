@@ -6,6 +6,7 @@ import { PHASE } from '../../lib/recommender.js';
 import { scanProgress } from '../../lib/taste-profile.js';
 import { session } from './session.js';
 import { DAILY_COUNT } from '../../lib/state.js';
+import { onWaitingChange, waiting } from './waiting.js';
 
 const SAMPLING_PHASES = new Set([PHASE.SAMPLING]);
 
@@ -60,6 +61,31 @@ export function progressParts(status) {
 /** Five bars that dance (an equalizer): CSS does the dancing, and stops it for people who asked for less motion. */
 const EQUALIZER = '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>';
 
+// Material's play_circle and pause_circle
+const WAIT_PLAY = '<svg class="wait-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>';
+const WAIT_PAUSE = '<svg class="wait-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>';
+const WAIT_IDLE = 'Play a song while waiting';
+
+/** The right side of the loading box: a song of the collection to listen to while the list is built. */
+function paintWait(info = waiting.info()) {
+  const box = $('status');
+  const wait = box && box.querySelector('.loading-wait');
+  if (!wait) return;
+  wait.hidden = !waiting.can();
+  const label = wait.querySelector('.wait-label');
+  const text = info.playing ? `Now playing: ${info.artist ? `${info.artist} - ` : ''}${info.song}` : WAIT_IDLE;
+  if (label.textContent !== text) { // the same fade as the title of the steps
+    label.textContent = text;
+    label.classList.remove('is-new'); void label.offsetWidth; label.classList.add('is-new');
+  }
+  const button = wait.querySelector('.wait-btn');
+  const action = info.playing ? 'Pause' : 'Play a song while waiting';
+  button.classList.toggle('is-playing', info.playing);
+  button.setAttribute('aria-label', action);
+  button.title = action;
+}
+onWaitingChange(paintWait);
+
 let countdownTimer = null;
 
 /** Counts down to `retryAt`, then says it is trying again (the service worker restarts the run by itself). */
@@ -82,7 +108,8 @@ function startCountdown(retryAt) {
  */
 function paintLoading(box, { title, detail }, progress) {
   if (!box.querySelector('.loading')) {
-    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong></strong><div class="loading-sub"><span></span></div></div></div><progress></progress>`;
+    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong></strong><div class="loading-sub"><span></span></div></div><div class="loading-wait" hidden><span class="wait-label"></span><button type="button" class="wait-btn">${WAIT_PLAY}${WAIT_PAUSE}</button></div></div><progress></progress>`;
+    box.querySelector('.wait-btn').addEventListener('click', () => waiting.toggle());
   }
   const strong = box.querySelector('.loading-text strong');
   if (strong.textContent !== title) {
@@ -99,6 +126,7 @@ function paintLoading(box, { title, detail }, progress) {
 /** Draws the box for the given status. "Load more" shows its own spinner instead of a box. */
 export function renderStatus(status) {
   const box = $('status');
+  session.running = Boolean(status.running);
   box.classList.remove('is-loading');
   if (!(status.error === 'rate_limited' && status.retryAt)) clearInterval(countdownTimer);
   if (status.running) {
@@ -108,6 +136,7 @@ export function renderStatus(status) {
     box.hidden = false;
     box.classList.add('is-loading');
     paintLoading(box, progressParts(status), determinate ? status : null);
+    paintWait();
   } else if (status.error === 'not_logged_in') {
     box.hidden = false;
     box.innerHTML = `<strong>You're not signed in to Bandcamp.</strong><p>Sign in to your account and come back here.</p>

@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.0
+- **A song while you wait.** On the right of the loading box there is "Play a song while waiting" and a small play button (Material's play and
+  pause circles). It plays a random song from an album of your own collection (not the wishlist or the recommendations). While it plays, the
+  line says "Now playing: Artist - Song" and the button turns into pause; paused, the first text comes back. The text changes with the same
+  fade as the title of the steps. When the song ends, another one starts, until the list is ready. The player bar shows the song meanwhile.
+- Fixed: the player bar failed to draw when something played before any list existed (the queue was missing in the first update).
+
 ## 0.15.14
 - The Playback menu, the queue, Liked Songs and the genre menu open and close with a short fade and slide (they used to pop in and out).
 

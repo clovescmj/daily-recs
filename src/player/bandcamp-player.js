@@ -173,9 +173,9 @@
       setText(q('.now-playing .title'), s.songTitle || s.albumTitle || ''); // the song, with the artist under it
       setText(q('.now-playing .artist span'), s.artist || '');
       q('.now-playing .artist').style.display = s.artist ? '' : 'none';
-      q('.collect').style.visibility = s.artist ? '' : 'hidden';
+      q('.collect').style.visibility = s.artist && !s.plain ? '' : 'hidden'; // a song played while waiting is not on any list: nothing to wish, like or skip
       // queue: only redraw when the list or the current album change (`queue` omitted = unchanged)
-      if (s.queue !== undefined) { queue = s.queue; queueKey = queueVersion(queue); }
+      if (s.queue != null) { queue = s.queue; queueKey = queueVersion(queue); }
       const sig = `${s.curId}|${queueKey}`;
       if (sig !== queueSig) {
         queueSig = sig;

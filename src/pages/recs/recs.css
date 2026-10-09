@@ -152,6 +152,16 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .loading-text { flex: 1; min-width: 0; }
 .loading-text strong { display: block; font-size: var(--bc-font-size-200); }
 .loading-text strong.is-new { animation: loading-in .3s ease; }
+.loading-wait { display: flex; align-items: center; gap: 4px; flex: 0 1 auto; min-width: 0; max-width: 46%; font-size: var(--bc-font-size-100); color: var(--muted); }
+.loading-wait[hidden] { display: none; }
+.wait-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wait-label.is-new { animation: loading-in .3s ease; } /* the same fade as the title of the steps */
+.wait-btn { flex: none; width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; color: var(--gray700); }
+.wait-btn:hover { color: var(--link-blue); }
+.wait-btn svg { width: 18px; height: 18px; fill: currentColor; display: block; }
+.wait-btn .wait-pause, .wait-btn.is-playing .wait-play { display: none; }
+.wait-btn.is-playing .wait-pause { display: block; }
+@media (max-width: 640px) { .wait-label { display: none; } } /* narrow window: only the button (its title says what it does) */
 .loading-sub { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .3s ease, opacity .3s ease, margin-top .3s ease; }
 .loading-sub.is-on { grid-template-rows: 1fr; opacity: 1; margin-top: 2px; }
 .loading-sub span { overflow: hidden; min-height: 0; font-size: var(--bc-font-size-100); color: var(--muted); }
@@ -173,7 +183,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .skeleton-line.wide { width: 70%; } .skeleton-line.short { width: 30%; }
 @keyframes shimmer { from { background-position: -300px 0; } to { background-position: 300px 0; } }
 @keyframes skeleton-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .loading-text strong.is-new { animation: none; } .loading-sub { transition: none; } .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .loading-text strong.is-new, .wait-label.is-new { animation: none; } .loading-sub { transition: none; } .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
 
 /* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
 .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }

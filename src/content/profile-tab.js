@@ -160,7 +160,7 @@
         break;
       case 'now':
         // Updates are partial: the queue is only included when it changed, so keep the last one.
-        state.lastNow = { ...message, queue: message.queue !== undefined ? message.queue : state.lastNow && state.lastNow.queue };
+        state.lastNow = { ...message, queue: message.queue !== undefined ? message.queue : state.lastNow ? state.lastNow.queue : undefined };
         renderBar();
         break;
       default:

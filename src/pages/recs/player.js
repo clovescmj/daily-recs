@@ -1,11 +1,12 @@
 // Audio playback. This page (an iframe inside the Bandcamp profile) owns the <audio> element; the Bandcamp-style bar
 // (src/player, drawn by the content script in the Bandcamp page) only shows state and sends commands back.
-import { embeddedPlayerUrl, isBandcampUrl, parseEmbeddedTracks, parseTracks } from '../../lib/bandcamp.js';
+import { embeddedPlayerUrl, isBandcampUrl, parseEmbeddedTracks, parseTracks, toHttpsUrl } from '../../lib/bandcamp.js';
 import { findCard, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { session } from './session.js';
 import { postToHost } from './host-bridge.js';
 import { MSG } from '../../lib/messages.js';
+import { waiting } from './waiting.js';
 
 const TRACKS_TTL_MS = 20 * 60 * 1000;      // stream URLs expire, so cached track lists only live a few minutes
 const EMIT_MIN_INTERVAL_MS = 200;
@@ -21,6 +22,7 @@ const player = {
   mode: 'one',          // 'one': a song per album (its featured track, or the first), in the order of the list; 'album': whole albums
   busy: false,          // loading tracks
   message: '',          // error text for the bar
+  waiting: false,       // a random song of the collection, played while a list is being built (it is not part of any list)
 };
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
@@ -43,8 +45,10 @@ async function fetchTracks(album, { fresh = false } = {}) {
   const onBandcamp = isBandcampUrl(album.url);
   const response = await fetch(onBandcamp ? album.url : embeddedPlayerUrl(album.id), { credentials: 'include' });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const tracks = (onBandcamp ? parseTracks : parseEmbeddedTracks)(await response.text());
-  trackCache.set(album.id, { tracks, at: Date.now() });
+  const html = await response.text();
+  const tracks = (onBandcamp ? parseTracks : parseEmbeddedTracks)(html);
+  const cover = html.match(/<meta property="og:image" content="([^"]+)"/);
+  trackCache.set(album.id, { tracks, at: Date.now(), art: cover ? toHttpsUrl(cover[1]) : '' });
   return tracks;
 }
 
@@ -74,6 +78,7 @@ export async function playAlbum(id, startIndex = null) {
   if (startIndex === null && player.current.id === id && audio.src) { togglePlay(); return; }
   const album = await poolAlbum(id);
   if (!album) return;
+  player.waiting = false;
   setAlbum(album);
   player.busy = true;
   player.message = '';
@@ -114,6 +119,60 @@ export function currentTrack() {
 /** Where an album starts: the track the artist highlights on Bandcamp, or the first one when none is set. */
 const startingTrack = (tracks) => Math.max(0, tracks.findIndex((track) => track.featured));
 
+// ── A song while waiting ────────────────────────────────────────────────
+
+let lastWaitingUrl = '';
+const collectionSources = () => ((session.state && session.state.owned && session.state.owned.sources) || [])
+  .filter((source) => source.kind === 'collection' && isBandcampUrl(source.url));
+
+/** True when there is a collection to pick a song from (the loading box shows the button only then). */
+export const canPlayWhileWaiting = () => collectionSources().length > 0;
+
+/** A random song from an album of the user's own collection (not the wishlist, not the recommendations). */
+export async function playWaitingSong() {
+  const sources = collectionSources();
+  if (!sources.length) return;
+  player.waiting = true;
+  player.busy = true;
+  player.message = '';
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const pick = sources[Math.floor(Math.random() * sources.length)];
+    if (sources.length > 1 && pick.url === lastWaitingUrl) continue;
+    lastWaitingUrl = pick.url;
+    const album = { id: `w:${pick.url}`, url: pick.url, title: pick.title, artist: pick.artist, art: '' };
+    try {
+      const tracks = await fetchTracks(album);
+      if (!tracks.length) continue;
+      if (!player.waiting) return; // something else started in the meantime
+      album.art = (trackCache.get(album.id) || {}).art || '';
+      player.album = album;
+      player.current = { id: album.id, tracks, index: startingTrack(tracks) };
+      playTrack(player.current.index);
+      return;
+    } catch { /* try another album */ }
+  }
+  player.busy = false;
+  player.waiting = false;
+  player.message = "Couldn't play a song. Try again.";
+  emit(true);
+}
+
+/** The button of the loading box: pauses and resumes the song, or starts one. */
+export function toggleWaiting() {
+  if (player.waiting && audio.src) return togglePlay();
+  return playWaitingSong();
+}
+
+/** What the loading box says about the song: playing (with its names) or not. */
+export const waitingInfo = () => {
+  const track = player.current.tracks[player.current.index];
+  return { playing: player.waiting && !audio.paused && Boolean(track), busy: player.waiting && player.busy, artist: player.album ? player.album.artist : '', song: track ? track.title : '' };
+};
+waiting.can = canPlayWhileWaiting;
+waiting.toggle = toggleWaiting;
+waiting.info = waitingInfo;
+let waitingKey = '';
+
 // ── Transport ───────────────────────────────────────────────────────────────────────────────────────────────────
 
 const nextAlbumId = () => { const ids = visibleCardIds(); return ids[ids.indexOf(player.current.id) + 1]; };
@@ -126,6 +185,7 @@ export const togglePlay = () => {
 export const pause = () => audio.pause();
 
 export function nextTrack() {
+  if (player.waiting) return session.running ? playWaitingSong() : skipAlbum();
   if (!player.current.id) return startFirst();
   if (player.mode === 'one') return skipAlbum(); // a song per album: the next one is the next album's
   if (player.current.index + 1 < player.current.tracks.length) return playTrack(player.current.index + 1);
@@ -140,6 +200,7 @@ function skipAlbum() {
 }
 
 export async function previousTrack() {
+  if (player.waiting) { audio.currentTime = 0; return; }
   if (player.mode === 'one') { // back to the previous album's song (or to the start of this one, when it has been playing a while)
     const ids = visibleCardIds();
     const before = ids[ids.indexOf(player.current.id) - 1];
@@ -273,7 +334,7 @@ function snapshot() {
   const queue = queueItems();
   const albumIndex = visibleCardIds().indexOf(current.id);
   const snap = {
-    has: session.hasList,
+    has: session.hasList || player.waiting, plain: player.waiting,
     art: album ? album.art : '', url: trackUrl(album, track),
     albumTitle: album ? album.title : '', songTitle: track ? track.title : '', artist: album ? album.artist : '',
     trackNo: track ? current.index + 1 : 0, track: track ? track.title : '', msg: player.message,
@@ -286,8 +347,8 @@ function snapshot() {
     isSaved: Boolean(album && track) && session.saved.has(`${album.id}:${current.index}`),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     mode: player.mode,
-    hasPrev: player.mode === 'one' ? albumIndex > 0 : current.index > 0,
-    hasNext: player.mode === 'one' ? albumIndex + 1 < queue.items.length : current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
+    hasPrev: player.waiting ? false : player.mode === 'one' ? albumIndex > 0 : current.index > 0,
+    hasNext: player.waiting ? true : player.mode === 'one' ? albumIndex + 1 < queue.items.length : current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;
@@ -302,6 +363,9 @@ export function emit(force = false) {
   if (!force && now - lastEmit < EMIT_MIN_INTERVAL_MS) return;
   lastEmit = now;
   const snap = snapshot();
+  const info = waitingInfo();
+  const key = `${info.playing}|${info.busy}|${info.artist}|${info.song}`;
+  if (key !== waitingKey) { waitingKey = key; waiting.listeners.forEach((listener) => listener(info)); }
   postToHost({ dr: 'now', ...snap });
   if (snap.queue) queueSentKey = queueCache.key;
   if (snap.savedList) savedSentKey = savedCache.key;
@@ -339,7 +403,7 @@ export function initPlayer() {
     if (saved !== null && Number.isFinite(+saved)) audio.volume = Math.max(0, Math.min(1, +saved));
   } catch { /* storage unavailable */ }
   registerMediaSessionHandlers();
-  audio.addEventListener('ended', nextTrack);
+  audio.addEventListener('ended', nextTrack); // (a song while waiting: another one, until the list is ready)
   audio.addEventListener('error', recoverFromAudioError);
   audio.addEventListener('play', markPlaying);
   audio.addEventListener('pause', markPlaying);
