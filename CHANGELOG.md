@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.4
+- The Playback menu follows the genre menu: the title "Playback" in bold, a short explanation under it in normal text, and a thin line
+  before the options. The chosen option has Bandcamp's own check, in the accent blue, instead of a bold name.
+
 ## 0.15.3
 - Adding a song to Liked Songs makes the list icon in the player bar bump up twice, softly (not with "reduce motion" on).
 

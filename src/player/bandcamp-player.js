@@ -56,9 +56,9 @@
         <div class="pb-wrap">
           <a href="#" class="x-btn pb-btn" role="button" aria-haspopup="true" aria-expanded="false" title="Playback" aria-label="Playback"><span class="pb-slot">${MODE_ICON.one}</span><span class="pb-label">One per album</span><svg class="pb-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
           <div class="pb-menu" role="menu" aria-label="Playback" hidden>
-            <div class="pb-title">Playback</div>
-            <a href="#" class="pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"></span>${MODE_ICON.one}One song per album</a>
-            <a href="#" class="pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"></span>${MODE_ICON.album}Full album</a>
+            <div class="pb-head"><b>Playback</b><span>Choose what plays from each album.</span></div>
+            <a href="#" class="pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.one}One song per album</a>
+            <a href="#" class="pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.album}Full album</a>
           </div>
         </div>
         <span class="x-sep" aria-hidden="true"></span>
@@ -238,7 +238,6 @@
       for (const option of el.querySelectorAll('.pb-opt')) {
         const on = (option.dataset.mode === 'one') === one;
         option.classList.toggle('sel', on); option.setAttribute('aria-checked', String(on));
-        setText(option.querySelector('.pb-check'), on ? '✓' : '');
       }
     }
     return { el, update };

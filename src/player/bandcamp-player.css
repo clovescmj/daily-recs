@@ -142,11 +142,14 @@
 #dr-player .pb-chev { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 #dr-player .pb-menu { position: absolute; left: 0; bottom: calc(100% + 6px); min-width: 210px; width: max-content; background: #fff; border-radius: 5px 5px 0 0; box-shadow: 0 0 3px 0 rgba(0,0,0,0.2); padding: 6px 0; z-index: 112; }
 #dr-player .pb-menu[hidden] { display: none; }
-#dr-player .pb-title { font-size: 11px; font-weight: 600; color: #777; text-transform: uppercase; letter-spacing: .04em; padding: 6px 12px; }
+#dr-player .pb-head { padding: 6px 12px 10px; border-bottom: 1px solid rgba(0,0,0,.08); margin-bottom: 4px; }
+#dr-player .pb-head b { display: block; font-size: 13px; font-weight: 600; color: #333; }
+#dr-player .pb-head span { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: #777; }
 #dr-player .pb-opt { display: flex; align-items: center; gap: 8px; white-space: nowrap; padding: 8px 12px; font-size: 13px; color: #333; }
 #dr-player .pb-opt:hover { background: #f7f6f6; text-decoration: none; }
-#dr-player .pb-opt.sel { font-weight: 600; }
-#dr-player .pb-check { width: 12px; color: rgb(0,161,198); }
+#dr-player .pb-check { width: 20px; height: 20px; flex: none; color: rgb(0,161,198); display: flex; } /* Bandcamp's own check, in the accent colour; the space stays so the names line up */
+#dr-player .pb-check svg { width: 20px; height: 20px; fill: currentColor; visibility: hidden; }
+#dr-player .pb-opt.sel .pb-check svg { visibility: visible; }
 #dr-player .pb-opt .pb-ico { margin-right: 2px; }
 #dr-player .pb-ico { width: 16px; height: 16px; fill: currentColor; flex: none; display: block; }
 #dr-player .pb-slot { display: inline-flex; }
