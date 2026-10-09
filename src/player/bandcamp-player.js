@@ -147,7 +147,14 @@
     q('.save').addEventListener('click', (e) => { e.preventDefault(); onCmd('save'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
     // the queue and the Liked list are two panels over the bar: opening one closes the other
-    const setQueue = (on) => { if (on) setSaved(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); };
+    /** Opening the queue brings the album that is playing to the top of the list, under its "Playing now" heading. */
+    const scrollToPlaying = () => {
+      const list = q('.queue ol'); const row = list.querySelector('li.active');
+      if (!row) { list.scrollTop = 0; return; }
+      const from = row.previousElementSibling && row.previousElementSibling.classList.contains('qsec') ? row.previousElementSibling : row;
+      list.scrollTop += from.getBoundingClientRect().top - list.getBoundingClientRect().top;
+    };
+    const setQueue = (on) => { if (on) setSaved(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); if (on) scrollToPlaying(); };
     const setSaved = (on) => { if (on) setQueue(false); q('.saved').classList.toggle('show', on); q('.x-saved').classList.toggle('active', on); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
     q('.x-saved').addEventListener('click', (e) => { e.preventDefault(); setSaved(!q('.saved').classList.contains('show')); });

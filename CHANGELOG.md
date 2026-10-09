@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.17
+- Opening the queue scrolls it to the album that is playing: its "Playing now" heading goes to the top of the list. With nothing playing, the list starts at the top.
+
 ## 1.1.16
 - Play mode: the icon of the selected button is white again (the bar's `a { color: inherit }` rule was beating the component's colour, so it showed grey on the dark
   button), and the two buttons touch each other (the space between them showed, because the bar made the control `inline-block`).
