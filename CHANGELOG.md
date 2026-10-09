@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.6
+- One corner radius, Bandcamp's (4 px, `--dr-radius`), everywhere: the queue and Liked Songs panels (their top corners were 5 px), the play button over the
+  covers (3 px), and the toast and the "new" tag of the tab, which had the 4 px written by hand.
+
 ## 0.17.5
 - The queue and Liked Songs panels have a border, in the same colour as the line of the player bar (it closes them at the bottom).
 

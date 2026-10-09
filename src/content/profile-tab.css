@@ -3,7 +3,7 @@
 #grid-tabs li.dr-tab { cursor: pointer; }
 /* "35 new" next to the tab name, styled like Bandcamp's "NEW" tag on the playlists tab (colours approximated) */
 #grid-tabs li.dr-tab .dr-new-tag {
-  display: inline-block; margin-left: 8px; padding: 2px 6px; border-radius: 4px; vertical-align: middle;
+  display: inline-block; margin-left: 8px; padding: 2px 6px; border-radius: var(--dr-radius); vertical-align: middle;
   background: #9bd3e6; color: #1b3b4b; font: 700 10px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
   letter-spacing: .04em; text-transform: uppercase;
 }
@@ -18,7 +18,7 @@ body.dr-open #carousel-player { transform: translateY(100%); visibility: hidden;
 body.dr-player-on { padding-bottom: 92px; }
 #dr-toast {
   position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%); z-index: 2147483001; max-width: 80vw; padding: 10px 16px;
-  background: #333; color: #fff; border-radius: 4px; font: 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #333; color: #fff; border-radius: var(--dr-radius); font: 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
   opacity: 0; pointer-events: none; transition: opacity .15s;
 }
 #dr-toast.show { opacity: 1; }
