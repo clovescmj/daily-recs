@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.9
+- The Playback button and its menu now follow the genre button and its menu: same height (32 px), border, text and hover on the button; same rows
+  (12 px text, same spacing and hover colour), header, colours, shadow, and the same fade and slide (0.15 s, 6 px) when they open and close.
+  The queue rows use the same hover colour.
+- One green for "in Liked Songs" (the cards and the player used two), one blue for the loading bar and the equalizer (the accent blue, like the links), and the
+  placeholder shimmer uses the page greys.
+
 ## 0.16.8
 - Fixed: 0.16.7 broke the recs page (a helper was removed by mistake and the page stopped at the start). Nothing else changed.
 
