@@ -5,8 +5,10 @@ New music every day, built from your own taste.
 A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fresh list of albums picked from what you own and what you've saved, never repeating and never showing what you already have.
 
 ## Install
+Step by step, for someone who is not a developer: [INSTALL.md](INSTALL.md). In short:
+
 1. Open `chrome://extensions` and turn on **Developer mode**.
-2. Click **Load unpacked** and choose this folder.
+2. Click **Load unpacked** and choose this folder (or the folder you extracted a [release](https://github.com/clovescmj/daily-recs/releases/latest) zip into).
 3. Sign in to bandcamp.com as usual (the extension uses your existing session and never sees your password).
 4. Open your profile: a **daily recs** tab appears next to collection / wishlist / followers. The toolbar icon takes you there (and asks you to sign in first if needed).
 
@@ -18,7 +20,7 @@ A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fr
 - **My tags:** explore new music by genre.
 - **Best matches:** perfect matches with your collection.
 - **Surprise me:** go beyond your collection.
-- A player bar in Bandcamp's style (one song per album or full albums, queue, Liked Songs), and a random song from your collection while a list is being built.
+- A player bar in Bandcamp's style (a play mode with full albums or shuffle, queue, Liked Songs), and a random song from your collection while a list is being built.
 
 ## Project layout
 ```
