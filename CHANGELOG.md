@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.5
+- Loading texts are shorter and consistent ("Signing in", "Reading your library", "Sampling your collection", "Ranking candidates", "Checking genres",
+  "Choosing your 8"). The second line only shows when there is something to say (how many albums are done, how many candidates were found); it
+  slides in and out, the title fades in at each step, and the text stays centred in a box that keeps its height. The counter on the right is gone.
+
 ## 0.15.4
 - The Playback menu follows the genre menu: the title "Playback" in bold, a short explanation under it in normal text, and a thin line
   before the options. The chosen option has Bandcamp's own check, in the accent blue, instead of a bold name.

@@ -143,11 +143,14 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* While a list is being built: an equalizer, what is going on, a counter, a thin bar, and placeholders for the albums */
 .status-box.is-loading { padding: 0; margin-bottom: 20px; }
-.loading { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 68px; box-sizing: border-box; } /* always two lines: the block keeps its height */
+.loading { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 68px; box-sizing: border-box; } /* fixed height: the text is centred in it, whether it has one line or two */
 .loading-text { flex: 1; min-width: 0; }
-.loading-text strong { font-size: var(--bc-font-size-200); }
-.loading-text span { display: block; margin-top: 2px; font-size: var(--bc-font-size-100); color: var(--muted); }
-.loading-count { font-size: var(--bc-font-size-100); color: var(--muted); white-space: nowrap; }
+.loading-text strong { display: block; font-size: var(--bc-font-size-200); }
+.loading-text strong.is-new { animation: loading-in .3s ease; }
+.loading-sub { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .3s ease, opacity .3s ease, margin-top .3s ease; }
+.loading-sub.is-on { grid-template-rows: 1fr; opacity: 1; margin-top: 2px; }
+.loading-sub span { overflow: hidden; min-height: 0; font-size: var(--bc-font-size-100); color: var(--muted); }
+@keyframes loading-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 .status-box.is-loading progress { height: 3px; margin: 0; border-radius: 0; }
 .eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 24px; flex: none; }
 .eq i { display: block; width: 4px; border-radius: 1px; background: var(--blue400); animation: eq-dance 1s ease-in-out infinite; }
@@ -165,7 +168,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .skeleton-line.wide { width: 70%; } .skeleton-line.short { width: 30%; }
 @keyframes shimmer { from { background-position: -300px 0; } to { background-position: 300px 0; } }
 @keyframes skeleton-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .loading-text strong.is-new { animation: none; } .loading-sub { transition: none; } .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
 
 /* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
 .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }

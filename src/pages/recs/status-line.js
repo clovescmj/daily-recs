@@ -34,27 +34,26 @@ export function progressText(status) {
 }
 
 /**
- * The same progress, split for the loading box: a title (what is being done), a detail line and a counter.
- * `count` is empty while there is nothing to count.
+ * The same progress, split for the loading box: a title (what is being done) and, only when there is something worth saying,
+ * a detail line (how far it is). `detail` is empty otherwise, and the box shows no second line.
  */
 export function progressParts(status) {
   const surprise = status.mode === 'surprise';
   const genres = (status.tagLabels || []).join(' + ');
-  const count = status.total ? `${formatNumber(status.done)} / ${formatNumber(status.total)}` : '';
-  if (status.mode === 'tags' && status.phase === PHASE.SCANNING) return { title: `Looking for your ${genres} albums…`, detail: 'Reading more of your albums to find them', count };
-  if (status.mode === 'tags' && SAMPLING_PHASES.has(status.phase)) return { title: `Digging into your ${genres} albums…`, detail: 'Reading what fans of them also own', count };
+  const albums = status.total ? `${formatNumber(status.done)} of ${formatNumber(status.total)} albums` : '';
+  if (status.mode === 'tags' && status.phase === PHASE.SCANNING) return { title: `Finding your ${genres} albums`, detail: albums };
+  if (status.mode === 'tags' && SAMPLING_PHASES.has(status.phase)) return { title: `Digging into ${genres}`, detail: albums };
   if (SAMPLING_PHASES.has(status.phase)) {
-    if (status.bootstrap) return { title: 'Learning your taste…', detail: 'First time only: it takes a few minutes', count };
-    const what = `${formatNumber(status.picked)} ${status.library ? `of your ${formatNumber(status.library)} albums` : 'random albums'}`;
-    return { title: surprise ? 'Digging for surprises…' : 'Digging through your collection…', detail: `Reading ${what}`, count };
+    if (status.bootstrap) return { title: 'Learning your taste', detail: 'First time only, takes a few minutes' };
+    return { title: surprise ? 'Digging for surprises' : 'Sampling your collection', detail: albums };
   }
   switch (status.phase) {
-    case PHASE.SIGNING_IN: return { title: 'Signing in to Bandcamp…', detail: 'Using the account you are already signed in with', count };
-    case PHASE.LIBRARY: return { title: 'Reading your collection and wishlist…', detail: 'To know what you already have', count };
-    case PHASE.TASTE: return { title: 'Checking the candidates against your taste…', detail: 'Looking at the genres of each one', count };
-    case PHASE.RANKING: return { title: 'Ranking the candidates…', detail: `${formatNumber(status.candidates)} candidates found`, count };
-    case PHASE.PICKING: return { title: surprise ? 'Digging below the obvious picks…' : `Picking your ${DAILY_COUNT}…`, detail: 'Choosing the best of the candidates', count };
-    default: return { title: 'Working…', detail: 'Almost there', count };
+    case PHASE.SIGNING_IN: return { title: 'Signing in', detail: '' };
+    case PHASE.LIBRARY: return { title: 'Reading your library', detail: '' };
+    case PHASE.TASTE: return { title: 'Checking genres', detail: albums };
+    case PHASE.RANKING: return { title: 'Ranking candidates', detail: status.candidates ? `${formatNumber(status.candidates)} found` : '' };
+    case PHASE.PICKING: return { title: `Choosing your ${DAILY_COUNT}`, detail: '' };
+    default: return { title: 'Working', detail: '' };
   }
 }
 
@@ -77,6 +76,26 @@ function startCountdown(retryAt) {
   countdownTimer = setInterval(tick, 1000);
 }
 
+/**
+ * The loading box is built once and then only updated, so the second line can slide in and out and the bar can grow.
+ * The title fades in when it changes; the detail keeps its last text while it collapses.
+ */
+function paintLoading(box, { title, detail }, progress) {
+  if (!box.querySelector('.loading')) {
+    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong></strong><div class="loading-sub"><span></span></div></div></div><progress></progress>`;
+  }
+  const strong = box.querySelector('.loading-text strong');
+  if (strong.textContent !== title) {
+    strong.textContent = title;
+    strong.classList.remove('is-new'); void strong.offsetWidth; strong.classList.add('is-new');
+  }
+  const sub = box.querySelector('.loading-sub');
+  if (detail) box.querySelector('.loading-sub span').textContent = detail;
+  sub.classList.toggle('is-on', !!detail);
+  const bar = box.querySelector('progress');
+  if (progress) { bar.max = Number(progress.total); bar.value = Number(progress.done) || 0; } else { bar.removeAttribute('max'); bar.removeAttribute('value'); }
+}
+
 /** Draws the box for the given status. "Load more" shows its own spinner instead of a box. */
 export function renderStatus(status) {
   const box = $('status');
@@ -87,10 +106,8 @@ export function renderStatus(status) {
     if (session.landing) { box.hidden = true; return; }
     const determinate = (status.phase === PHASE.SAMPLING || status.phase === PHASE.TASTE) && status.total;
     box.hidden = false;
-    const { title, detail, count } = progressParts(status);
     box.classList.add('is-loading');
-    box.innerHTML = `<div class="loading" role="status">${EQUALIZER}<div class="loading-text"><strong>${esc(title)}</strong><span>${esc(detail || '\u00a0')}</span></div>${count ? `<span class="loading-count">${esc(count)}</span>` : ''}</div>`
-      + (determinate ? `<progress max="${Number(status.total)}" value="${Number(status.done) || 0}"></progress>` : '<progress></progress>');
+    paintLoading(box, progressParts(status), determinate ? status : null);
   } else if (status.error === 'not_logged_in') {
     box.hidden = false;
     box.innerHTML = `<strong>You're not signed in to Bandcamp.</strong><p>Sign in to your account and come back here.</p>

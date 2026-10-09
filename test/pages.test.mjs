@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { cardHtml } from '../src/pages/recs/cards.js';
-import { progressText } from '../src/pages/recs/status-line.js';
+import { progressParts, progressText } from '../src/pages/recs/status-line.js';
 import { esc, formatTime, safeUrl } from '../src/pages/recs/dom.js';
 import { PHASE } from '../src/lib/recommender.js';
 import { parseMessage } from '../src/lib/messages.js';
@@ -82,4 +82,12 @@ test('feedback links: store support page, and a prefilled GitHub bug report with
   assert.equal(url.origin + url.pathname, 'https://github.com/clovescmj/daily-recs/issues/new');
   assert.equal(url.searchParams.get('labels'), 'bug');
   assert.match(url.searchParams.get('body'), /Daily Recs v1\.2\.3\nMozilla\/5\.0 Test/);
+});
+
+test('the loading box has a second line only when there is something to say', () => {
+  assert.equal(progressParts({ phase: PHASE.SIGNING_IN }).detail, '');
+  assert.equal(progressParts({ phase: PHASE.PICKING }).title, `Choosing your ${DAILY_COUNT}`);
+  assert.equal(progressParts({ phase: PHASE.SAMPLING, done: 12, total: 60 }).detail, '12 of 60 albums');
+  assert.equal(progressParts({ phase: PHASE.RANKING, candidates: 340 }).detail, '340 found');
+  assert.match(progressParts({ phase: PHASE.SAMPLING, mode: 'tags', tagLabels: ['ambient'], done: 1, total: 4 }).title, /ambient/);
 });
