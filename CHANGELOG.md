@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.5
+- Player bar: the heart, + and ⊘ sit on the bottom edge of the cover (the title already starts at its top edge).
+
 ## 0.16.4
 - The queue and Liked Songs panels are back to their old shape (no border, rounded top corners, against the bar), with the same shadow as the menus. They open
   rising a little from the bar (14 px) instead of fading.

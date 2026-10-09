@@ -56,7 +56,8 @@
 #dr-player .transport .icon.disabled { opacity: 0.1; cursor: default; }
 
 /* "♡ wishlist · go to album", same place and style as Bandcamp's player (below the artist) */
-#dr-player .now-playing .info { margin-top: 4px; overflow: visible; }
+#dr-player .now-playing .info { margin-top: 4px; height: 60px; overflow: visible; display: flex; flex-direction: column; } /* as tall as the cover: the icons sit on its bottom edge */
+#dr-player .now-playing .collect { margin-top: auto; }
 #dr-player .collect { color: rgb(0,161,198); font-weight: 500; font-size: 12px; line-height: 18px; white-space: nowrap; display: flex; align-items: center; gap: 12px; }
 #dr-player .collect a { color: rgb(0,161,198); }
 #dr-player .collect a:hover { text-decoration: underline; }
