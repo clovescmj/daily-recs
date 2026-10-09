@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.3
+- When the list is ready while a song of the loading is playing, the song fades out (1.5 s) and the first album of the list starts. If the song was
+  paused, nothing starts by itself.
+
 ## 0.16.2
 - The text of the loading button says where the song comes from: "Play a song from your collection while waiting".
 

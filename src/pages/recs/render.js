@@ -5,6 +5,7 @@ import { $ } from './dom.js';
 import { emit, markPlaying } from './player.js';
 import { session } from './session.js';
 import { renderStatus } from './status-line.js';
+import { waiting } from './waiting.js';
 import { renderViewSwitch } from './views.js';
 import { flushWishlistQueue } from './wishlist-actions.js';
 
@@ -86,10 +87,12 @@ function renderGrid(state, status) {
 export function render(state, status) {
   session.state = state;
   const running = Boolean(status.running);
+  const wasRunning = session.running; // (renderStatus below updates it)
   renderViewSwitch(state, status);
   renderStatus(status);
   renderGrid(state, status);
   $('play-all').hidden = !session.hasList;
+  if (wasRunning && !running) waiting.finish(); // a song played while waiting: now the list plays
   emit(true);
   if (state && state.wishQueue && state.wishQueue.length) flushWishlistQueue();
 }
