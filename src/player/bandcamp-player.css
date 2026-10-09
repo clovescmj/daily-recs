@@ -100,8 +100,9 @@
 
 /* queue ("now playing albums"): Bandcamp's .queue rules, opening upwards from the bar */
 #dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: #FFF;
-  opacity: 0; visibility: hidden; transform: translateY(6px); pointer-events: none; transition: opacity .18s ease, transform .18s ease, visibility 0s .18s; border: 1px solid rgb(34 34 34 / 32%); box-shadow: 0 4px 16px rgb(34 34 34 / 16%); border-radius: 4px; box-sizing: border-box; } /* same border, corners and shadow as the other menus; it stays against the bar */
-#dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity .18s ease, transform .18s ease, visibility 0s; }
+  opacity: 0; visibility: hidden; transform: translateY(14px); pointer-events: none; transition: opacity .12s ease, transform .22s cubic-bezier(.2,.8,.2,1), visibility 0s .22s;
+  box-shadow: 0 4px 16px rgb(34 34 34 / 16%); border-radius: 5px 5px 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
+#dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity .12s ease, transform .22s cubic-bezier(.2,.8,.2,1), visibility 0s; }
 #dr-player .queue-header { margin: 16px 16px 10px; display: flex; justify-content: space-between; }
 #dr-player .queue-header h2 { margin: 0; font-size: 18px; font-weight: 500; }
 #dr-player .queue-header h2 b { font-weight: bold; }
