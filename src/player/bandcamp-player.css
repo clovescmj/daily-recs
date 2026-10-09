@@ -154,7 +154,7 @@
 
 /* Play mode: two buttons (a segmented control); the icons next to it are 20px tall and sit at the top: the margin centres it on them */
 #dr-player .pb-seg { margin-top: -6px; }
-#dr-player .pb-ico { width: 16px; height: 16px; fill: currentColor; flex: none; display: block; }
+#dr-player .pb-ico { width: 20px; height: 20px; fill: currentColor; flex: none; display: block; }
 
 /* No grey flash or box on the icons when they are clicked (the keyboard focus ring stays) */
 #dr-player a, #dr-player [role="button"] { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }

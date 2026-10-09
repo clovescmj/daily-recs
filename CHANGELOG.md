@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.2
+- Play mode: the two icons (Full album, Shuffle) now have the same size as the other icons on the right of the bar (a 20 px box, a glyph of about 15 px, like the queue icon).
+
 ## 1.1.1
 - Play mode has two options now, shown as a pair of buttons with icons (a tooltip says what each does) instead of a menu: **Full album** (the default: the albums
   in order, every song, starting at the first song of the first album) and **Shuffle** (one song of each album in a random order, never the same song twice, with new
