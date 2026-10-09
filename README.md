@@ -43,7 +43,8 @@ src/
   styles/                design tokens (tokens.css) and shared components (components.css), used by the page, the player bar and the tab
   pages/
     recs/                the recommendations page (ES modules, one concern per file; main.js wires them)
-    about/, shared/
+    about/               About page and the "What's new" page (one short note per release: keep it up to date when you ship)
+    shared/
   assets/                the logo of the About page (the player icons are inline SVG)
 test/                    node:test suites with an offline fake Bandcamp
 CHANGELOG.md, PRIVACY.md  history by version, and the privacy policy the store links to

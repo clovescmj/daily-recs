@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.1
+- A "What's new" page, opened from the About page, with a short note per release (`src/pages/about/whats-new.html`). The full history is this file, which now also
+  travels inside the zip. Docs and store texts are all in English.
+
 ## 1.0.0
 First stable version. What it does:
 - A **daily recs** tab on your own Bandcamp profile with a fresh list of albums every day, picked from what you own and save, never repeating and never showing what you
