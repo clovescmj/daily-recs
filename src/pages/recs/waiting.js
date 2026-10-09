@@ -4,7 +4,6 @@ export const waiting = {
   can: () => false,                                  // is there a collection to pick a song from?
   toggle: () => {},                                  // start a random song, or pause / resume it
   info: () => ({ playing: false, artist: '', song: '' }),
-  finish: () => {},                                  // the list is ready: the song fades out and the list starts
   listeners: [],                                     // called with the new info when what the box says changes
 };
 export const onWaitingChange = (listener) => { waiting.listeners.push(listener); };

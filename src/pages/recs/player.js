@@ -167,29 +167,7 @@ export const waitingInfo = () => {
   const track = player.current.tracks[player.current.index];
   return { playing: player.waiting && !audio.paused && Boolean(track), busy: player.waiting && player.busy, artist: player.album ? player.album.artist : '', song: track ? track.title : '' };
 };
-const FADE_MS = 1500;
-/** The list is ready while a song plays: it fades out and the first album of the list starts (nothing happens if the song is paused). */
-export function finishWaiting() {
-  if (!player.waiting || audio.paused || !session.hasList) return;
-  const first = visibleCardIds()[0];
-  if (!first) return;
-  const start = audio.volume;
-  const steps = 30;
-  let step = 0;
-  const timer = setInterval(() => {
-    step += 1;
-    if (!player.waiting) { clearInterval(timer); audio.volume = start; return; } // the user chose something else meanwhile
-    audio.volume = Math.max(0, start * (1 - step / steps));
-    if (step < steps) return;
-    clearInterval(timer);
-    audio.pause();
-    audio.volume = start;
-    playAlbum(first);
-  }, FADE_MS / steps);
-}
-
 waiting.can = canPlayWhileWaiting;
-waiting.finish = finishWaiting;
 waiting.toggle = toggleWaiting;
 waiting.info = waitingInfo;
 let waitingKey = '';

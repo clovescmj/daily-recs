@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.9
+- When the list is ready while a song of your collection is playing, the song is no longer stopped: it keeps playing and now shows in the player bar (without the
+  wishlist, Liked Songs and hide icons, since it is on no list). Next, or the end of the song, moves on to the first album of the list. (This replaces the fade out
+  of 1.5 s that started the list.)
+
 ## 1.0.8
 - Fix: the + of a card did nothing and never lit up (1.0.6 left a call to a removed helper in the cards' repaint, which stopped the save before it was written).
   It now adds the whole album to Liked Songs, lights up, and takes it out on a second click, also when nothing is playing.
