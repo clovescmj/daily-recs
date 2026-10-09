@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.1
+- The token values are now Bandcamp's own, read from bandcamp.com (the names stay ours). Visible changes: the accent blue is Bandcamp's blue (`#0cacd7`), "don't show"
+  is Bandcamp's red (`#e50a0a`), the heart in the wishlist is Bandcamp's orange (`#e65225`), resting icons are `#949494`, the primary button (Start digging, Find music)
+  is Bandcamp's dark button with its hover, pressed and disabled looks, the hover of the selects is Bandcamp's 8% veil, the titles of the page and of the queue are 1.25 rem,
+  and the lines of the bar, the progress and the veil over the covers use Bandcamp's transparencies.
+
 ## 0.18.0
 - **Every value comes from the tokens.** Not only the corner radius: all colours, greys, font family, sizes and weights, line heights, durations and delays of the
   recs page, the player bar, the tab and the About page now use `src/styles/tokens.css`, which follows Bandcamp's design system (palette, type scale, 4 px corners).

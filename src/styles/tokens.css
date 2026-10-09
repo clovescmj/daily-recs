@@ -1,5 +1,6 @@
-/* Design tokens: the one place for every colour, size and timing of the recs page, the player bar and the tab, which follow Bandcamp's own design
-   system (palette, type scale, 4 px corners). The stylesheets only use these, never a loose value.
+/* Design tokens: the one place for every colour, size and timing of the recs page, the player bar and the tab. The values are Bandcamp's own design
+   tokens (read from bandcamp.com: greys, blues, green, red, transparencies, type scale, buttons); a few things Bandcamp has no token for are marked.
+   The stylesheets only use these, never a loose value.
    Prefixed `--dr-` so nothing clashes with Bandcamp's own variables. */
 :root, #dr-player {
   /* palette (Bandcamp's greys) */
@@ -12,8 +13,18 @@
   --dr-gray-600: #333;
   --dr-gray-700: #222;
   --dr-ink-72: rgb(34 34 34 / 72%);
+  --dr-ink-50: rgb(34 34 34 / 50%);
   --dr-ink-32: rgb(34 34 34 / 32%);
+  --dr-ink-16: rgb(34 34 34 / 16%);
   --dr-ink-8: rgb(34 34 34 / 8%);
+  --dr-blue300: #99dbeb;
+  --dr-blue400: #0cacd7;                   /* Bandcamp's blue */
+  --dr-blue500: #007c9e;
+  --dr-blue600: #056277;
+  --dr-green500: #2a8737;
+  --dr-red500: #e50a0a;
+  --dr-orange500: #e65225;
+  --dr-graphical: #949494;                 /* Bandcamp's colour for icons that are at rest */
 
   /* surfaces and text */
   --dr-surface: var(--dr-white);
@@ -23,52 +34,62 @@
   --dr-text-faint: var(--dr-gray-400);
   --dr-text-player: var(--dr-gray-500);    /* base text of the player bar */
   --dr-glyph: var(--dr-gray-600);          /* icons and marks of the player bar */
-  --dr-icon: #8a8f91;                      /* resting colour of the action icons */
-  --dr-scrim: rgb(0 0 0 / 50%);            /* dark veil over a cover */
+  --dr-icon: var(--dr-graphical);          /* resting colour of the action icons */
+  --dr-scrim: var(--dr-ink-50);            /* dark veil over a cover */
 
   /* meaning */
-  --dr-accent: #00a1c6;                    /* links, checks, the progress of the loading: Bandcamp's own link blue */
-  --dr-accent-dark: #007c9e;
-  --dr-success: #2a8737;                   /* a song of it is in Liked Songs */
-  --dr-danger: #d64541;                    /* don't show music like this */
-  --dr-wish: #f7931e;                      /* in the wishlist */
-  --dr-tag-bg: #9bd3e6;                    /* the "new" tag of the tab (Bandcamp's own, approximated) */
-  --dr-tag-text: #1b3b4b;
+  --dr-accent: var(--dr-blue400);          /* links, checks, the progress of the loading */
+  --dr-accent-dark: var(--dr-blue500);
+  --dr-success: var(--dr-green500);        /* a song of it is in Liked Songs */
+  --dr-danger: var(--dr-red500);           /* don't show music like this */
+  --dr-wish: var(--dr-orange500);          /* in the wishlist */
+  --dr-tag-bg: var(--dr-blue300);          /* the "new" tag of the tab */
+  --dr-tag-text: var(--dr-blue600);
+
+  /* buttons (Bandcamp's primary button, and the hover and pressed states of the plain ones) */
+  --dr-button-bg: var(--dr-gray-700);
+  --dr-button-bg-hover: var(--dr-gray-600);
+  --dr-button-bg-active: var(--dr-gray-500);
+  --dr-button-text: var(--dr-white);
+  --dr-button-plain-hover: var(--dr-ink-8);
+  --dr-button-plain-active: var(--dr-ink-16);
+  --dr-disabled-bg: var(--dr-ink-8);
+  --dr-disabled-text: var(--dr-gray-400);
 
   /* lines */
   --dr-line: var(--dr-gray-200);           /* separators of the page */
   --dr-border: var(--dr-gray-300);         /* buttons and selects */
-  --dr-border-soft: #d9d9d9;               /* play buttons */
+  --dr-border-soft: var(--dr-gray-200);    /* play buttons */
   --dr-border-menu: var(--dr-ink-32);
-  --dr-border-bar: rgb(0 0 0 / 15%);       /* the line on top of the player bar, and of the panels that open from it */
+  --dr-border-bar: var(--dr-ink-16);       /* the line on top of the player bar, and of the panels that open from it */
   --dr-divider: var(--dr-ink-8);           /* thin line inside a menu */
   --dr-hover: var(--dr-ink-8);             /* background of a row under the pointer */
-  --dr-input-border: #ccc;                 /* Bandcamp's search field, and its focus */
-  --dr-focus: #50a1e6;
-  --dr-focus-ring: #b4d7f9;
+  --dr-input-border: var(--dr-border-menu);
+  --dr-focus: var(--dr-blue400);
+  --dr-focus-ring: var(--dr-blue300);
   --dr-progress: var(--dr-gray-600);       /* bars of the player: what is played, what is loaded, the track */
-  --dr-progress-buffer: rgb(51 51 51 / 40%);
-  --dr-progress-track: rgb(51 51 51 / 10%);
+  --dr-progress-buffer: var(--dr-ink-32);
+  --dr-progress-track: var(--dr-ink-8);
 
   /* shape */
   --dr-radius: 4px;
-  --dr-shadow-menu: 0 4px 16px rgb(34 34 34 / 16%);
+  --dr-shadow-menu: 0 4px 16px var(--dr-ink-16);
 
   /* type */
   --dr-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --dr-font-xs: 10px;
-  --dr-font-s: 12px;
-  --dr-font-base: 13px;
-  --dr-font-m: 14px;
-  --dr-font-l: 16px;
-  --dr-font-title: 18px;
-  --dr-font-xl: 24px;
+  --dr-font-xs: 10px;                      /* (the "new" tag: Bandcamp has no token this small) */
+  --dr-font-s: .75rem;
+  --dr-font-base: 13px;                    /* the body text of Bandcamp's pages */
+  --dr-font-m: .875rem;
+  --dr-font-l: 1rem;
+  --dr-font-title: 1.25rem;
+  --dr-font-xl: 1.5rem;
   --dr-weight-regular: 400;
   --dr-weight-medium: 500;
   --dr-weight-bold: 700;
   --dr-line-xs: 16px;
   --dr-line-s: 18px;
-  --dr-line-title: 20px;
+  --dr-line-title: 1.43em;
   --dr-line-m: 1.5714em;
   --dr-line-xl: 1.5em;
   --dr-line-tight: 1.3;
