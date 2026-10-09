@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.8
+- Fixed: 0.16.7 broke the recs page (a helper was removed by mistake and the page stopped at the start). Nothing else changed.
+
 ## 0.16.7
 - The page no longer scrolls by itself when a list finishes loading: it stays where you left it. (The scroll to the top of the list was sent after the
   search ended, so it fired right when the albums appeared.)

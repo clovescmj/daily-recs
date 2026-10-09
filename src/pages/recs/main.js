@@ -8,6 +8,7 @@ import { initPlayer, playAlbum, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, refreshLanding, setLandingVisible } from './landing.js';
+import { $ } from './dom.js';
 import { initViewSwitch } from './views.js';
 import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-actions.js';
 
