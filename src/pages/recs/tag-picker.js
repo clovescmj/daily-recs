@@ -16,7 +16,7 @@ export const labelOf = (state, key) => (state && state.tagLabels && state.tagLab
  * the ticked genres change. Returns { render, getSelected, setSelected, focus }.
  */
 export function createTagPicker(root, { withButton = false, onGo = () => {}, onChange = () => {} } = {}) {
-  root.innerHTML = `<div class="tags-coverage"></div>
+  root.innerHTML = `<div class="dr-menu-head tags-coverage"></div>
     <input class="tags-input" type="search" placeholder="Type a genre…" aria-label="Find or add a genre" autocomplete="off">
     <ul class="tags-list"></ul>${withButton ? '<div class="tags-foot"><button type="button" class="button tags-go">Find music</button><p class="tags-note">This will refresh your list with a new search.</p></div>' : ''}`;
   const $in = (selector) => root.querySelector(selector);
@@ -51,7 +51,7 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
     // A genre that was typed but isn't in the scanned list yet is added with "+ Add": it then shows up ticked, like the others.
     $in('.tags-list').innerHTML = rows.length ? rows.map((row) => (row.typed
       ? `<li><button type="button" class="tags-add-button" data-key="${esc(row.key)}" data-label="${esc(row.label)}">+ Add “${esc(row.label)}”</button></li>`
-      : `<li><label>
+      : `<li><label class="dr-menu-row">
         <input type="checkbox" value="${esc(row.key)}" data-label="${esc(row.label)}"${selected.has(row.key) ? ' checked' : ''}>
         <span class="tag-name">${esc(row.label)}</span>
         ${row.count ? `<span class="tag-count">${formatNumber(row.count)}</span>` : ''}</label></li>`)).join('')

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Daily Recs for Bandcamp",
-  "version": "0.16.9",
+  "version": "0.17.0",
   "description": "Fresh Bandcamp recommendations every day, based on your own collection. Never shows what you already own.",
   "minimum_chrome_version": "109",
   "icons": {
@@ -41,6 +41,8 @@
         "src/content/profile-tab.js"
       ],
       "css": [
+        "src/styles/tokens.css",
+        "src/styles/components.css",
         "src/player/bandcamp-player.css",
         "src/content/profile-tab.css"
       ],

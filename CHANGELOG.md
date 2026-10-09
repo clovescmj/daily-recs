@@ -3,6 +3,15 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.0
+- **Design system.** The colours, sizes and timings used by more than one element now live in one place, `src/styles/tokens.css` (`--dr-*`), used by the
+  recs page and by the player bar. The page and the bar no longer repeat the same hex values.
+- **Shared components** in `src/styles/components.css`: `dr-select` (the buttons that pick a list or open a menu), `dr-menu` with `dr-menu-head` and
+  `dr-menu-row` (the genre menu and the Playback menu are now the same component), and `dr-act` (the heart, the + and the ⊘, which were drawn three times,
+  on the cards, in the bar and in the queue).
+- The queue icons have the same size and spacing as the ones of the cards and the bar (18 px, 12 px). Unused styles and variables were removed.
+- The About page loads the same tokens.
+
 ## 0.16.9
 - The Playback button and its menu now follow the genre button and its menu: same height (32 px), border, text and hover on the button; same rows
   (12 px text, same spacing and hover colour), header, colours, shadow, and the same fade and slide (0.15 s, 6 px) when they open and close.

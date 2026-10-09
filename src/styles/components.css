@@ -1,0 +1,41 @@
+/* Components shared by the recs page and the player bar. They only use the tokens of tokens.css. */
+
+/* ── Select: the button that opens a menu or picks a list (My tags, Best matches, Playback) ── */
+.dr-select {
+  display: inline-flex; align-items: center; gap: 6px; height: var(--dr-control-h); padding: 6px var(--dr-menu-pad-x);
+  font: inherit; font-size: var(--dr-font-s); line-height: var(--dr-line-s); color: var(--dr-text); white-space: nowrap; cursor: pointer;
+  background: var(--dr-surface); border: 1px solid var(--dr-border); border-radius: var(--dr-radius);
+}
+.dr-select:hover:not(:disabled) { background: var(--dr-surface-soft); text-decoration: none; }
+
+/* ── Menu: a floating box with an optional header and rows. Opens and closes with a short fade and slide; closed, it takes no room and
+   cannot be clicked (display:none cannot be animated). `--up` is for menus that open above their button. ── */
+.dr-menu {
+  position: absolute; background: var(--dr-surface); color: var(--dr-text); text-align: left;
+  border: 1px solid var(--dr-border-menu); border-radius: var(--dr-radius); box-shadow: var(--dr-shadow-menu);
+  transition: opacity var(--dr-menu-dur) var(--dr-ease), transform var(--dr-menu-dur) var(--dr-ease), visibility 0s;
+}
+.dr-menu[hidden] {
+  display: block; opacity: 0; visibility: hidden; transform: translateY(calc(var(--dr-menu-shift) * -1)); max-height: 0; overflow: hidden;
+  pointer-events: none; border-width: 0;
+  transition: opacity var(--dr-menu-dur) var(--dr-ease), transform var(--dr-menu-dur) var(--dr-ease), visibility 0s var(--dr-menu-dur), max-height 0s var(--dr-menu-dur);
+}
+.dr-menu--up[hidden] { transform: translateY(var(--dr-menu-shift)); }
+@media (prefers-reduced-motion: reduce) { .dr-menu, .dr-menu[hidden] { transition: none; } }
+
+.dr-menu-head { padding: 10px var(--dr-menu-pad-x); font-size: var(--dr-font-s); line-height: var(--dr-line-s); color: var(--dr-text-muted); border-bottom: 1px solid var(--dr-divider); }
+.dr-menu-head b { display: block; font-size: var(--dr-font-m); line-height: 20px; font-weight: 700; color: var(--dr-text); }
+.dr-menu-head b + span { display: block; margin-top: 2px; }
+
+.dr-menu-row { display: flex; align-items: center; gap: 8px; padding: var(--dr-row-pad-y) var(--dr-menu-pad-x); font-size: var(--dr-font-s); line-height: var(--dr-line-s); color: var(--dr-text); cursor: pointer; }
+.dr-menu-row:hover { background: var(--dr-hover); text-decoration: none; }
+
+/* ── Action icon: the heart, the + / check and the ⊘ of the cards, the player bar and the queue. The link says which one it is
+   (--wish, --save, --dislike) and whether it is on (`is-on`, or `on` in the bar). ── */
+.dr-act { display: inline-flex; align-items: center; --dr-act-hover: var(--dr-accent); --dr-act-on: var(--dr-accent); }
+.dr-act svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-icon); display: block; }
+.dr-act:hover svg { fill: var(--dr-act-hover); }
+.dr-act.is-on svg, .dr-act.is-on:hover svg, .dr-act.on svg, .dr-act.on:hover svg { fill: var(--dr-act-on); }
+.dr-act--wish { --dr-act-hover: var(--dr-accent); --dr-act-on: var(--dr-wish); }       /* blue on hover, orange when it is in the wishlist */
+.dr-act--save { --dr-act-hover: var(--dr-success); --dr-act-on: var(--dr-success); }   /* green: a song of it is in Liked Songs */
+.dr-act--dislike { --dr-act-hover: var(--dr-danger); --dr-act-on: var(--dr-danger); } /* red on hover and when active; click again to bring it back */

@@ -1,0 +1,48 @@
+/* Design tokens shared by the recs page (inside its frame) and the player bar (drawn in the Bandcamp page).
+   One place for every colour, size and timing that more than one element uses; the two stylesheets only alias or use these.
+   Prefixed `--dr-` so nothing clashes with Bandcamp's own variables. */
+:root, #dr-player {
+  /* surfaces and text */
+  --dr-surface: #fff;
+  --dr-surface-soft: #f8f8f8;          /* hover of a button */
+  --dr-text: #222;
+  --dr-text-muted: rgb(34 34 34 / 72%);
+  --dr-text-faint: #767676;
+  --dr-icon: #8a8f91;                  /* resting colour of the action icons */
+
+  /* meaning */
+  --dr-accent: #00a1c6;                /* links, checks, the progress of the loading: Bandcamp's own link blue */
+  --dr-accent-dark: #007c9e;
+  --dr-success: #2a8737;               /* a song of it is in Liked Songs */
+  --dr-danger: #d64541;                /* don't show music like this */
+  --dr-wish: #f7931e;                  /* in the wishlist */
+
+  /* lines */
+  --dr-border: #aaa;                   /* buttons and selects */
+  --dr-border-menu: rgb(34 34 34 / 32%);
+  --dr-divider: rgb(34 34 34 / 8%);    /* thin line inside a menu */
+  --dr-hover: rgb(34 34 34 / 8%);      /* background of a row under the pointer */
+
+  /* shape */
+  --dr-radius: 4px;
+  --dr-shadow-menu: 0 4px 16px rgb(34 34 34 / 16%);
+
+  /* type and size */
+  --dr-font-s: 12px;
+  --dr-font-m: 14px;
+  --dr-line-s: 18px;
+  --dr-control-h: 32px;                /* buttons and selects */
+  --dr-icon-size: 18px;                /* action icons of the cards, the bar and the queue */
+  --dr-icon-gap: 12px;
+  --dr-menu-pad-x: 12px;
+  --dr-row-pad-y: 5px;
+
+  /* motion */
+  --dr-ease: ease;
+  --dr-menu-dur: .15s;                 /* menus (genres, playback) fade and slide this much */
+  --dr-menu-shift: 6px;
+  --dr-ease-out: cubic-bezier(.2, .8, .2, 1);
+  --dr-panel-fade: .12s;               /* queue and Liked Songs rise from the bar */
+  --dr-panel-rise: .22s;
+  --dr-panel-shift: 14px;
+}

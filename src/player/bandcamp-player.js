@@ -24,6 +24,9 @@
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let savedCount = null;
+  const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', dislike: 'dislike' };
+  /** One icon of a row of the queue or of the Liked list. */
+  const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}`).join(',');
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
@@ -38,7 +41,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="save" href="#" title="Add to Liked Songs" aria-label="Add to Liked Songs">${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
+          <div class="collect"><a class="dr-act dr-act--wish wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="dr-act dr-act--save save" href="#" title="Add to Liked Songs" aria-label="Add to Liked Songs">${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')}</a><a class="dr-act dr-act--dislike dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>
@@ -54,11 +57,11 @@
       </div>
       <div class="col col-4-15 controls-extra">
         <div class="pb-wrap">
-          <a href="#" class="x-btn pb-btn" role="button" aria-haspopup="true" aria-expanded="false" title="Playback" aria-label="Playback"><span class="pb-slot">${MODE_ICON.one}</span><span class="pb-label">One per album</span><svg class="pb-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
-          <div class="pb-menu" role="menu" aria-label="Playback" hidden>
-            <div class="pb-head"><b>Playback</b><span>Choose what plays from each album.</span></div>
-            <a href="#" class="pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.one}One song per album</a>
-            <a href="#" class="pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.album}Full album</a>
+          <a href="#" class="x-btn dr-select pb-btn" role="button" aria-haspopup="true" aria-expanded="false" title="Playback" aria-label="Playback"><span class="pb-slot">${MODE_ICON.one}</span><span class="pb-label">One per album</span><svg class="pb-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+          <div class="dr-menu dr-menu--up pb-menu" role="menu" aria-label="Playback" hidden>
+            <div class="dr-menu-head pb-head"><b>Playback</b><span>Choose what plays from each album.</span></div>
+            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.one}One song per album</a>
+            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.album}Full album</a>
           </div>
         </div>
         <span class="x-sep" aria-hidden="true"></span>
@@ -179,7 +182,6 @@
       const sig = `${s.curId}|${queueKey}`;
       if (sig !== queueSig) {
         queueSig = sig;
-        const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
         q('.queue ol').innerHTML = queue.map((it, i) =>
           `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span><span class="qlabel">${i + 1}. ${esc(it.label)}</span><span class="qact">`
           + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
@@ -193,7 +195,6 @@
           const ic = q('.x-saved .x-icon'); ic.classList.remove('bump'); void ic.getBoundingClientRect(); ic.classList.add('bump');
         }
         savedCount = s.savedList.length;
-        const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
         q('.saved ol').innerHTML = s.savedList.length
           ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}"><span class="qlabel">${esc(it.label)}</span><span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)

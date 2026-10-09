@@ -2,36 +2,27 @@
    design system stylesheet, so the page looks native inside the profile.
    Sections: tokens · base · header · controls · lists of the day · status · album grid · card actions · profile-tab layout. */
 
-/* ── Tokens (names as in Bandcamp's design system) ──────────────────────────────────────────────────────────────── */
+/* ── Tokens: the colours, sizes and timings that the player bar also uses live in src/styles/tokens.css (--dr-*); this page only adds its own
+   names for them, and Bandcamp's type scale ──────────────────────────────────────────────────────────────────────────────────── */
 :root {
   --white: #fff;
-  --gray100: #f8f8f8; --gray200: #e6e6e6; --gray300: #aaa; --gray400: #767676; --gray500: #5a5a5a; --gray600: #333; --gray700: #222;
-  --blue300: #99dbeb; --blue400: #0cacd7; --blue500: #007c9e;
-  --green500: #2a8737; --green600: #1f672a;
-  --red500: #e50a0a; --red600: #b60404;
-  --link-blue: #00a1c6;             /* the link colour on Bandcamp's profile pages: rgb(0, 161, 198) */
-  --transparency-dark-8: rgb(34 34 34 / 8%);
-  --transparency-dark-16: rgb(34 34 34 / 16%);
-  --transparency-dark-32: rgb(34 34 34 / 32%);
-  --transparency-dark-72: rgb(34 34 34 / 72%);
-  --bc-font-size-100: 0.75rem; --bc-font-size-200: 0.875rem; --bc-font-size-300: 1rem; --bc-font-size-500: 1.5rem;
-  --bc-font-weight-regular: 400; --bc-font-weight-medium: 500; --bc-font-weight-bold: 700;
+  --gray100: #f8f8f8; --gray200: #e6e6e6; --gray600: #333; --gray700: #222;
+  --link-blue: var(--dr-accent);    /* the link colour on Bandcamp's profile pages: rgb(0, 161, 198) */
+  --bc-font-size-100: 0.75rem; --bc-font-size-200: 0.875rem; --bc-font-size-500: 1.5rem;
+  --bc-font-weight-regular: 400;
   --bc-line-height-200: 1.5714em; --bc-line-height-500: 1.5em;
-  --bc-radius: 4px;
+  --bc-radius: var(--dr-radius);
 
   /* page aliases */
   --bg: var(--white);
-  --text: var(--gray700);
-  --muted: var(--transparency-dark-72);
-  --faint: var(--gray400);
+  --text: var(--dr-text);
+  --muted: var(--dr-text-muted);
+  --faint: var(--dr-text-faint);
   --line: var(--gray200);
-  --soft: var(--gray100);
+  --soft: var(--dr-surface-soft);
   --link: var(--link-blue);
-  --link-dark: var(--blue500);
+  --link-dark: var(--dr-accent-dark);
   --accent: var(--link-blue);
-  --icon: #8a8f91;
-  --danger: #d64541;                /* "don't show again", on white */
-  --wishlist: #f7931e;              /* heart when the album is in the wishlist */
   --border-hover: #b4b4b4;
   --border-active: #c4c4c4;
 }
@@ -78,42 +69,27 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 /* ── The lists of the day: a toggle that works like radio buttons (My tags with its genre picker, Best matches, Surprise me) ── */
 .view-switch { display: flex; }
 .view-switch > * + *, .view-switch > .tags-picker + .view-button { margin-left: -1px; }
-.view-button {
-  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: var(--bc-font-size-100); padding: 6px 12px; cursor: pointer;
-  border: 1px solid var(--gray300); background: var(--white); color: var(--text); white-space: nowrap;
-}
+.view-button { border-radius: 0; } /* a segment of the toggle: only its two ends are rounded */
 .tags-picker .view-button { border-radius: var(--bc-radius) 0 0 var(--bc-radius); }
 .view-switch > .view-button:last-child { border-radius: 0 var(--bc-radius) var(--bc-radius) 0; }
-.view-button:hover:not(:disabled) { background: var(--soft); }
 .view-button.is-active, .view-button.is-active:hover:not(:disabled) { background: var(--gray700); border-color: var(--gray700); color: var(--white); position: relative; z-index: 1; } /* stays dark on hover */
 .view-button:disabled { opacity: .6; cursor: default; }
 .view-button .icon-stroke:last-child { width: 12px; height: 12px; }
 .tags-picker { position: relative; }
-.tags-menu {
-  position: absolute; top: calc(100% + 6px); left: 0; z-index: 25; width: 300px; background: var(--white); color: var(--gray700);
-  border: 1px solid var(--transparency-dark-32); border-radius: var(--bc-radius); box-shadow: 0 4px 16px rgb(34 34 34 / 16%); text-align: left;
-  transition: opacity .15s ease, transform .15s ease, visibility 0s;
-}
-/* opens and closes with a short fade and slide; closed, it takes no room and cannot be clicked (display:none cannot be animated) */
-.tags-menu[hidden] { display: block; opacity: 0; visibility: hidden; transform: translateY(-6px); max-height: 0; overflow: hidden; pointer-events: none; border-width: 0;
-  transition: opacity .15s ease, transform .15s ease, visibility 0s .15s, max-height 0s .15s; }
-@media (prefers-reduced-motion: reduce) { .tags-menu, .tags-menu[hidden] { transition: none; } }
+.tags-menu { top: calc(100% + 6px); left: 0; z-index: 25; width: 300px; } /* looks and opening come from .dr-menu */
 .tags-menu.align-right { left: auto; right: 0; }   /* when the left-aligned menu would run past the window */
-.tags-coverage { padding: 10px 12px; font-size: var(--bc-font-size-100); color: var(--muted); border-bottom: 1px solid var(--transparency-dark-8); }
 .tags-input {
   display: block; width: calc(100% - 24px); margin: 10px 12px 6px; padding: 6px 8px; font: inherit; font-size: var(--bc-font-size-100);
   border: 1px solid #ccc; border-radius: var(--bc-radius); outline: none; -webkit-appearance: none; appearance: none;
 }
 .tags-input:focus { border-color: #50a1e6; box-shadow: 0 0 5px #b4d7f9; } /* Bandcamp's own search-field focus */
 .tags-list { list-style: none; margin: 0; padding: 0 0 6px; max-height: 210px; overflow-y: auto; }
-.tags-list label { display: flex; align-items: center; gap: 8px; padding: 5px 12px; font-size: var(--bc-font-size-100); cursor: pointer; }
-.tags-list label:hover { background: var(--transparency-dark-8); }
 .tags-list input { accent-color: var(--gray700); margin: 0; }
 .tags-add-button { display: block; width: 100%; padding: 6px 12px; font: inherit; font-size: var(--bc-font-size-100); text-align: left; color: var(--link); background: none; border: 0; cursor: pointer; }
-.tags-add-button:hover { background: var(--transparency-dark-8); text-decoration: underline; }
+.tags-add-button:hover { background: var(--dr-hover); text-decoration: underline; }
 .tag-count { margin-left: auto; color: var(--muted); }
 .tags-empty { padding: 8px 12px; font-size: var(--bc-font-size-100); color: var(--muted); }
-.tags-foot { padding: 10px 12px 12px; border-top: 1px solid var(--transparency-dark-8); }
+.tags-foot { padding: 10px 12px 12px; border-top: 1px solid var(--dr-divider); }
 .tags-note { margin: 8px 0 0; font-size: var(--bc-font-size-100); line-height: 1.3; color: var(--muted); text-align: center; } /* caption: Bandcamp's small text size */
 .tags-foot .button { width: 100%; justify-content: center; background: var(--gray700); border-color: var(--gray700); }
 .tags-foot .button:hover:not(:disabled) { background: var(--gray600); border-color: var(--gray600); }
@@ -230,15 +206,10 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
 
 /* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
-.album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-.album-actions a { color: var(--accent); display: inline-flex; align-items: center; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: var(--dr-icon-gap); }
+.album-actions a { color: var(--accent); -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 .album-actions a:hover { text-decoration: underline; }
 .album-actions .action-dislike { margin-left: auto; } /* the "don't show" icon sits at the right edge of the card */
-.album-actions svg { width: 18px; height: 18px; fill: var(--icon); } /* the same size and spacing as the icons in the player bar */
-.action-save:hover svg, .action-save.is-on svg, .action-save.is-on:hover svg { fill: var(--green500); } /* green: a song of it is in Liked Songs */
-.action-wishlist:hover svg { fill: var(--accent); }
-.action-wishlist.is-on svg, .action-wishlist.is-on:hover svg { fill: var(--wishlist); }
-.action-dislike:hover svg, .action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--danger); } /* red when active; click again to bring the album back */
 
 /* ── Footer ───────────────────────────────────────────────────────────────────────────────────────────── */
 .page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); }
