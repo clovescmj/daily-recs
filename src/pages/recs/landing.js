@@ -38,9 +38,9 @@ const ROOM_BELOW_MENU_PX = 40;
 function reserveMenuRoom() {
   const menu = $('landing-tags');
   const wasHidden = menu.hidden;
-  if (wasHidden) { picker.render(); menu.hidden = false; menu.style.visibility = 'hidden'; }
+  if (wasHidden) { picker.render(); menu.style.transition = 'none'; menu.hidden = false; menu.style.visibility = 'hidden'; } // (no fade while measuring)
   const bottom = menu.getBoundingClientRect().bottom - $('landing').getBoundingClientRect().top;
-  if (wasHidden) { menu.hidden = true; menu.style.visibility = ''; }
+  if (wasHidden) { menu.hidden = true; menu.style.visibility = ''; requestAnimationFrame(() => { menu.style.transition = ''; }); }
   if (bottom > 0) $('landing').style.minHeight = `${Math.ceil(bottom + ROOM_BELOW_MENU_PX)}px`;
 }
 

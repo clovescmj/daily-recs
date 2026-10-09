@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.3
+- Fixed: the genre menu had no fade and slide when it opened and closed. A general rule of the page (`[hidden]` means `display: none`) was stronger than the menu's
+  own closed state, so the menu was removed instead of animated. Menus are now the exception to that rule.
+
 ## 0.17.2
 - Fixed: opening the profile straight on the daily recs tab (the toolbar icon, or a reload on that tab) showed Bandcamp's own collection for a moment before our tab
   replaced it. The collection is now kept out of sight from the first moment (a small script that runs as the page starts loading), and shown again if the

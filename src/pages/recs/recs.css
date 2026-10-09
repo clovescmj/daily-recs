@@ -29,7 +29,7 @@
 
 /* ── Base ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
 /* Anything with the `hidden` attribute stays hidden even when another rule sets `display`. */
-[hidden] { display: none !important; }
+[hidden]:not(.dr-menu) { display: none !important; } /* (a menu that is hidden is faded and slid out by components.css, so it can be animated) */
 * { box-sizing: border-box; }
 body {
   margin: 0; padding-bottom: 96px; background: var(--bg); color: var(--text);
