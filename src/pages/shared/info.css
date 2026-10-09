@@ -1,8 +1,8 @@
 /* About page (shares tokens and base styles with recs.css) */
 body.info .page { max-width: 680px; }
-body.info h1 { font-size: 24px; margin: 4px 0 6px; font-weight: normal; }
-body.info h2 { font-size: 16px; margin: 24px 0 6px; }
-body.info p, body.info li { font-size: 14px; line-height: 1.55; }
+body.info h1 { font-size: var(--dr-font-xl); margin: 4px 0 6px; font-weight: var(--dr-weight-regular); }
+body.info h2 { font-size: var(--dr-font-l); margin: 24px 0 6px; }
+body.info p, body.info li { font-size: var(--dr-font-m); line-height: 1.55; }
 body.info ul { padding-left: 20px; }
 .meta { color: var(--muted); margin: 0 0 14px; }
 .links { margin-top: 28px; }

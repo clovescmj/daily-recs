@@ -1,49 +1,99 @@
-/* Design tokens shared by the recs page (inside its frame) and the player bar (drawn in the Bandcamp page).
-   One place for every colour, size and timing that more than one element uses; the two stylesheets only alias or use these.
+/* Design tokens: the one place for every colour, size and timing of the recs page, the player bar and the tab, which follow Bandcamp's own design
+   system (palette, type scale, 4 px corners). The stylesheets only use these, never a loose value.
    Prefixed `--dr-` so nothing clashes with Bandcamp's own variables. */
 :root, #dr-player {
+  /* palette (Bandcamp's greys) */
+  --dr-white: #fff;
+  --dr-gray-100: #f8f8f8;
+  --dr-gray-200: #e6e6e6;
+  --dr-gray-300: #aaa;
+  --dr-gray-400: #767676;
+  --dr-gray-500: #5a5a5a;
+  --dr-gray-600: #333;
+  --dr-gray-700: #222;
+  --dr-ink-72: rgb(34 34 34 / 72%);
+  --dr-ink-32: rgb(34 34 34 / 32%);
+  --dr-ink-8: rgb(34 34 34 / 8%);
+
   /* surfaces and text */
-  --dr-surface: #fff;
-  --dr-surface-soft: #f8f8f8;          /* hover of a button */
-  --dr-text: #222;
-  --dr-text-muted: rgb(34 34 34 / 72%);
-  --dr-text-faint: #767676;
-  --dr-icon: #8a8f91;                  /* resting colour of the action icons */
+  --dr-surface: var(--dr-white);
+  --dr-surface-soft: var(--dr-gray-100);   /* hover of a button */
+  --dr-text: var(--dr-gray-700);
+  --dr-text-muted: var(--dr-ink-72);
+  --dr-text-faint: var(--dr-gray-400);
+  --dr-text-player: var(--dr-gray-500);    /* base text of the player bar */
+  --dr-glyph: var(--dr-gray-600);          /* icons and marks of the player bar */
+  --dr-icon: #8a8f91;                      /* resting colour of the action icons */
+  --dr-scrim: rgb(0 0 0 / 50%);            /* dark veil over a cover */
 
   /* meaning */
-  --dr-accent: #00a1c6;                /* links, checks, the progress of the loading: Bandcamp's own link blue */
+  --dr-accent: #00a1c6;                    /* links, checks, the progress of the loading: Bandcamp's own link blue */
   --dr-accent-dark: #007c9e;
-  --dr-success: #2a8737;               /* a song of it is in Liked Songs */
-  --dr-danger: #d64541;                /* don't show music like this */
-  --dr-wish: #f7931e;                  /* in the wishlist */
+  --dr-success: #2a8737;                   /* a song of it is in Liked Songs */
+  --dr-danger: #d64541;                    /* don't show music like this */
+  --dr-wish: #f7931e;                      /* in the wishlist */
+  --dr-tag-bg: #9bd3e6;                    /* the "new" tag of the tab (Bandcamp's own, approximated) */
+  --dr-tag-text: #1b3b4b;
 
   /* lines */
-  --dr-border: #aaa;                   /* buttons and selects */
-  --dr-border-menu: rgb(34 34 34 / 32%);
-  --dr-border-bar: rgba(0, 0, 0, 0.15);  /* the line on top of the player bar, and of the panels that open from it */
-  --dr-divider: rgb(34 34 34 / 8%);    /* thin line inside a menu */
-  --dr-hover: rgb(34 34 34 / 8%);      /* background of a row under the pointer */
+  --dr-line: var(--dr-gray-200);           /* separators of the page */
+  --dr-border: var(--dr-gray-300);         /* buttons and selects */
+  --dr-border-soft: #d9d9d9;               /* play buttons */
+  --dr-border-menu: var(--dr-ink-32);
+  --dr-border-bar: rgb(0 0 0 / 15%);       /* the line on top of the player bar, and of the panels that open from it */
+  --dr-divider: var(--dr-ink-8);           /* thin line inside a menu */
+  --dr-hover: var(--dr-ink-8);             /* background of a row under the pointer */
+  --dr-input-border: #ccc;                 /* Bandcamp's search field, and its focus */
+  --dr-focus: #50a1e6;
+  --dr-focus-ring: #b4d7f9;
+  --dr-progress: var(--dr-gray-600);       /* bars of the player: what is played, what is loaded, the track */
+  --dr-progress-buffer: rgb(51 51 51 / 40%);
+  --dr-progress-track: rgb(51 51 51 / 10%);
 
   /* shape */
   --dr-radius: 4px;
   --dr-shadow-menu: 0 4px 16px rgb(34 34 34 / 16%);
 
-  /* type and size */
+  /* type */
+  --dr-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --dr-font-xs: 10px;
   --dr-font-s: 12px;
+  --dr-font-base: 13px;
   --dr-font-m: 14px;
+  --dr-font-l: 16px;
+  --dr-font-title: 18px;
+  --dr-font-xl: 24px;
+  --dr-weight-regular: 400;
+  --dr-weight-medium: 500;
+  --dr-weight-bold: 700;
+  --dr-line-xs: 16px;
   --dr-line-s: 18px;
-  --dr-control-h: 32px;                /* buttons and selects */
-  --dr-icon-size: 18px;                /* action icons of the cards, the bar and the queue */
+  --dr-line-title: 20px;
+  --dr-line-m: 1.5714em;
+  --dr-line-xl: 1.5em;
+  --dr-line-tight: 1.3;
+
+  /* sizes */
+  --dr-control-h: 32px;                    /* buttons and selects */
+  --dr-icon-size: 18px;                    /* action icons of the cards, the bar and the queue */
   --dr-icon-gap: 12px;
   --dr-menu-pad-x: 12px;
   --dr-row-pad-y: 5px;
 
   /* motion */
   --dr-ease: ease;
-  --dr-menu-dur: .15s;                 /* menus (genres, playback) fade and slide this much */
-  --dr-menu-shift: 6px;
   --dr-ease-out: cubic-bezier(.2, .8, .2, 1);
-  --dr-panel-fade: .12s;               /* queue and Liked Songs rise from the bar */
+  --dr-dur-fast: .1s;
+  --dr-menu-dur: .15s;                     /* menus (genres, playback) fade and slide this much */
+  --dr-menu-shift: 6px;
+  --dr-dur-base: .3s;                      /* texts and bars that change */
+  --dr-dur-slow: .5s;                      /* the placeholders come in */
+  --dr-stagger: 70ms;                      /* one after the other */
+  --dr-dur-bump: .7s;                      /* the Liked Songs icon jumps */
+  --dr-panel-fade: .12s;                   /* queue and Liked Songs rise from the bar */
   --dr-panel-rise: .22s;
   --dr-panel-shift: 14px;
+  --dr-loop-eq: 1s;                        /* loops of the loading */
+  --dr-loop-shimmer: 1.3s;
+  --dr-loop-bar: 1.4s;
 }

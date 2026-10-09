@@ -4,22 +4,22 @@
 /* "35 new" next to the tab name, styled like Bandcamp's "NEW" tag on the playlists tab (colours approximated) */
 #grid-tabs li.dr-tab .dr-new-tag {
   display: inline-block; margin-left: 8px; padding: 2px 6px; border-radius: var(--dr-radius); vertical-align: middle;
-  background: #9bd3e6; color: #1b3b4b; font: 700 10px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: var(--dr-tag-bg); color: var(--dr-tag-text); font: var(--dr-weight-bold) var(--dr-font-xs)/1.4 var(--dr-font-family);
   letter-spacing: .04em; text-transform: uppercase;
 }
 #grid-tabs li.dr-tab .dr-new-tag:empty { display: none; }
 #dr-frame { display: block; max-width: 100%; height: 200px; border: 0; background: transparent; }
 #dr-frame[hidden] { display: none; }
 /* Bandcamp's own player slides down while ours slides up, and back */
-#carousel-player { transition: transform .3s ease .12s, visibility 0s linear 0s; }
-body.dr-open #carousel-player { transform: translateY(100%); visibility: hidden; transition: transform .3s ease, visibility 0s linear .3s; }
+#carousel-player { transition: transform var(--dr-dur-base) ease var(--dr-panel-fade), visibility 0s linear 0s; }
+body.dr-open #carousel-player { transform: translateY(100%); visibility: hidden; transition: transform var(--dr-dur-base) ease, visibility 0s linear var(--dr-dur-base); }
 @media (prefers-reduced-motion: reduce) { #carousel-player, body.dr-open #carousel-player { transition: none; } }
 
 body.dr-player-on { padding-bottom: 92px; }
 #dr-toast {
   position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%); z-index: 2147483001; max-width: 80vw; padding: 10px 16px;
-  background: #333; color: #fff; border-radius: var(--dr-radius); font: 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
-  opacity: 0; pointer-events: none; transition: opacity .15s;
+  background: var(--dr-gray-600); color: var(--dr-white); border-radius: var(--dr-radius); font: var(--dr-font-base)/1.4 var(--dr-font-family);
+  opacity: 0; pointer-events: none; transition: opacity var(--dr-menu-dur);
 }
 #dr-toast.show { opacity: 1; }
 /* Opened straight on the daily recs tab (#dailyrecs): Bandcamp's own collection stays out of sight until the panel is there (see early.js). The tab bar stays. */

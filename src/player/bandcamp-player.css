@@ -1,7 +1,7 @@
 /* Replica of Bandcamp's own player (#carousel-player). The rules come from their public CSS
    (trackpipe/public/css/hubs/carousel_player.css), with the selector scoped to #dr-player. */
-#dr-player { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 2147483000; color: #505958;
-  font: 13px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif; text-align: left; }
+#dr-player { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 2147483000; color: var(--dr-text-player);
+  font: var(--dr-font-base)/1.4 var(--dr-font-family); text-align: left; }
 #dr-player[hidden] { display: none; }
 #dr-player, #dr-player * { box-sizing: border-box; }
 #dr-player a { color: inherit; text-decoration: none; }
@@ -10,42 +10,42 @@
 #dr-player .col-7-15 { width: 45.750452079566%; }
 #dr-player .col + .col { margin-left: 1.7179023508%; }
 
-#dr-player .carousel-player-inner { display: flex; flex-wrap: nowrap; align-items: flex-start; height: 80px; width: 100%; background: #FFF; padding: 6px;
+#dr-player .carousel-player-inner { display: flex; flex-wrap: nowrap; align-items: flex-start; height: 80px; width: 100%; background: var(--dr-white); padding: 6px;
   border-top: 1px solid var(--dr-border-bar); z-index: 112; position: relative; }
 #dr-player .now-playing { display: flex; }
 #dr-player .now-playing > * { display: inline-block; vertical-align: top; }
 #dr-player .now-playing img { width: 60px; height: 60px; margin: 4px 0 4px 4px; display: block; }
-#dr-player .now-playing .info { line-height: 18px; margin-left: 8px; max-width: calc(100% - 76px); margin-top: 4px;
+#dr-player .now-playing .info { line-height: var(--dr-line-s); margin-left: 8px; max-width: calc(100% - 76px); margin-top: 4px;
   position: relative; white-space: nowrap; text-overflow: ellipsis; overflow: visible; height: 60px; display: flex; flex-direction: column; } /* as tall as the cover: the icons sit on its bottom edge */
-#dr-player .now-playing .title { font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
-  font-size: 14px; line-height: 16px; }
-#dr-player .now-playing .artist { max-width: 200px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 12px; }
+#dr-player .now-playing .title { font-weight: var(--dr-weight-bold); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+  font-size: var(--dr-font-m); line-height: var(--dr-line-xs); }
+#dr-player .now-playing .artist { max-width: 200px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: var(--dr-font-s); }
 #dr-player .now-playing .np-link:hover :is(.title, .artist) { text-decoration: underline; } /* the name of the album and the artist underline together, like on the cards */
 
 #dr-player .progress-transport, #dr-player .controls-extra { display: flex; margin-top: 10px; }
 #dr-player .progress-transport * { box-sizing: content-box; }
 #dr-player .info-progress { display: inline-block; flex-grow: 1; margin-right: 10px; margin-top: 6px; width: calc(100% - 145px); }
 #dr-player .info-progress > * { display: flex; }
-#dr-player .progress-transport .title { flex-grow: 1; font-weight: 500; max-width: calc(100% - 80px); overflow: hidden;
+#dr-player .progress-transport .title { flex-grow: 1; font-weight: var(--dr-weight-medium); max-width: calc(100% - 80px); overflow: hidden;
   text-overflow: ellipsis; white-space: nowrap; }
 #dr-player .progress-transport .title a.no-queue, #dr-player .progress-transport .title a.no-queue:hover { text-decoration: none; cursor: default; }
 #dr-player .progress-transport .pos-dur { margin-top: 1px; }
-#dr-player .progress-bar { height: 15px; width: 100%; position: relative; background: #FFF; margin-top: 4px; cursor: pointer; }
+#dr-player .progress-bar { height: 15px; width: 100%; position: relative; background: var(--dr-white); margin-top: 4px; cursor: pointer; }
 #dr-player .progress, #dr-player .buffer, #dr-player .progress-bg { width: 0%; position: absolute; height: 6px; margin-top: 4px; }
-#dr-player .progress-bg { background: rgba(50, 50, 50, 0.1); width: 100%; }
-#dr-player .progress { background: rgba(50, 50, 50, 1); z-index: 2; }
-#dr-player .buffer { background: rgba(50, 50, 50, 0.4); z-index: 1; }
+#dr-player .progress-bg { background: var(--dr-progress-track); width: 100%; }
+#dr-player .progress { background: var(--dr-progress); z-index: 2; }
+#dr-player .buffer { background: var(--dr-progress-buffer); z-index: 1; }
 #dr-player .seek-control-outer { height: 100%; width: 100%; position: relative; margin-left: -6px; margin-right: 5px; }
-#dr-player .seek-control { background: #333; width: 13px; height: 13px; position: absolute; bottom: 1px; right: -5px;
+#dr-player .seek-control { background: var(--dr-glyph); width: 13px; height: 13px; position: absolute; bottom: 1px; right: -5px;
   border-radius: 50%; display: none; cursor: pointer; }
 #dr-player .info-progress:hover .seek-control, #dr-player .progress-bar.seeking .seek-control { display: block; }
 
 #dr-player .progress-transport .transport { width: 80px; display: flex; align-items: center; align-self: flex-end; height: 15px; flex-shrink: 0; } /* bottom-aligned with the progress bar (its last child) and the same height, so the icons share its vertical centre whatever the fonts */
 #dr-player .transport > * { display: block; margin: 0 3px; }
-#dr-player .playpause { cursor: pointer; border: 1px solid #d9d9d9; padding: 11px; margin-right: 14px; height: 18px; width: 17px; position: relative; }
+#dr-player .playpause { cursor: pointer; border: 1px solid var(--dr-border-soft); padding: 11px; margin-right: 14px; height: 18px; width: 17px; position: relative; }
 #dr-player .playpause .play { width: 0; height: 0; border-top: 9px inset transparent; border-bottom: 9px inset transparent;
-  border-left: 15px solid rgb(34, 34, 34); display: inline-block; cursor: pointer; margin-left: 2px; }
-#dr-player .playpause .pause { border: 0; border-left: 5px solid #2d2d2d; border-right: 5px solid #2d2d2d; height: 18px;
+  border-left: 15px solid var(--dr-text); display: inline-block; cursor: pointer; margin-left: 2px; }
+#dr-player .playpause .pause { border: 0; border-left: 5px solid var(--dr-glyph); border-right: 5px solid var(--dr-glyph); height: 18px;
   width: 4px; margin-right: 2px; margin-left: 1px; }
 #dr-player .playpause .busy { background-image: var(--dr-busy); background-position: 50% 50%; background-repeat: no-repeat;
   border: none; height: 33px; margin: 4px auto; width: 37px; overflow: visible; position: absolute; top: 0; left: 1px; background-size: contain; }
@@ -57,7 +57,7 @@
 
 /* "♡ wishlist · go to album", same place and style as Bandcamp's player (below the artist) */
 #dr-player .now-playing .collect { margin-top: auto; }
-#dr-player .collect { color: var(--dr-accent); font-weight: 500; font-size: var(--dr-font-s); line-height: var(--dr-line-s); white-space: nowrap; display: flex; align-items: center; gap: var(--dr-icon-gap); }
+#dr-player .collect { color: var(--dr-accent); font-weight: var(--dr-weight-medium); font-size: var(--dr-font-s); line-height: var(--dr-line-s); white-space: nowrap; display: flex; align-items: center; gap: var(--dr-icon-gap); }
 #dr-player .collect a { color: var(--dr-accent); vertical-align: middle; }
 #dr-player .collect a:hover { text-decoration: underline; }
 
@@ -65,10 +65,10 @@
 /* extras + volume */
 #dr-player .controls-extra { margin-top: 23px; justify-content: flex-end; gap: 16px; } /* the same space between all the elements */
 #dr-player .controls-extra > * { display: inline-block; }
-#dr-player .x-icon, #dr-player .vol-icon { fill: #333; width: 20px; height: 20px; cursor: pointer; display: block; }
-#dr-player .x-icon { color: #333; }
+#dr-player .x-icon, #dr-player .vol-icon { fill: var(--dr-glyph); width: 20px; height: 20px; cursor: pointer; display: block; }
+#dr-player .x-icon { color: var(--dr-glyph); }
 #dr-player .x-btn { opacity: 0.7; }
-#dr-player .x-sep { width: 1px; height: 20px; background: rgba(0,0,0,.18); }
+#dr-player .x-sep { width: 1px; height: 20px; background: var(--dr-border-bar); }
 #dr-player .x-btn:hover, #dr-player .x-btn.active { opacity: 1; }
 #dr-player .x-btn.active .x-icon { fill: var(--dr-accent); color: var(--dr-accent); }
 #dr-player .vol-icon-wrapper { width: 24px; height: 20px; }
@@ -77,10 +77,10 @@
 #dr-player .vol > * { display: inline-block; vertical-align: middle; }
 #dr-player .vol-slider { width: 60px; height: 10px; position: relative; cursor: pointer; }
 #dr-player .vol-bg, #dr-player .vol-amt { margin-top: 4px; height: 3px; position: absolute; }
-#dr-player .vol-bg { background: rgba(50, 50, 50, 0.4); width: 100%; }
-#dr-player .vol-amt { background: rgba(50, 50, 50, 1); }
+#dr-player .vol-bg { background: var(--dr-progress-buffer); width: 100%; }
+#dr-player .vol-amt { background: var(--dr-progress); }
 #dr-player .vol-control-outer { height: 100%; position: relative; margin-left: -3px; margin-right: 5px; }
-#dr-player .vol-control { background: #333; width: 9px; height: 9px; position: absolute; bottom: 0; left: 0; border-radius: 50%; display: none; cursor: pointer; }
+#dr-player .vol-control { background: var(--dr-glyph); width: 9px; height: 9px; position: absolute; bottom: 0; left: 0; border-radius: 50%; display: none; cursor: pointer; }
 #dr-player .vol:hover .vol-control, #dr-player .vol-slider.changing .vol-control { display: block; }
 
 /* same breakpoints as Bandcamp */
@@ -93,14 +93,14 @@
 }
 
 /* queue ("now playing albums"): Bandcamp's .queue rules, opening upwards from the bar */
-#dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: #FFF;
+#dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: var(--dr-white);
   opacity: 0; visibility: hidden; transform: translateY(var(--dr-panel-shift)); pointer-events: none; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s var(--dr-panel-rise);
   border: 1px solid var(--dr-border-bar); border-bottom: 0; /* the bar's own line closes it at the bottom */ box-shadow: var(--dr-shadow-menu); border-radius: var(--dr-radius) var(--dr-radius) 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
 #dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s; }
 #dr-player .queue-header { margin: 16px 16px 10px; display: flex; justify-content: space-between; }
-#dr-player .queue-header h2 { margin: 0; font-size: 18px; font-weight: 500; }
-#dr-player .queue-header h2 b { font-weight: bold; }
-#dr-player .close-icon { height: 20px; width: 20px; margin-top: 2px; cursor: pointer; fill: #333; display: block; }
+#dr-player .queue-header h2 { margin: 0; font-size: var(--dr-font-title); font-weight: var(--dr-weight-medium); }
+#dr-player .queue-header h2 b { font-weight: var(--dr-weight-bold); }
+#dr-player .close-icon { height: 20px; width: 20px; margin-top: 2px; cursor: pointer; fill: var(--dr-glyph); display: block; }
 #dr-player .queue ol, #dr-player .queue li { list-style: none; padding: 0; margin: 0; }
 #dr-player .queue ol { height: calc(100% - 54px); overflow-y: auto; }
 #dr-player .queue li { padding: 8px 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; }
@@ -109,18 +109,18 @@
 #dr-player .queue li.active, #dr-player .queue li:hover { background: var(--dr-hover); }
 #dr-player .queue .qpp { flex: none; display: inline-block; vertical-align: middle; width: 14px; margin-right: 8px; height: 12px; visibility: hidden; }
 #dr-player .queue li.active .qpp, #dr-player .queue li:hover .qpp { visibility: visible; }
-#dr-player .queue .qpp::before { content: ""; box-sizing: content-box; display: inline-block; width: 0; height: 0; border-top: 6px inset transparent; border-bottom: 6px inset transparent; border-left: 9px solid rgb(34,34,34); }
-#dr-player .queue.audible li.active .qpp::before { border: 0; border-left: 3px solid #2d2d2d; border-right: 3px solid #2d2d2d; height: 12px; width: 2px; }
+#dr-player .queue .qpp::before { content: ""; box-sizing: content-box; display: inline-block; width: 0; height: 0; border-top: 6px inset transparent; border-bottom: 6px inset transparent; border-left: 9px solid var(--dr-text); }
+#dr-player .queue.audible li.active .qpp::before { border: 0; border-left: 3px solid var(--dr-glyph); border-right: 3px solid var(--dr-glyph); height: 12px; width: 2px; }
 #dr-player .now-playing img:not([src]) { visibility: hidden; }
 
 /* Slide transition when the bar appears / disappears (tab switch) */
 #dr-player { transition: transform .3s ease .12s, visibility 0s linear 0s; }
 #dr-player.is-offscreen { transform: translateY(100%); visibility: hidden; transition: transform .3s ease, visibility 0s linear .3s; }
 @keyframes dr-bump { 0% { transform: none; } 15% { transform: translateY(-8px) rotate(-14deg); } 35% { transform: translateY(-8px) rotate(12deg); } 55% { transform: translateY(-4px) rotate(-8deg); } 75% { transform: rotate(4deg); } 100% { transform: none; } } /* jumps and wobbles, like a bell */
-#dr-player .x-icon.bump { animation: dr-bump .7s ease-out; transform-origin: 50% 100%; }
+#dr-player .x-icon.bump { animation: dr-bump var(--dr-dur-bump) ease-out; transform-origin: 50% 100%; }
 @media (prefers-reduced-motion: reduce) { #dr-player .x-icon.bump { animation: none; } }
 @media (prefers-reduced-motion: reduce) { #dr-player, #dr-player.is-offscreen { transition: none; } }
-#dr-player .queue .empty { display: block; cursor: default; color: #777; white-space: normal; }
+#dr-player .queue .empty { display: block; cursor: default; color: var(--dr-text-faint); white-space: normal; }
 #dr-player .queue .empty:hover { background: transparent; }
 
 /* Playback: a button with the name of the mode that opens a short list upwards */

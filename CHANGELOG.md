@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.0
+- **Every value comes from the tokens.** Not only the corner radius: all colours, greys, font family, sizes and weights, line heights, durations and delays of the
+  recs page, the player bar, the tab and the About page now use `src/styles/tokens.css`, which follows Bandcamp's design system (palette, type scale, 4 px corners).
+  No loose colour, size or timing is left in the stylesheets.
+- A few near-duplicates became one value: the base text of the player bar (`#505958`) is Bandcamp's grey `#5a5a5a`, the dark marks (`#2d2d2d`, `#333`) are `#333`, the
+  bars of the player are `#333`, and the separator of the bar uses the same line as the bar.
+
 ## 0.17.6
 - One corner radius, Bandcamp's (4 px, `--dr-radius`), everywhere: the queue and Liked Songs panels (their top corners were 5 px), the play button over the
   covers (3 px), and the toast and the "new" tag of the tab, which had the 4 px written by hand.

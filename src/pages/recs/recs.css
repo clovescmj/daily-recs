@@ -2,27 +2,23 @@
    design system stylesheet, so the page looks native inside the profile.
    Sections: tokens · base · header · controls · lists of the day · status · album grid · card actions · profile-tab layout. */
 
-/* ── Tokens: the colours, sizes and timings that the player bar also uses live in src/styles/tokens.css (--dr-*); this page only adds its own
-   names for them, and Bandcamp's type scale ──────────────────────────────────────────────────────────────────────────────────── */
+/* ── Tokens: everything shared lives in src/styles/tokens.css (--dr-*). The names below are only this page's shorter names for them. ─── */
 :root {
-  --white: #fff;
-  --gray100: #f8f8f8; --gray200: #e6e6e6; --gray600: #333; --gray700: #222;
-  --link-blue: var(--dr-accent);    /* the link colour on Bandcamp's profile pages: rgb(0, 161, 198) */
-  --bc-font-size-100: 0.75rem; --bc-font-size-200: 0.875rem; --bc-font-size-500: 1.5rem;
-  --bc-font-weight-regular: 400;
-  --bc-line-height-200: 1.5714em; --bc-line-height-500: 1.5em;
+  --white: var(--dr-white); --gray100: var(--dr-gray-100); --gray200: var(--dr-gray-200); --gray600: var(--dr-gray-600); --gray700: var(--dr-gray-700);
+  --link-blue: var(--dr-accent);
+  --bc-font-size-100: var(--dr-font-s); --bc-font-size-200: var(--dr-font-m); --bc-font-size-500: var(--dr-font-xl);
+  --bc-font-weight-regular: var(--dr-weight-regular);
+  --bc-line-height-200: var(--dr-line-m); --bc-line-height-500: var(--dr-line-xl);
   --bc-radius: var(--dr-radius);
-
-  /* page aliases */
-  --bg: var(--white);
+  --bg: var(--dr-surface);
   --text: var(--dr-text);
   --muted: var(--dr-text-muted);
   --faint: var(--dr-text-faint);
-  --line: var(--gray200);
+  --line: var(--dr-line);
   --soft: var(--dr-surface-soft);
-  --link: var(--link-blue);
+  --link: var(--dr-accent);
   --link-dark: var(--dr-accent-dark);
-  --accent: var(--link-blue);
+  --accent: var(--dr-accent);
   --border-hover: #b4b4b4;
   --border-active: #c4c4c4;
 }
@@ -33,7 +29,7 @@
 * { box-sizing: border-box; }
 body {
   margin: 0; padding-bottom: 96px; background: var(--bg); color: var(--text);
-  font: 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;
+  font: var(--dr-font-base)/1.5 var(--dr-font-family); -webkit-font-smoothing: antialiased;
 }
 a { color: var(--link); text-decoration: none; }
 a:hover { color: var(--link-dark); text-decoration: underline; }
@@ -47,11 +43,11 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 }
 .page-heading { display: flex; align-items: center; gap: 14px; }
 /* Same play / pause button as Bandcamp's player bar: a square with a thin border, black triangle or two bars. */
-.play-all { flex: none; width: 41px; height: 41px; padding: 0; border: 1px solid #d9d9d9; background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.play-all:hover { border-color: #bbb; }
+.play-all { flex: none; width: 41px; height: 41px; padding: 0; border: 1px solid var(--dr-border-soft); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.play-all:hover { border-color: var(--dr-border); }
 .play-all:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .play-all-icon { box-sizing: content-box; /* the page-wide border-box would squash the two pause bars into one */ width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 15px solid var(--gray700); margin-left: 3px; }
-.play-all.is-playing .play-all-icon { width: 4px; height: 18px; border: 0; border-left: 5px solid #2d2d2d; border-right: 5px solid #2d2d2d; margin: 0; }
+.play-all.is-playing .play-all-icon { width: 4px; height: 18px; border: 0; border-left: 5px solid var(--dr-glyph); border-right: 5px solid var(--dr-glyph); margin: 0; }
 .page-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .page-subtitle { margin: 0; font-size: var(--bc-font-size-200); line-height: var(--bc-line-height-200); color: var(--muted); }
 .page-actions { display: flex; }
@@ -80,9 +76,9 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .tags-menu.align-right { left: auto; right: 0; }   /* when the left-aligned menu would run past the window */
 .tags-input {
   display: block; width: calc(100% - 24px); margin: 10px 12px 6px; padding: 6px 8px; font: inherit; font-size: var(--bc-font-size-100);
-  border: 1px solid #ccc; border-radius: var(--bc-radius); outline: none; -webkit-appearance: none; appearance: none;
+  border: 1px solid var(--dr-input-border); border-radius: var(--bc-radius); outline: none; -webkit-appearance: none; appearance: none;
 }
-.tags-input:focus { border-color: #50a1e6; box-shadow: 0 0 5px #b4d7f9; } /* Bandcamp's own search-field focus */
+.tags-input:focus { border-color: var(--dr-focus); box-shadow: 0 0 5px var(--dr-focus-ring); } /* Bandcamp's own search-field focus */
 .tags-list { list-style: none; margin: 0; padding: 0 0 6px; max-height: 210px; overflow-y: auto; }
 .tags-list input { accent-color: var(--gray700); margin: 0; }
 .tags-add-button { display: block; width: 100%; padding: 6px 12px; font: inherit; font-size: var(--bc-font-size-100); text-align: left; color: var(--link); background: none; border: 0; cursor: pointer; }
@@ -90,7 +86,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .tag-count { margin-left: auto; color: var(--muted); }
 .tags-empty { padding: 8px 12px; font-size: var(--bc-font-size-100); color: var(--muted); }
 .tags-foot { padding: 10px 12px 12px; border-top: 1px solid var(--dr-divider); }
-.tags-note { margin: 8px 0 0; font-size: var(--bc-font-size-100); line-height: 1.3; color: var(--muted); text-align: center; } /* caption: Bandcamp's small text size */
+.tags-note { margin: 8px 0 0; font-size: var(--bc-font-size-100); line-height: var(--dr-line-tight); color: var(--muted); text-align: center; } /* caption: Bandcamp's small text size */
 .tags-foot .button { width: 100%; justify-content: center; background: var(--gray700); border-color: var(--gray700); }
 .tags-foot .button:hover:not(:disabled) { background: var(--gray600); border-color: var(--gray600); }
 
@@ -113,11 +109,11 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .status-box strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* always one line */
 .status-box progress { display: block; width: 100%; height: 6px; margin-top: 8px; border: 0; border-radius: var(--bc-radius); overflow: hidden; -webkit-appearance: none; appearance: none; background: var(--gray200); }
 .status-box progress::-webkit-progress-bar { background: var(--gray200); }                  /* a light track, so the bar is easy to see */
-.status-box progress::-webkit-progress-value { background: var(--accent); transition: width .3s ease; }
+.status-box progress::-webkit-progress-value { background: var(--accent); transition: width var(--dr-dur-base) var(--dr-ease); }
 .status-box progress::-moz-progress-bar { background: var(--accent); }
 /* no known total yet: a bar that slides along the track */
 .status-box progress:indeterminate::-webkit-progress-bar {
-  background: linear-gradient(90deg, var(--gray200) 0 35%, var(--accent) 35% 65%, var(--gray200) 65% 100%) 0 0 / 300% 100%; animation: bar-slide 1.4s linear infinite;
+  background: linear-gradient(90deg, var(--gray200) 0 35%, var(--accent) 35% 65%, var(--gray200) 65% 100%) 0 0 / 300% 100%; animation: bar-slide var(--dr-loop-bar) linear infinite;
 }
 @keyframes bar-slide { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .status-box progress:indeterminate::-webkit-progress-bar { animation: none; } }
@@ -127,31 +123,31 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .loading { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 68px; box-sizing: border-box; } /* fixed height: the text is centred in it, whether it has one line or two */
 .loading-text { flex: 1; min-width: 0; }
 .loading-text strong { display: block; font-size: var(--bc-font-size-200); }
-.loading-text strong.is-new { animation: loading-in .3s ease; }
+.loading-text strong.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); }
 .loading-wait { display: flex; align-items: center; gap: 4px; flex: 0 1 auto; min-width: 0; max-width: 46%; font-size: var(--bc-font-size-100); color: var(--muted); }
 .loading-wait[hidden] { display: none; }
 .wait-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wait-label.is-new { animation: loading-in .3s ease; } /* the same fade as the title of the steps */
+.wait-label.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); } /* the same fade as the title of the steps */
 .wait-btn { flex: none; width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; color: var(--gray700); }
 .wait-btn:hover { color: var(--link-blue); }
 .wait-btn svg { width: 18px; height: 18px; fill: currentColor; display: block; }
 .wait-btn .wait-pause, .wait-btn.is-playing .wait-play { display: none; }
 .wait-btn.is-playing .wait-pause { display: block; }
 @media (max-width: 640px) { .wait-label { display: none; } } /* narrow window: only the button (its title says what it does) */
-.loading-sub { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .3s ease, opacity .3s ease, margin-top .3s ease; }
+.loading-sub { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows var(--dr-dur-base) var(--dr-ease), opacity var(--dr-dur-base) var(--dr-ease), margin-top var(--dr-dur-base) var(--dr-ease); }
 .loading-sub.is-on { grid-template-rows: 1fr; opacity: 1; margin-top: 2px; }
 .loading-sub span { overflow: hidden; min-height: 0; font-size: var(--bc-font-size-100); color: var(--muted); }
 @keyframes loading-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 .status-box.is-loading progress { height: 3px; margin: 0; border-radius: 0; }
 .eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 24px; flex: none; }
-.eq i { display: block; width: 4px; border-radius: 1px; background: var(--accent); transform-origin: bottom; animation: eq-dance 1s ease-in-out infinite; }
+.eq i { display: block; width: 4px; border-radius: 1px; background: var(--accent); transform-origin: bottom; animation: eq-dance var(--dr-loop-eq) ease-in-out infinite; }
 .eq i:nth-child(1) { height: 10px; animation-delay: -.2s; } .eq i:nth-child(2) { height: 22px; animation-delay: -.5s; }
 .eq i:nth-child(3) { height: 15px; animation-delay: -.1s; } .eq i:nth-child(4) { height: 24px; animation-delay: -.7s; }
 .eq i:nth-child(5) { height: 9px; animation-delay: -.35s; }
 @keyframes eq-dance { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
-.skeleton { animation: skeleton-in .5s ease both; animation-delay: calc(var(--i, 0) * 70ms); } /* the cards come in one after the other */
+.skeleton { animation: skeleton-in var(--dr-dur-slow) var(--dr-ease) both; animation-delay: calc(var(--i, 0) * var(--dr-stagger)); } /* the cards come in one after the other */
 .skeleton-cover, .skeleton-line {
-  background: linear-gradient(90deg, var(--gray200) 0, var(--gray100) 50%, var(--gray200) 100%) 0 0 / 600px 100%; animation: shimmer 1.3s linear infinite;
+  background: linear-gradient(90deg, var(--gray200) 0, var(--gray100) 50%, var(--gray200) 100%) 0 0 / 600px 100%; animation: shimmer var(--dr-loop-shimmer) linear infinite;
 }
 .skeleton-cover { aspect-ratio: 1; margin-bottom: 10px; }
 .skeleton-line { height: 10px; width: 45%; margin-bottom: 7px; border-radius: 2px; }
@@ -162,65 +158,65 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
 .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }
-.album-card { display: flex; flex-direction: column; padding: 10px; border: 1px dotted transparent; background: #fff; }
+.album-card { display: flex; flex-direction: column; padding: 10px; border: 1px dotted transparent; background: var(--white); }
 .album-card:hover, .album-card:focus-within { border-color: var(--border-hover); }
 .album-card.is-playing { border: 1px solid var(--border-active); }
 
 .album-cover { position: relative; display: block; }
-.album-cover img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--soft); border: 1px solid #eee; }
+.album-cover img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--soft); border: 1px solid var(--dr-line); }
 
 /* Play overlay: Bandcamp's 74×54 black box on a 210px cover (kept proportional), 50% opacity, white 17×20 triangle. */
 .cover-play {
   position: absolute; left: 32.86%; top: 34.76%; width: 35.24%; height: 25.71%; padding: 0; border: 0; border-radius: var(--bc-radius);
-  background: rgba(0, 0, 0, .5); font-size: 0; line-height: 0; opacity: 0; transition: opacity .1s ease-out; cursor: pointer;
+  background: var(--dr-scrim); font-size: 0; line-height: 0; opacity: 0; transition: opacity var(--dr-dur-fast) ease-out; cursor: pointer;
 }
 .cover-play::before {
   content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: 0; height: 0; border-left: 17px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+  width: 0; height: 0; border-left: 17px solid var(--white); border-top: 10px solid transparent; border-bottom: 10px solid transparent;
 }
 .album-card:hover .cover-play, .album-card:focus-within .cover-play, .album-card.is-playing .cover-play { opacity: 1; }
 .album-card.is-audible .cover-play::before { /* pause bars while the album is playing */
-  border: 0; width: 17px; height: 20px; background: linear-gradient(90deg, #fff 0 5px, transparent 5px 12px, #fff 12px 17px);
+  border: 0; width: 17px; height: 20px; background: linear-gradient(90deg, var(--white) 0 5px, transparent 5px 12px, var(--white) 12px 17px);
 }
 
 /* "Don't show again" badge: takes the place of the play overlay, same box. Only exists on disliked cards. */
 .cover-badge {
   display: none; position: absolute; left: 32.86%; top: 34.76%; width: 35.24%; height: 25.71%; border-radius: var(--bc-radius);
-  background: rgba(0, 0, 0, .5); align-items: center; justify-content: center; cursor: default; /* hover shows the tooltip */
+  background: var(--dr-scrim); align-items: center; justify-content: center; cursor: default; /* hover shows the tooltip */
 }
-.cover-badge svg { width: 30px; height: 30px; fill: #fff; display: block; }
+.cover-badge svg { width: 30px; height: 30px; fill: var(--white); display: block; }
 
 .album-body { padding: 8px 0 0; display: flex; flex-direction: column; gap: 1px; flex: 1; }
 .album-title, .album-artist { align-self: flex-start; } /* hover only over the text, not the whole row */
-.album-title { font-size: 14px; font-weight: bold; color: var(--text); line-height: 1.3; }
+.album-title { font-size: var(--dr-font-m); font-weight: var(--dr-weight-bold); color: var(--text); line-height: var(--dr-line-tight); }
 .album-artist { color: var(--muted); }
 .album-artist::before { content: "by "; }
 /* Like Bandcamp's collection: hovering the title or the artist underlines both and darkens the artist. */
 .album-title:hover, .album-artist:hover { color: var(--text); text-decoration: none; }
 .album-body:has(.album-title:hover, .album-artist:hover) :is(.album-title, .album-artist) { color: var(--text); text-decoration: underline; }
-.album-reason { font-size: 12px; color: var(--faint); margin-top: 4px; }
+.album-reason { font-size: var(--dr-font-s); color: var(--faint); margin-top: 4px; }
 
 /* Disliked this visit: dimmed (not removed) so it can be undone; the action row keeps its full colours. */
-.album-card.is-disliked .album-cover img { filter: grayscale(1); opacity: .5; transition: opacity .15s; }
-.album-card.is-disliked :is(.album-title, .album-artist, .album-reason) { opacity: .4; transition: opacity .15s; }
+.album-card.is-disliked .album-cover img { filter: grayscale(1); opacity: .5; transition: opacity var(--dr-menu-dur); }
+.album-card.is-disliked :is(.album-title, .album-artist, .album-reason) { opacity: .4; transition: opacity var(--dr-menu-dur); }
 .album-card.is-disliked:hover .album-cover img,
 .album-card.is-disliked:hover :is(.album-title, .album-artist, .album-reason) { opacity: .7; }
 .album-card.is-disliked .cover-play { display: none; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
 
 /* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
-.album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: var(--dr-icon-gap); }
+.album-actions { margin-top: auto; padding-top: 8px; font-size: var(--dr-font-base); color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: var(--dr-icon-gap); }
 .album-actions a { color: var(--accent); -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 .album-actions a:hover { text-decoration: underline; }
 .album-actions .action-dislike { margin-left: auto; } /* the "don't show" icon sits at the right edge of the card */
 
 /* ── Footer ───────────────────────────────────────────────────────────────────────────────────────────── */
-.page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); }
+.page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: var(--dr-font-s); color: var(--faint); }
 
 /* ── This page lives in an iframe inside the Bandcamp profile tab: transparent, as wide as the tab bar ───────────── */
 .recs-page, .recs-page body { background: transparent; overflow: hidden; padding-bottom: 0; }
 .recs-page .page { max-width: none; padding: 16px 0 24px; }  /* 16px between Bandcamp's tab bar line and the title */
-.recs-page .page-title { font-size: 18px; }
+.recs-page .page-title { font-size: var(--dr-font-title); }
 .recs-page .page-header { margin-bottom: 14px; }             /* 16px of padding below the subtitle stays */
 .recs-page .page-footer { margin-top: 20px; }
 
