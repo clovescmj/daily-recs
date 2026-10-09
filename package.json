@@ -1,6 +1,6 @@
 {
   "name": "bandcamp-daily-recs",
-  "version": "0.18.7",
+  "version": "0.18.8",
   "private": true,
   "description": "Chrome extension: fresh Bandcamp recommendations every day, based on your own collection.",
   "type": "module",

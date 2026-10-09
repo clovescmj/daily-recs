@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.8
+- Opening screen: the line under the options ("Perfect matches with your collection.") always has its line reserved, so it appearing no longer pushes the Start digging button down.
+  Opening the genre menu no longer scrolls the page to its search field.
+
 ## 0.18.7
 - About: "How it works" is shorter and says what you get (five lines); the separate "Listening" section is gone.
 

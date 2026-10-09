@@ -90,6 +90,6 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
     render,
     getSelected: () => [...selected].sort(),
     setSelected(keys) { selected = new Set(keys); $in('.tags-input').value = ''; render(); },
-    focus: () => $in('.tags-input').focus(),
+    focus: () => $in('.tags-input').focus({ preventScroll: true }), // (the menu opens under the button that was pressed: the page stays where it is)
   };
 }

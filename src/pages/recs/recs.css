@@ -99,7 +99,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .landing-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
 .landing-options { justify-content: center; }
-.landing-hint { max-width: 420px; min-height: 1.4em; margin: 14px auto 18px; font-size: var(--bc-font-size-100); color: var(--muted); }
+.landing-hint { max-width: 420px; min-height: var(--dr-line-s); margin: 14px auto 18px; font-size: var(--bc-font-size-100); line-height: var(--dr-line-s); color: var(--muted); } /* one line is always reserved: the text appearing does not push the button */
 .button--large { height: 40px; padding: 0 28px; font-size: var(--bc-font-size-200); justify-content: center; }
 
 /* ── Status (progress of a run) ─────────────────────────────────────────────────────────────────────────────────── */
