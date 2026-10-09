@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.4
+- The text of the primary button is bold, like the blue button of the profile.
+
 ## 0.18.3
 - The primary button (Start digging, Find music) is the blue button of the Bandcamp profile (`#309fc3`, like "Send message"), with a darker hover and pressed look; disabled
   stays grey. Its colours are tokens of their own (`--dr-profile-button*`). The hover and pressed colours are my estimate of the profile's, not read from it.

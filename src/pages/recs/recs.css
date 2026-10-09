@@ -55,7 +55,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 /* ── Controls ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 .button {
   display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: var(--bc-font-size-100); padding: 5px 12px;
-  border-radius: var(--bc-radius); cursor: pointer; border: 1px solid var(--dr-button-bg); background: var(--dr-button-bg); color: var(--dr-button-text);
+  border-radius: var(--bc-radius); cursor: pointer; border: 1px solid var(--dr-button-bg); background: var(--dr-button-bg); color: var(--dr-button-text); font-weight: var(--dr-weight-bold);
 }
 .button:hover:not(:disabled) { background: var(--dr-button-bg-hover); border-color: var(--dr-button-bg-hover); }
 .button:active:not(:disabled) { background: var(--dr-button-bg-active); border-color: var(--dr-button-bg-active); }
