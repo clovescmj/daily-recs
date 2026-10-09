@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.3
+- Adding a song to Liked Songs makes the list icon in the player bar bump up twice, softly (not with "reduce motion" on).
+
 ## 0.15.2
 - Loading: the placeholder cards fill whole rows of the grid (two rows, whatever the number of columns, and they follow the window if it
   is resized), they come in one after the other, and the shimmer is easier to see.
