@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.13
+- The icon of Best matches is the 18 px variant of Material's `target_check` (optical size 20, downloaded from Material Symbols), which keeps its lines firm at this size.
+
 ## 1.1.12
 - Icons inside buttons are 18 px (they were 16 px, which rendered a little rough): the list buttons, Play mode, the song while waiting and the arrow of the genre button.
   Icons on their own stay at 20 px. Token `--dr-icon-size-button`.
