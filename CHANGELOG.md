@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.7
+- About: "How it works" is shorter and says what you get (five lines); the separate "Listening" section is gone.
+
 ## 0.18.6
 - About page updated: Liked Songs and the + button, the ⊘ inside genre lists, a short "Listening" section (playback modes, the queue, the song while the list loads), and the
   privacy line says that the audio comes from Bandcamp's own servers.
