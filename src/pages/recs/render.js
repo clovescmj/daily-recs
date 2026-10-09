@@ -76,7 +76,7 @@ function renderGrid(state, status) {
       const card = findCard(id);
       if (!card) continue;
       paintWish(card, session.wished.has(id));
-      paintSave(card, hasSavedSong(id));
+      paintSave(card, session.savedAlbums.has(id));
       paintDislike(card, session.dislikedThisVisit.has(id));
     }
   }

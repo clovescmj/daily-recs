@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.8
+- Fix: the + of a card did nothing and never lit up (1.0.6 left a call to a removed helper in the cards' repaint, which stopped the save before it was written).
+  It now adds the whole album to Liked Songs, lights up, and takes it out on a second click, also when nothing is playing.
+
 ## 1.0.7
 - The Recommendations queue and Liked Songs lists now share one layout: the same header (title, count, close), rows with the cover, the title and a second line
   (artist, or artist and album for a song), the same icons and hover, and a footer. The queue groups its rows under "Played", "Playing now" and "Up next" (the playing
