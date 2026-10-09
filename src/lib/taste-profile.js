@@ -1,4 +1,6 @@
 import { isBandcampUrl, normalizeTag } from './bandcamp.js';
+import { isKnownGenre } from './genres.js';
+import { isPlace } from './places.js';
 import { hashSource } from './taste-sync.js';
 
 // What the user's library says about their taste: how much each of their albums counts, and a weighted profile of the
@@ -158,6 +160,8 @@ const NOT_GENRES = new Set([
   'various', 'variousartists', 'va', '7inch', '10inch', '12inch', 'flexi', 'reissue', 'remaster', 'remastered',
 ]);
 const MIN_ALBUMS = 2;              // a tag found on a single album of the user's isn't a genre of theirs
+const MIN_ALBUMS_UNLISTED = 4;     // a tag that is not a known genre (a scene, a club, a typo) must be much more common than that...
+const MIN_PRIMARY_UNLISTED = 0.4;  // ...and almost always among the first tags of the page
 const MIN_NAME_LENGTH = 4;         // shorter tags would "match" inside too many names
 const NAME_SHARE = 0.5;            // hide a tag when at least this share of its albums come from an account of that name
 const PRIMARY_POSITIONS = 3;       // genres come first on a page...
@@ -183,8 +187,10 @@ export function selectableTags(state) {
   }
   return knownTags(state, MIN_ALBUMS).filter(({ key }) => {
     const entry = stats[key];
-    return !NOT_GENRES.has(key) && !GENERIC_GENRES.has(key) && !/^(19|20)\d\d$/.test(key)
-      && entry.primary / entry.albums >= MIN_PRIMARY_SHARE
+    if (NOT_GENRES.has(key) || GENERIC_GENRES.has(key) || /^(19|20)\d\d$/.test(key) || !/^[\p{L}\p{N}&' +-]+$/u.test(key) || isPlace(key)) return false;
+    const listed = isKnownGenre(key);
+    return entry.albums >= (listed ? MIN_ALBUMS : MIN_ALBUMS_UNLISTED)
+      && entry.primary / entry.albums >= (listed ? MIN_PRIMARY_SHARE : MIN_PRIMARY_UNLISTED)
       && !(entry.named >= 2 && entry.named / entry.albums >= NAME_SHARE);
   });
 }

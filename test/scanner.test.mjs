@@ -129,9 +129,24 @@ describe('which tags are offered as genres', () => {
 
   test('a tag that is never among the first ones on a page is not treated as a genre', () => {
     const state = library([
-      ['https://a.bandcamp.com/album/1', 'A', 'noise', 'harsh', 'wall', 'power', 'sideproject'], ['https://b.bandcamp.com/album/2', 'B', 'noise', 'harsh', 'wall', 'power', 'sideproject'],
+      ['https://a.bandcamp.com/album/1', 'A', 'noise', 'drone', 'doom', 'punk', 'sideproject'], ['https://b.bandcamp.com/album/2', 'B', 'noise', 'drone', 'doom', 'punk', 'sideproject'],
     ]);
-    assert.deepEqual(offered(state).sort(), ['harsh', 'noise', 'wall']);
+    assert.deepEqual(offered(state).sort(), ['doom', 'drone', 'noise']);
+  });
+
+  test('junk is not offered: lists of hashtags, places, typos and names that only two albums share', () => {
+    const state = library([
+      ['https://a.bandcamp.com/album/1', 'A', 'ebm', 'punk#ebm#lofi#postpunk', 'tbilisi', 'khidi', 'othr'],
+      ['https://b.bandcamp.com/album/2', 'B', 'ebm', 'punk#ebm#lofi#postpunk', 'tbilisi', 'khidi', 'othr'],
+      ['https://c.bandcamp.com/album/3', 'C', 'ebm', 'punk#ebm#lofi#postpunk'],
+    ]);
+    assert.deepEqual(offered(state), ['ebm']);
+  });
+
+  test('a tag that is not a known genre is offered once it is clearly common in the library', () => {
+    const albums = ['1', '2', '3', '4'].map((n) => [`https://x${n}.bandcamp.com/album/${n}`, `X${n}`, 'witchy', 'ebm']);
+    assert.deepEqual(offered(library(albums)).sort(), ['ebm', 'witchy']);
+    assert.deepEqual(offered(library(albums.slice(0, 3))), ['ebm']);
   });
 
   test('a tag found on a single album is not offered, but stays in the taste profile', () => {

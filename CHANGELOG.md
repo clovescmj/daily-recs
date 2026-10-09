@@ -3,6 +3,15 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.11
+- Cleaner genres in the picker. Junk like "punk #ebm #lofi #post-punk", "tbilisi", "khidi" or "othr" no longer shows up:
+  - a tag where the artist wrote a list of #hashtags is read as the separate tags (punk, ebm, lofi, post-punk) instead of one odd tag;
+  - names of countries, regions and cities (about 400) are never genres, and are not even recorded when an album is read;
+  - a tag only counts as a genre when it is a known genre (a list of about 450) found on two of your albums; any other tag (a club, a scene, a typo, a label) has to be on
+    four albums and almost always among the first tags of the page;
+  - tags with odd characters are dropped.
+  Your albums are not read again: the filter works on what was already scanned.
+
 ## 0.18.10
 - The text of the primary buttons (Start digging, Find music) is centred vertically by its letters: it sat about 2 px low, because the box is centred by the line and the
   letters rest on the baseline. The boxes keep their size.

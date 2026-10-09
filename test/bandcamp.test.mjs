@@ -210,3 +210,9 @@ test('albums on a label domain are played from the embedded player page', () => 
   assert.deepEqual(tracks.map((t) => [t.title, t.featured]), [['one', false], ['two', true]]);
   assert.deepEqual(parseEmbeddedTracks('<html></html>'), []);
 });
+
+test('parseTags splits a list of hashtags into tags and drops the names of places', () => {
+  const tag = (text) => `<a class="tag" href="https://bandcamp.com/discover/x">${text}</a>`;
+  assert.deepEqual(parseTagsFromPage(tag('punk #ebm #lofi #post-punk')), ['punk', 'ebm', 'lofi', 'postpunk']);
+  assert.deepEqual(parseTagsFromPage(['tbilisi', 'brazil', 'berlin', 'ebm'].map(tag).join('')), ['ebm']);
+});
