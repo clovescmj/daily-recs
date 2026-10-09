@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.13
+- The queue and Liked Songs panels sit against the bar again (they keep the new border, corners and shadow).
+
 ## 0.15.12
 - The queue and Liked Songs panels have the same border, corners, shadow and distance from the bar as the Playback and genre menus.
 
