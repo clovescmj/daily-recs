@@ -59,8 +59,8 @@
       </div>
       <div class="col col-4-15 controls-extra">
         <div class="dr-segment pb-seg" role="radiogroup" aria-label="Play mode">
-          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="album" title="Play mode: Full album (albums in order, every song)" aria-label="Play mode: Full album (albums in order, every song)">${MODE_ICON.album}</a>
-          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="shuffle" title="Play mode: Shuffle (one song from each album, in random order)" aria-label="Play mode: Shuffle (one song from each album, in random order)">${MODE_ICON.shuffle}</a>
+          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="album" title="Play mode&#10;Full album: albums in order, every song" aria-label="Play mode: Full album, albums in order, every song">${MODE_ICON.album}</a>
+          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="shuffle" title="Play mode&#10;Shuffle: one song from each album, in random order" aria-label="Play mode: Shuffle, one song from each album, in random order">${MODE_ICON.shuffle}</a>
         </div>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Recommendations queue" aria-label="Recommendations queue">${svg(P.queue, 'x-icon', '', 'Recommendations queue')}</a>

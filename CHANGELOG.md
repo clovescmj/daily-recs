@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.18
+- The tooltips of the Play mode buttons have two lines: "Play mode", then the text of the mode ("Full album: albums in order, every song" or "Shuffle: one song from each album, in random order").
+
 ## 1.1.17
 - Opening the queue scrolls it to the album that is playing: its "Playing now" heading goes to the top of the list. With nothing playing, the list starts at the top.
 
