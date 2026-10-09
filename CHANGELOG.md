@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.10
+- The bump of the Liked Songs icon is bigger (10 px and 5 px, with a little zoom) and the icon turns the accent blue while it jumps.
+
 ## 0.15.9
 - The dot after the heart in the player bar is gone: the heart, the + and the ⊘ are evenly spaced (12 px).
 

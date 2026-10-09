@@ -127,8 +127,9 @@
 /* Slide transition when the bar appears / disappears (tab switch) */
 #dr-player { transition: transform .3s ease .12s, visibility 0s linear 0s; }
 #dr-player.is-offscreen { transform: translateY(100%); visibility: hidden; transition: transform .3s ease, visibility 0s linear .3s; }
-@keyframes dr-bump { 0%, 40%, 80%, 100% { transform: translateY(0); } 20% { transform: translateY(-6px); } 60% { transform: translateY(-3px); } }
-#dr-player .x-icon.bump { animation: dr-bump .6s ease-out; }
+@keyframes dr-bump { 0%, 45%, 85%, 100% { transform: translateY(0) scale(1); } 20% { transform: translateY(-10px) scale(1.25); } 65% { transform: translateY(-5px) scale(1.12); } }
+@keyframes dr-bump-color { 0%, 100% { fill: #333; } 20%, 65% { fill: rgb(0,161,198); } } /* the icon lights up in the accent blue while it jumps */
+#dr-player .x-icon.bump { animation: dr-bump .7s ease-out, dr-bump-color .7s ease-out; }
 @media (prefers-reduced-motion: reduce) { #dr-player .x-icon.bump { animation: none; } }
 @media (prefers-reduced-motion: reduce) { #dr-player, #dr-player.is-offscreen { transition: none; } }
 #dr-player .queue .empty { display: block; cursor: default; color: #777; white-space: normal; }
