@@ -54,7 +54,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* ── Controls ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 .button {
-  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: var(--bc-font-size-100); padding: 5px 12px;
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: var(--bc-font-size-100); padding: 4px 12px 6px; /* a little more room below: the letters sit on the baseline, so they look centred */
   border-radius: var(--bc-radius); cursor: pointer; border: 1px solid var(--dr-button-bg); background: var(--dr-button-bg); color: var(--dr-button-text); font-weight: var(--dr-weight-bold);
 }
 .button:hover:not(:disabled) { background: var(--dr-button-bg-hover); border-color: var(--dr-button-bg-hover); }
@@ -100,7 +100,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
 .landing-options { justify-content: center; }
 .landing-hint { max-width: 420px; min-height: var(--dr-line-s); margin: 14px auto 18px; font-size: var(--bc-font-size-100); line-height: var(--dr-line-s); color: var(--muted); } /* one line is always reserved: the text appearing does not push the button */
-.button--large { height: 40px; padding: 0 28px; font-size: var(--bc-font-size-200); justify-content: center; }
+.button--large { height: 40px; padding: 0 28px 2px; font-size: var(--bc-font-size-200); justify-content: center; }
 
 /* ── Status (progress of a run) ─────────────────────────────────────────────────────────────────────────────────── */
 .status-box { background: var(--soft); border: 1px solid var(--line); padding: 14px 16px; margin-bottom: 20px; }

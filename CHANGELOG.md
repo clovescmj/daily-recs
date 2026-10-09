@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.10
+- The text of the primary buttons (Start digging, Find music) is centred vertically by its letters: it sat about 2 px low, because the box is centred by the line and the
+  letters rest on the baseline. The boxes keep their size.
+
 ## 0.18.9
 - Liked Songs has an empty state: the list icon, "No liked songs yet" and "Tap the + on an album or in the player to save songs here.", with the same + icon
   as the cards (the grey one, before it turns green). It also shows from the start; before, the empty panel was blank until a song was added and removed.
