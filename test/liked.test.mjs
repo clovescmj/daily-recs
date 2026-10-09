@@ -26,6 +26,17 @@ describe('the Liked Songs list', () => {
     assert.deepEqual(list.map((s) => `${s.id}:${s.i}`), ['1:0']);
   });
 
+  test('only a whole album is marked, and taking one song out clears the mark', () => {
+    let list = withSongs([], [song('1', 0)], true);
+    assert.ok(!list.some((s) => s.all), 'a single song does not mark its album');
+    list = withSongs(list, [{ ...song('2', 0), all: true }, { ...song('2', 1), all: true }], true);
+    assert.deepEqual(list.filter((s) => s.all).map((s) => s.id), ['2', '2']);
+    list = withSongs(list, [song('2', 0)], true);
+    assert.equal(list.filter((s) => s.all).length, 2, 'adding a song again keeps the mark');
+    list = withSongs(list, [song('2', 1)], false);
+    assert.ok(!list.some((s) => s.all), 'the album is no longer whole');
+  });
+
   test('a change is written at once under its own key', async () => {
     const area = fakeArea();
     await changeLiked(area, [song('7', 2)], true);

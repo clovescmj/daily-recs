@@ -44,17 +44,19 @@ export async function setSave({ id, i, title }, on) {
 }
 
 async function setSongs(songs, on, message) {
-  for (const { id, i } of songs) { if (on) session.saved.add(`${id}:${i}`); else session.saved.delete(`${id}:${i}`); }
+  for (const { id, i, all } of songs) {
+    if (on) { session.saved.add(`${id}:${i}`); if (all) session.savedAlbums.add(id); } else { session.saved.delete(`${id}:${i}`); session.savedAlbums.delete(id); }
+  }
   emit(true);
   toast(message);
-  await updateLiked(songs.map(({ id, i, title }) => ({ id, i, title: String(title || '').slice(0, 200) })), on); // saved for good before anything else
+  await updateLiked(songs.map(({ id, i, title, all }) => ({ id, i, title: String(title || '').slice(0, 200), ...(all ? { all: true } : {}) })), on); // saved for good before anything else
   for (const { id, i, title } of songs) await send({ type: MSG.FEEDBACK, id, kind: on ? 'save' : 'unsave', index: i, track: String(title || '').slice(0, 200) });
 }
 
-/** The + of a card: adds all the songs of the album to Liked Songs, or, when a song of it is already there, takes the album out. */
+/** The + of a card: adds all the songs of the album to Liked Songs, or, when the album was added whole, takes its songs out. */
 export async function saveAlbumSong(id) {
-  const keys = [...session.saved].filter((key) => key.startsWith(`${id}:`));
-  if (keys.length) { // already in: take the album's songs out
+  if (session.savedAlbums.has(id)) { // already in: take the album's songs out
+    const keys = [...session.saved].filter((key) => key.startsWith(`${id}:`));
     const saved = ((await loadState()) || {}).saved || [];
     const songs = keys.map((key) => Number(key.split(':')[1])).map((i) => ({ id, i, title: (saved.find((item) => item.id === id && item.i === i) || {}).title }));
     await setSongs(songs, false, 'Removed album from Liked Songs');
@@ -62,7 +64,7 @@ export async function saveAlbumSong(id) {
   }
   const songs = await albumSongs(id).catch(() => []);
   if (!songs.length) { toast("Couldn't read this album's songs. Try again."); return; }
-  await setSongs(songs, true, 'Added album to Liked Songs');
+  await setSongs(songs.map((song) => ({ ...song, all: true })), true, 'Added album to Liked Songs');
 }
 
 export async function dislikeAlbum(id) {

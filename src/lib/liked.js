@@ -12,12 +12,18 @@ export async function loadLiked(area) {
   return Array.isArray(stored) ? stored : null;
 }
 
-/** The list with `songs` added (or taken out): a song is one album and one track number, and it is never there twice. */
+/**
+ * The list with `songs` added (or taken out): a song is one album and one track number, and it is never there twice.
+ * `all: true` marks a song that came in with its whole album (the + of a card); taking any song of an album out clears that mark
+ * from the rest of it, so a card only shows an album as added while it was added whole.
+ */
 export function withSongs(list, songs, on) {
   let result = list;
-  for (const { id, i, title } of songs) {
+  for (const { id, i, title, all } of songs) {
+    const before = result.find((entry) => entry.id === id && entry.i === i);
     result = result.filter((entry) => !(entry.id === id && entry.i === i));
-    if (on) result.push({ id, i, title });
+    if (on) result.push(all || (before && before.all) ? { id, i, title, all: true } : { id, i, title });
+    else result = result.map((entry) => (entry.id === id && entry.all ? { id: entry.id, i: entry.i, title: entry.title } : entry));
   }
   return result;
 }

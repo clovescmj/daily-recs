@@ -17,6 +17,8 @@ export const session = {
   dislikedThisVisit: new Set(),
   /** Tracks in the Liked list, as "albumId:trackNumber" (the + of the player bar). */
   saved: new Set(),
+  /** Albums that were added whole to Liked Songs (the + of a card): only these show as added on their card. */
+  savedAlbums: new Set(),
   /** Albums the user put in the wishlist from here (the heart). */
   wished: new Set(),
   /** True when a list for today exists, which is when the player bar is shown even if nothing is playing. */

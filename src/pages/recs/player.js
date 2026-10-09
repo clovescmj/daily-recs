@@ -302,8 +302,8 @@ export function markPlaying() {
 
 // ── Bar state ───────────────────────────────────────────────────────────────────────────────────────────────────
 
-/** True when a song of the album is in Liked Songs. */
-const hasSavedSong = (id) => [...session.saved].some((key) => key.startsWith(`${id}:`));
+/** True when the album was added whole to Liked Songs (a single song of it does not count). */
+const hasSavedSong = (id) => session.savedAlbums.has(id);
 
 function queueItems() {
   const ids = visibleCardIds();

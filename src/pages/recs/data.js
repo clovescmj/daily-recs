@@ -11,6 +11,7 @@ export async function loadState() {
 }
 
 /** Adds or removes songs of the Liked Songs and writes them at once: it does not wait for the service worker, which may be busy with a run. */
+/** `songs`: { id, i, title, all? } (see withSongs). */
 export const updateLiked = (songs, on) => changeLiked(chrome.storage.local, songs, on, async () => ((await loadState()) || {}).saved || []);
 
 export async function loadStatus() {

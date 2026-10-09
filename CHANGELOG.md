@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.6
+- A card only shows its album as added to Liked Songs when the whole album was added with the + of the card. Saving a single song from the player no longer ticks the
+  album. Each song added with its album carries a mark (`all`) that is cleared as soon as you take one of its songs out. Albums added before this version show as not added
+  until you add them again.
+
 ## 1.0.5
 - Player bar: the play button, the title with its progress bar, and the previous / next arrows are now centred on the cover (the play button was 3 px high, and the
   progress block 1 px low). The buttons on the right (Playback, queue, Liked Songs, volume) sit on the same centre; the arrows stay on the line of the progress bar.

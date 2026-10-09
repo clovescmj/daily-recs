@@ -43,9 +43,6 @@ export function listFor(state, view, keys = []) {
   return isFromToday(list) ? list : null;
 }
 
-/** True when a song of the album is in Liked Songs. */
-const hasSavedSong = (id) => [...session.saved].some((key) => key.startsWith(`${id}:`));
-
 /** The list on screen. */
 export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' || session.fresh ? null : listFor(state, 'best'));
 
@@ -60,6 +57,7 @@ function renderGrid(state, status) {
   session.hasList = Boolean(list) && list.ids.some((id) => !hiddenIn(state, id, list));
   session.wished = new Set(state ? state.wishlisted || [] : []);
   session.saved = new Set((state ? state.saved || [] : []).map((entry) => `${entry.id}:${entry.i}`)); // the Liked list: tracks
+  session.savedAlbums = new Set((state ? state.saved || [] : []).filter((entry) => entry.all).map((entry) => entry.id));
 
   if (list) session.fresh = false;
   if (!list && (status.running || session.pending) && !session.landing) { setSkeleton(); return; } // a list was asked for: its placeholders, not a message
@@ -70,7 +68,7 @@ function renderGrid(state, status) {
   const key = ids.join(',');
   if (key !== renderedKey) {
     $('album-grid').innerHTML = ids.map((id) => cardHtml(state.pool[id], {
-      wished: session.wished.has(id), saved: hasSavedSong(id), disliked: session.dislikedThisVisit.has(id),
+      wished: session.wished.has(id), saved: session.savedAlbums.has(id), disliked: session.dislikedThisVisit.has(id),
     })).join('');
     renderedKey = key;
   } else {
