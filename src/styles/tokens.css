@@ -5,6 +5,7 @@
 :root, #dr-player {
   /* palette (Bandcamp's greys) */
   --dr-white: #fff;
+  --dr-black: #000;
   --dr-gray-100: #f8f8f8;
   --dr-gray-200: #e6e6e6;
   --dr-gray-300: #aaa;
@@ -120,4 +121,5 @@
   --dr-loop-eq: 1s;                        /* loops of the loading */
   --dr-loop-shimmer: 1.3s;
   --dr-loop-bar: 1.4s;
+  --dr-loop-spinner: .63s;                 /* the player's spinner: nine steps of 70 ms */
 }

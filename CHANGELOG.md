@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.15
+- The icons that are used in the player bar are SVG now, not images: the previous and next arrows and the spinner of the song that is loading. The spinner is one
+  drawing that turns in nine steps (like the nine pictures it replaces), so it is sharp at any zoom, uses the tokens, and stops when the system asks for less motion.
+  The two image files are gone, and the page of the extension no longer has to be told which images to load from the Bandcamp page. The About logo stays a PNG.
+
 ## 0.18.14
 - Our own drawings, looking the same: the previous / next sprite and the loading spinner of the player bar are redrawn from their shapes (measured to match: the
   difference is about 1 in 255 per pixel), and the check mark of the Liked Songs circle, the check of the Playback menu and the record-box icon of the full-album mode are

@@ -176,8 +176,6 @@
   function ensureBar() {
     if (state.bar) return state.bar;
     state.bar = BCPlayer.create({
-      spriteUrl: chrome.runtime.getURL('src/assets/nextprev.png'),
-      busyUrl: chrome.runtime.getURL('src/assets/playerbusy.gif'),
       onCmd: sendCommand,
     });
     document.body.appendChild(state.bar.el);

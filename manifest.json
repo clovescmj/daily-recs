@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Daily Recs for Bandcamp",
-  "version": "0.18.14",
+  "version": "0.18.15",
   "description": "Fresh Bandcamp recommendations every day, based on your own collection. Never shows what you already own.",
   "minimum_chrome_version": "109",
   "icons": {
@@ -61,8 +61,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "src/pages/recs/recs.html",
-        "src/assets/*"
+        "src/pages/recs/recs.html"
       ],
       "matches": [
         "https://bandcamp.com/*"

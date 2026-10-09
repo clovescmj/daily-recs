@@ -31,13 +31,11 @@
   const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}`).join(',');
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
-  function create({ spriteUrl, busyUrl, onCmd }) {
+  function create({ onCmd }) {
     const el = document.createElement('div');
     el.id = 'dr-player';
     el.hidden = true;
     el.classList.add('is-offscreen');
-    el.style.setProperty('--dr-sprite', `url(${spriteUrl})`);
-    el.style.setProperty('--dr-busy', `url(${busyUrl})`);
     el.innerHTML = `<div class="carousel-player-inner">
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
@@ -45,7 +43,7 @@
           <div class="collect"><a class="dr-act dr-act--wish wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="dr-act dr-act--save save" href="#" title="Add to Liked Songs" aria-label="Add to Liked Songs">${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')}</a><a class="dr-act dr-act--dislike dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
-        <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>
+        <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"><svg viewBox="0 0 46 44" aria-hidden="true" focusable="false"><g><circle cx="14.59" cy="13.56" r="3.42"/><circle cx="23.03" cy="10.06" r="3.42" fill-opacity="0.47"/><circle cx="31.47" cy="13.56" r="3.42" fill-opacity="0.47"/><circle cx="34.97" cy="22.00" r="3.42" fill-opacity="0.68"/><circle cx="31.47" cy="30.44" r="3.42" fill-opacity="0.68"/><circle cx="23.03" cy="33.94" r="3.42" fill-opacity="0.87"/><circle cx="14.59" cy="30.44" r="3.42" fill-opacity="0.87"/><circle cx="11.09" cy="22.00" r="3.42"/></g></svg></div></div>
         <div class="info-progress">
           <div class="info">
             <div class="title"><a class="no-queue"><span class="trk-no"></span><span class="trk"></span></a></div>
@@ -54,7 +52,7 @@
           <div class="progress-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress"></div><div class="buffer"></div><div class="progress-bg"></div>
             <div class="seek-control-outer"><div class="seek-control"></div></div></div>
         </div>
-        <div class="transport"><div class="prev"><div class="icon prev-icon" role="button" tabindex="0" aria-label="Previous track" title="Previous track"></div></div><div class="next"><div class="icon next-icon" role="button" tabindex="0" aria-label="Next track" title="Next track"></div></div></div>
+        <div class="transport"><div class="prev"><div class="icon prev-icon" role="button" tabindex="0" aria-label="Previous track" title="Previous track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M4 2h4v20H4zM8 12 24 2v20zM22 12 38 2v20z"/></svg></div></div><div class="next"><div class="icon next-icon" role="button" tabindex="0" aria-label="Next track" title="Next track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M34 2h4v20h-4zM4 2l16 10L4 22zM18 2l16 10L18 22z"/></svg></div></div></div>
       </div>
       <div class="col col-4-15 controls-extra">
         <div class="pb-wrap">
@@ -121,8 +119,8 @@
       if (d !== undefined && lastState) { e.preventDefault(); onCmd('vol', Math.max(0, Math.min(1, (lastState.vol || 0) + d))); }
     });
     q('.playpause').addEventListener('click', () => onCmd('toggle'));
-    q('.prev-icon').addEventListener('click', (e) => { if (!e.target.classList.contains('disabled')) onCmd('prev'); });
-    q('.next-icon').addEventListener('click', (e) => { if (!e.target.classList.contains('disabled')) onCmd('next'); });
+    q('.prev-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('prev'); });
+    q('.next-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('next'); });
     // Playback: a button that opens a short list (it opens upwards, the bar is at the foot of the page)
     let closePanels = () => {};
     const setPlaybackMenu = (on) => { q('.pb-menu').hidden = !on; q('.pb-btn').classList.toggle('open', on); q('.pb-btn').setAttribute('aria-expanded', String(on)); };

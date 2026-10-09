@@ -44,7 +44,7 @@ src/
   pages/
     recs/                the recommendations page (ES modules, one concern per file; main.js wires them)
     about/, shared/
-  assets/                player sprite and busy animation (our own drawings)
+  assets/                the logo of the About page (the player icons are inline SVG)
 test/                    node:test suites with an offline fake Bandcamp
 CHANGELOG.md, PRIVACY.md  history by version, and the privacy policy the store links to
 ```

@@ -47,12 +47,13 @@
   border-left: 15px solid var(--dr-text); display: inline-block; cursor: pointer; margin-left: 2px; }
 #dr-player .playpause .pause { border: 0; border-left: 5px solid var(--dr-glyph); border-right: 5px solid var(--dr-glyph); height: 18px;
   width: 4px; margin-right: 2px; margin-left: 1px; }
-#dr-player .playpause .busy { background-image: var(--dr-busy); background-position: 50% 50%; background-repeat: no-repeat;
-  border: none; height: 33px; margin: 4px auto; width: 37px; overflow: visible; position: absolute; top: 0; left: 1px; background-size: contain; }
-#dr-player .transport .icon { width: 20px; height: 12px; background: var(--dr-sprite) 0 0 / 40px 12px no-repeat transparent;
-  margin: 0 0 1px; cursor: pointer; opacity: 0.5; }
+#dr-player .playpause .busy { border: none; height: 33px; margin: 4px auto; width: 37px; overflow: visible; position: absolute; top: 0; left: 1px; }
+#dr-player .busy svg { display: block; width: 100%; height: 100%; fill: var(--dr-black); }
+#dr-player .busy g { transform-origin: 23.03px 22px; animation: dr-spin var(--dr-loop-spinner) steps(9) infinite; } /* the ring turns 40 degrees at each step */
+@keyframes dr-spin { to { transform: rotate(360deg); } }
+#dr-player .transport .icon { width: 20px; height: 12px; margin: 0 0 1px; cursor: pointer; opacity: 0.5; }
+#dr-player .transport .icon svg { display: block; width: 20px; height: 12px; fill: var(--dr-black); }
 #dr-player .transport .icon:hover { opacity: 1; }
-#dr-player .transport .icon.next-icon { background-position: 100% 0; }
 #dr-player .transport .icon.disabled { opacity: 0.1; cursor: default; }
 
 /* "♡ wishlist · go to album", same place and style as Bandcamp's player (below the artist) */
@@ -118,7 +119,7 @@
 #dr-player.is-offscreen { transform: translateY(100%); visibility: hidden; transition: transform .3s ease, visibility 0s linear .3s; }
 @keyframes dr-bump { 0% { transform: none; } 15% { transform: translateY(-8px) rotate(-14deg); } 35% { transform: translateY(-8px) rotate(12deg); } 55% { transform: translateY(-4px) rotate(-8deg); } 75% { transform: rotate(4deg); } 100% { transform: none; } } /* jumps and wobbles, like a bell */
 #dr-player .x-icon.bump { animation: dr-bump var(--dr-dur-bump) ease-out; transform-origin: 50% 100%; }
-@media (prefers-reduced-motion: reduce) { #dr-player .x-icon.bump { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #dr-player .x-icon.bump, #dr-player .busy g { animation: none; } }
 @media (prefers-reduced-motion: reduce) { #dr-player, #dr-player.is-offscreen { transition: none; } }
 #dr-player .queue .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 0 40px 40px; text-align: center; cursor: default; color: var(--dr-text-muted); white-space: normal; font-size: var(--dr-font-s); line-height: 1.5; }
 #dr-player .queue .empty .empty-icon { width: 48px; height: 48px; margin-bottom: 12px; fill: var(--dr-icon); }
