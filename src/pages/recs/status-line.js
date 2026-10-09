@@ -37,9 +37,9 @@ export function progressParts(status) {
 /** Five bars that dance (an equalizer): CSS does the dancing, and stops it for people who asked for less motion. */
 const EQUALIZER = '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>';
 
-// Material's play_arrow and pause
-const WAIT_PLAY = '<svg class="wait-play" viewBox="0 -960 960 960" aria-hidden="true"><path d="M320-200v-560l440 280-440 280Z"/></svg>';
-const WAIT_PAUSE = '<svg class="wait-pause" viewBox="0 -960 960 960" aria-hidden="true"><path d="M520-200v-560h240v560H520Zm-320 0v-560h240v560H200Z"/></svg>';
+// Material's play_arrow and pause (18 px optical size)
+const WAIT_PLAY = '<svg class="wait-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 19.333v-14.667l11.333 7.333 -11.333 7.333Z"/></svg>';
+const WAIT_PAUSE = '<svg class="wait-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.333 19v-14h4.667v14H14.333Zm-9.333 0v-14h4.667v14H5Z"/></svg>';
 const WAIT_IDLE = 'Play a song while waiting';
 
 /** The right side of the loading box: a song of the collection to listen to while the list is built. */
