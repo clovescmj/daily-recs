@@ -3,6 +3,15 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.0
+First stable version. What it does:
+- A **daily recs** tab on your own Bandcamp profile with a fresh list of albums every day, picked from what you own and save, never repeating and never showing what you
+  already have. Three lists: **My tags** (explore new music by genre), **Best matches** (perfect matches with your collection) and **Surprise me** (go beyond your collection).
+- **Heart** (Bandcamp wishlist, the only thing that touches your account), **+** (Liked Songs, kept in your browser) and **⊘** (don't show music like this).
+- A player bar in Bandcamp's style: one song per album or full albums, queue, Liked Songs, and a random song of your collection while a list is being built.
+- One design system for the page, the bar and the tab (`src/styles`), with Bandcamp's own values, and our own drawings for every icon and animation.
+- Private by design: everything runs in your browser and only talks to Bandcamp.
+
 ## 0.18.16
 - From the opening screen to the loading: "Start digging" fades the opening screen out (0.3 s) and then fades the list in (its header, the progress and the placeholders, 0.3 s),
   instead of swapping at once. With "reduce motion" on, it still swaps at once.
