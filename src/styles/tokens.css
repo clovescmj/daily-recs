@@ -38,7 +38,8 @@
   --dr-scrim: var(--dr-ink-50);            /* dark veil over a cover */
 
   /* meaning */
-  --dr-accent: var(--dr-blue400);          /* links, checks, the progress of the loading */
+  --dr-profile-blue: #00a1c6;              /* the link blue of the fan profile (its tabs and links), the page we live in: not one of the design-system tokens */
+  --dr-accent: var(--dr-profile-blue);     /* links, checks, the progress of the loading: the same blue as the tabs */
   --dr-accent-dark: var(--dr-blue500);
   --dr-success: var(--dr-green500);        /* a song of it is in Liked Songs */
   --dr-danger: var(--dr-red500);           /* don't show music like this */

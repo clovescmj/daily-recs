@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.2
+- The accent blue is the blue of the profile's own tabs again (`#00a1c6`), now a token of its own (`--dr-profile-blue`), since the profile uses it and Bandcamp's design system
+  does not have it. Links, checks and the progress of the loading use it, so they match the tab bar next to them.
+
 ## 0.18.1
 - The token values are now Bandcamp's own, read from bandcamp.com (the names stay ours). Visible changes: the accent blue is Bandcamp's blue (`#0cacd7`), "don't show"
   is Bandcamp's red (`#e50a0a`), the heart in the wishlist is Bandcamp's orange (`#e65225`), resting icons are `#949494`, the primary button (Start digging, Find music)
