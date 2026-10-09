@@ -7,11 +7,13 @@ Daily Recs for Bandcamp is an independent extension. It is not made, endorsed or
 ## What it does with your data
 - It uses the Bandcamp session you are already signed in with to read **your collection and wishlist** and the "you may also like" section and genre tags of album pages on `bandcamp.com`. It never sees or stores your password.
 - It stores, **on your computer** (`chrome.storage.local`): a snapshot of your library (titles, artists and links), the recommendations it found, and a profile of the genre tags of your albums.
+- It stores your **Liked Songs** (the songs you save with the + button: the song and album titles and the album link) on your computer too, in `chrome.storage.local`. They are never synced or sent anywhere.
 - It stores the **albums you hide** in `chrome.storage.sync`, which Chrome syncs through your own Google account, so they follow you to your other computers. This is controlled by your Chrome sync settings.
+- To play music it loads the audio and the cover images straight from Bandcamp's own servers (`bandcamp.com` and `bcbits.com`, the network Bandcamp uses for its media), the same way Bandcamp's own pages do. The "song while waiting" is a random song of your own collection, read from the page of one of your albums, and only starts when you press play.
 - It adds or removes an album from your Bandcamp wishlist **only when you click** the heart. Hiding an album never changes your Bandcamp account.
 
 ## What it does not do
-- It does not send your data to the developer or to any server other than `bandcamp.com`.
+- It does not send your data to the developer or to any server other than Bandcamp's (`bandcamp.com` and its media servers).
 - It does not use analytics, advertising or trackers.
 - It does not sell or share data with anyone.
 - It does not load or run remote code.

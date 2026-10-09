@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.14
+- Our own drawings, looking the same: the previous / next sprite and the loading spinner of the player bar are redrawn from their shapes (measured to match: the
+  difference is about 1 in 255 per pixel), and the check mark of the Liked Songs circle, the check of the Playback menu and the record-box icon of the full-album mode are
+  now simple shapes of ours. Nothing is copied from Bandcamp's files any more (the layout and style of the bar still follow Bandcamp's).
+- Docs: the privacy policy now mentions Liked Songs, the audio and covers that come from Bandcamp's media servers, and the song while waiting; the store listing and the README
+  describe the current features; the store has its first screenshot (`store/images/screenshot-1-1280x800.png`).
+
 ## 0.18.13
 - Wording: "Click" instead of "Tap" in the empty Liked Songs and in the About page (it is a desktop extension).
 

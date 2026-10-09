@@ -7,17 +7,16 @@
     heart: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
     heartOn: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
     addCircle: 'M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
-    checkCircle: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM10.25 17.13L6.38 12.72 7.73 11.55l2.52 2.79 6.03-6.84 1.35 1.17z',
+    checkCircle: 'M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20zM7.668 11.497 10.242 14.348 16.275 7.505 17.625 8.695 10.258 17.052 6.332 12.703z',
     block: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z',
     queue: 'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // Icons of the two ways to play (each one centred in its own box and of a similar size): a music note (one song per album), and Bandcamp's collection icon (the record box of the "next album"
-  // button) turned 90° to the right (whole albums).
+  // Icons of the two ways to play (each one centred in its own box and of a similar size): a music note (one song per album), and a record box (our own drawing) turned 90° to the right (whole albums).
   const MODE_ICON = {
     one: `<svg class="pb-ico" viewBox="4 2 14 20" aria-hidden="true" focusable="false"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`,
-    album: `<svg class="pb-ico" viewBox="2.67 5.15 19.5 19.5" aria-hidden="true" focusable="false"><g transform="rotate(90 12.42 14.9)"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.657 8.31c0-.7.567-1.269 1.268-1.269H18.91c.7 0 1.268.568 1.268 1.269v13.187c0 .7-.567 1.268-1.268 1.268H5.925c-.7 0-1.268-.568-1.268-1.268zm1.521.253v12.68h12.479V8.563z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12.418 13.33c-.823 0-1.529.683-1.529 1.573s.706 1.573 1.529 1.573c.822 0 1.528-.682 1.528-1.573s-.706-1.573-1.528-1.573m-4.694 1.573c0-2.595 2.08-4.738 4.694-4.738s4.694 2.143 4.694 4.738-2.08 4.74-4.694 4.74-4.694-2.144-4.694-4.74"/></g></svg>`,
+    album: `<svg class="pb-ico" viewBox="2.67 5.15 19.5 19.5" aria-hidden="true" focusable="false"><g transform="rotate(90 12.42 14.9)"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.925 7.041H18.91a1.268 1.268 0 0 1 1.268 1.268V21.497a1.268 1.268 0 0 1-1.268 1.268H5.925a1.268 1.268 0 0 1-1.268-1.268V8.309a1.268 1.268 0 0 1 1.268-1.268zM6.178 8.563H18.657V21.243H6.178zM7.724 14.903a4.694 4.739 0 1 1 9.388 0 4.694 4.739 0 1 1-9.388 0zM10.889 14.903a1.529 1.573 0 1 1 3.057 0 1.529 1.573 0 1 1-3.057 0z"/></g></svg>`,
   };
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
   const LIKED_ICON = `<svg class="x-icon" viewBox="0 -960 960 960" role="img" aria-label="Liked songs"><title>Liked songs</title><path d="M500-360q42 0 71-29t29-71v-220h120v-80H560v220q-13-10-28-15t-32-5q-42 0-71 29t-29 71q0 42 29 71t71 29ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z"/></svg>`;
@@ -62,7 +61,7 @@
           <a href="#" class="x-btn dr-select pb-btn" role="button" aria-haspopup="true" aria-expanded="false" title="Playback" aria-label="Playback"><span class="pb-slot">${MODE_ICON.one}</span><span class="pb-label">One per album</span><svg class="pb-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
           <div class="dr-menu dr-menu--up pb-menu" role="menu" aria-label="Playback" hidden>
             <div class="dr-menu-head pb-head"><b>Playback</b><span>Choose what plays from each album.</span></div>
-            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.one}One song per album</a>
+            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.939 14.498 7.468 19.593 20.03 7.03 18.97 5.97 7.532 17.407 4.061 13.502z"/></svg></span>${MODE_ICON.one}One song per album</a>
             <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.album}Full album</a>
           </div>
         </div>

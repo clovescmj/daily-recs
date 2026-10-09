@@ -14,10 +14,11 @@ A Chrome extension that adds a **daily recs** tab to your Bandcamp profile: a fr
 - Starts from what you own and what you've saved on Bandcamp.
 - Finds albums that fans of those records love, and keeps the ones that fit your taste.
 - Shows only what's new to you: nothing you own, nothing repeated.
-- The **heart** adds an album to your Bandcamp wishlist. The **⊘** says "don't show music like this": that album, its artist and the albums Bandcamp pairs with it stop coming.
+- The **heart** adds an album to your Bandcamp wishlist, the **+** saves songs to Liked Songs (kept in your browser), and the **⊘** says "don't show music like this": that album, its artist and the albums Bandcamp pairs with it stop coming.
 - **My tags:** explore new music by genre.
 - **Best matches:** perfect matches with your collection.
 - **Surprise me:** go beyond your collection.
+- A player bar in Bandcamp's style (one song per album or full albums, queue, Liked Songs), and a random song from your collection while a list is being built.
 
 ## Project layout
 ```
@@ -32,16 +33,18 @@ src/
     ranking.js           scoring, one-per-artist picking, surprise mode
     recommender.js       refresh / feedback use cases (store + fetch injected)
     taste-sync.js        hidden albums <-> chrome.storage.sync (chunked, last-write-wins)
+    taste-profile.js     genres of the user's albums and which ones are offered (genres.js: known genres, places.js: places that are never genres)
     state.js, messages.js, storage-keys.js, config.js
   background/            service worker (registers every listener synchronously at top level)
     service-worker.js    entry point
     jobs.js, messages.js, storage.js, navigation.js, menu.js, wishlist-in-page.js
   content/               tab injected into the user's own Bandcamp profile
   player/                Bandcamp-style player bar (classic script + CSS)
+  styles/                design tokens (tokens.css) and shared components (components.css), used by the page, the player bar and the tab
   pages/
     recs/                the recommendations page (ES modules, one concern per file; main.js wires them)
     about/, shared/
-  assets/                player sprite and busy animation
+  assets/                player sprite and busy animation (our own drawings)
 test/                    node:test suites with an offline fake Bandcamp
 CHANGELOG.md, PRIVACY.md  history by version, and the privacy policy the store links to
 ```
