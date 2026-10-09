@@ -100,8 +100,8 @@
 
 /* queue ("now playing albums"): Bandcamp's .queue rules, opening upwards from the bar */
 #dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: #FFF;
-  display: none; border: 1px solid rgb(34 34 34 / 32%); box-shadow: 0 4px 16px rgb(34 34 34 / 16%); border-radius: 4px; box-sizing: border-box; } /* same border, corners and shadow as the other menus; it stays against the bar */
-#dr-player .queue.show { display: block; }
+  opacity: 0; visibility: hidden; transform: translateY(6px); pointer-events: none; transition: opacity .18s ease, transform .18s ease, visibility 0s .18s; border: 1px solid rgb(34 34 34 / 32%); box-shadow: 0 4px 16px rgb(34 34 34 / 16%); border-radius: 4px; box-sizing: border-box; } /* same border, corners and shadow as the other menus; it stays against the bar */
+#dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity .18s ease, transform .18s ease, visibility 0s; }
 #dr-player .queue-header { margin: 16px 16px 10px; display: flex; justify-content: space-between; }
 #dr-player .queue-header h2 { margin: 0; font-size: 18px; font-weight: 500; }
 #dr-player .queue-header h2 b { font-weight: bold; }
@@ -140,7 +140,9 @@
 #dr-player .pb-btn:hover, #dr-player .pb-btn.open { border-color: #999; text-decoration: none; }
 #dr-player .pb-chev { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 #dr-player .pb-menu { position: absolute; left: 0; bottom: calc(100% + 11px); /* 6px above the button (it sticks out 5px above its box) */ min-width: 210px; width: max-content; background: #fff; border: 1px solid rgb(34 34 34 / 32%); border-radius: 4px; box-shadow: 0 4px 16px rgb(34 34 34 / 16%); padding: 0 0 6px; z-index: 112; } /* same border, corners and shadow as the genre menu */
-#dr-player .pb-menu[hidden] { display: none; }
+#dr-player .pb-menu { transition: opacity .18s ease, transform .18s ease, visibility 0s; }
+#dr-player .pb-menu[hidden] { display: block; opacity: 0; visibility: hidden; transform: translateY(6px); pointer-events: none; transition: opacity .18s ease, transform .18s ease, visibility 0s .18s; }
+@media (prefers-reduced-motion: reduce) { #dr-player .queue, #dr-player .queue.show, #dr-player .pb-menu, #dr-player .pb-menu[hidden] { transition: none; } }
 #dr-player .pb-head { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,.08); margin-bottom: 4px; }
 #dr-player .pb-head b { display: block; font-size: 13px; font-weight: 600; color: #333; }
 #dr-player .pb-head span { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: #777; }

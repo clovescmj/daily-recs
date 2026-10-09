@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.14
+- The Playback menu, the queue, Liked Songs and the genre menu open and close with a short fade and slide (they used to pop in and out).
+
 ## 0.15.13
 - The queue and Liked Songs panels sit against the bar again (they keep the new border, corners and shadow).
 
