@@ -11,7 +11,7 @@
 #dr-player .col + .col { margin-left: 1.7179023508%; }
 
 #dr-player .carousel-player-inner { display: flex; flex-wrap: nowrap; align-items: flex-start; height: 80px; width: 100%; background: #FFF; padding: 6px;
-  border-top: 1px solid rgba(0,0,0,0.15); z-index: 112; position: relative; }
+  border-top: 1px solid var(--dr-border-bar); z-index: 112; position: relative; }
 #dr-player .now-playing { display: flex; }
 #dr-player .now-playing > * { display: inline-block; vertical-align: top; }
 #dr-player .now-playing img { width: 60px; height: 60px; margin: 4px 0 4px 4px; display: block; }
@@ -95,7 +95,7 @@
 /* queue ("now playing albums"): Bandcamp's .queue rules, opening upwards from the bar */
 #dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: #FFF;
   opacity: 0; visibility: hidden; transform: translateY(var(--dr-panel-shift)); pointer-events: none; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s var(--dr-panel-rise);
-  box-shadow: var(--dr-shadow-menu); border-radius: 5px 5px 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
+  border: 1px solid var(--dr-border-bar); border-bottom: 0; /* the bar's own line closes it at the bottom */ box-shadow: var(--dr-shadow-menu); border-radius: 5px 5px 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
 #dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s; }
 #dr-player .queue-header { margin: 16px 16px 10px; display: flex; justify-content: space-between; }
 #dr-player .queue-header h2 { margin: 0; font-size: 18px; font-weight: 500; }

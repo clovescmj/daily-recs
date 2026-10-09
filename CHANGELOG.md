@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.5
+- The queue and Liked Songs panels have a border, in the same colour as the line of the player bar (it closes them at the bottom).
+
 ## 0.17.4
 - The Liked Songs icon no longer restarts its jump halfway when several songs are added in a row (an album adds all its songs one after the other): one jump at
   a time, and a new one only after it has finished.

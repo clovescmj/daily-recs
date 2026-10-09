@@ -20,6 +20,7 @@
   /* lines */
   --dr-border: #aaa;                   /* buttons and selects */
   --dr-border-menu: rgb(34 34 34 / 32%);
+  --dr-border-bar: rgba(0, 0, 0, 0.15);  /* the line on top of the player bar, and of the panels that open from it */
   --dr-divider: rgb(34 34 34 / 8%);    /* thin line inside a menu */
   --dr-hover: rgb(34 34 34 / 8%);      /* background of a row under the pointer */
 
