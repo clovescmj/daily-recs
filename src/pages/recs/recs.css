@@ -47,7 +47,6 @@ body {
 a { color: var(--link); text-decoration: none; }
 a:hover { color: var(--link-dark); text-decoration: underline; }
 .page { max-width: 960px; margin: 0 auto; padding: 28px 16px 48px; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .empty-state { color: var(--muted); padding: 40px 0; text-align: center; }
 
 /* ── Header ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -72,8 +71,6 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
   border-radius: var(--bc-radius); cursor: pointer; border: 1px solid var(--link); background: var(--link); color: var(--white);
 }
 .button:hover { background: var(--link-dark); border-color: var(--link-dark); }
-.button--ghost { background: var(--white); color: var(--text); border-color: var(--gray300); }
-.button--ghost:hover { background: var(--soft); border-color: var(--gray400); }
 .button:disabled { opacity: .5; cursor: default; }
 .button:focus-visible, .view-button:focus-visible { outline: 2px solid var(--blue400); outline-offset: 2px; }
 .icon-stroke { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -95,9 +92,9 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .tags-menu {
   position: absolute; top: calc(100% + 6px); left: 0; z-index: 25; width: 300px; background: var(--white); color: var(--gray700);
   border: 1px solid var(--transparency-dark-32); border-radius: var(--bc-radius); box-shadow: 0 4px 16px rgb(34 34 34 / 16%); text-align: left;
+  transition: opacity .15s ease, transform .15s ease, visibility 0s;
 }
 /* opens and closes with a short fade and slide; closed, it takes no room and cannot be clicked (display:none cannot be animated) */
-.tags-menu { transition: opacity .15s ease, transform .15s ease, visibility 0s; }
 .tags-menu[hidden] { display: block; opacity: 0; visibility: hidden; transform: translateY(-4px); max-height: 0; overflow: hidden; pointer-events: none; border-width: 0;
   transition: opacity .15s ease, transform .15s ease, visibility 0s .15s, max-height 0s .15s; }
 @media (prefers-reduced-motion: reduce) { .tags-menu, .tags-menu[hidden] { transition: none; } }
@@ -146,7 +143,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 @keyframes bar-slide { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .status-box progress:indeterminate::-webkit-progress-bar { animation: none; } }
 
-/* While a list is being built: an equalizer, what is going on, a counter, a thin bar, and placeholders for the albums */
+/* While a list is being built: an equalizer, what is going on (and how far it is, when that is known), a thin bar, and placeholders for the albums */
 .status-box.is-loading { padding: 0; margin-bottom: 20px; }
 .loading { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 68px; box-sizing: border-box; } /* fixed height: the text is centred in it, whether it has one line or two */
 .loading-text { flex: 1; min-width: 0; }
@@ -168,12 +165,11 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 @keyframes loading-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 .status-box.is-loading progress { height: 3px; margin: 0; border-radius: 0; }
 .eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 24px; flex: none; }
-.eq i { display: block; width: 4px; border-radius: 1px; background: var(--blue400); animation: eq-dance 1s ease-in-out infinite; }
+.eq i { display: block; width: 4px; border-radius: 1px; background: var(--blue400); transform-origin: bottom; animation: eq-dance 1s ease-in-out infinite; }
 .eq i:nth-child(1) { height: 10px; animation-delay: -.2s; } .eq i:nth-child(2) { height: 22px; animation-delay: -.5s; }
 .eq i:nth-child(3) { height: 15px; animation-delay: -.1s; } .eq i:nth-child(4) { height: 24px; animation-delay: -.7s; }
 .eq i:nth-child(5) { height: 9px; animation-delay: -.35s; }
 @keyframes eq-dance { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
-.eq i { transform-origin: bottom; }
 .skeleton { animation: skeleton-in .5s ease both; animation-delay: calc(var(--i, 0) * 70ms); } /* the cards come in one after the other */
 .skeleton-cover, .skeleton-line {
   background: linear-gradient(90deg, #e4e4e4 0, #f6f6f6 50%, #e4e4e4 100%) 0 0 / 600px 100%; animation: shimmer 1.3s linear infinite;
@@ -235,7 +231,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
 .album-actions { margin-top: auto; padding-top: 8px; font-size: 13px; color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-.album-actions a { color: var(--accent); display: inline-flex; align-items: center; }
+.album-actions a { color: var(--accent); display: inline-flex; align-items: center; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 .album-actions a:hover { text-decoration: underline; }
 .album-actions .action-dislike { margin-left: auto; } /* the "don't show" icon sits at the right edge of the card */
 .album-actions svg { width: 18px; height: 18px; fill: var(--icon); } /* the same size and spacing as the icons in the player bar */
@@ -244,13 +240,8 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .action-wishlist.is-on svg, .action-wishlist.is-on:hover svg { fill: var(--wishlist); }
 .action-dislike:hover svg, .action-dislike.is-on svg, .action-dislike.is-on:hover svg { fill: var(--danger); } /* red when active; click again to bring the album back */
 
-/* ── Footer and toast ───────────────────────────────────────────────────────────────────────────────────────────── */
+/* ── Footer ───────────────────────────────────────────────────────────────────────────────────────────── */
 .page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); }
-.toast {
-  position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%); z-index: 30; max-width: 80vw; padding: 10px 16px;
-  background: var(--gray600); color: var(--white); border-radius: var(--bc-radius); opacity: 0; pointer-events: none; transition: opacity .15s;
-}
-.toast.is-visible { opacity: 1; }
 
 /* ── This page lives in an iframe inside the Bandcamp profile tab: transparent, as wide as the tab bar ───────────── */
 .recs-page, .recs-page body { background: transparent; overflow: hidden; padding-bottom: 0; }
@@ -260,6 +251,5 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .recs-page .page-footer { margin-top: 20px; }
 
 /* No grey flash or box on the icons of a card when they are clicked (the keyboard focus ring stays) */
-.album-actions a { -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 .album-actions a:active, .album-actions a:focus { background: transparent; box-shadow: none; }
 .album-actions a:focus:not(:focus-visible) { outline: none; }

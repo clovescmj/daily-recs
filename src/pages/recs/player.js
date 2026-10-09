@@ -32,7 +32,6 @@ let savedCache = { key: '', items: [] };
 let savedSentKey = '';
 let recoveredAt = null;          // guards the one-shot recovery from an expired stream URL
 
-export const isPlaying = () => !audio.paused;
 export const currentId = () => player.current.id;
 export const currentAlbum = () => player.album;
 
