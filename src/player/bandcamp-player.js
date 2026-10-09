@@ -120,6 +120,7 @@
     q('.prev-icon').addEventListener('click', (e) => { if (!e.target.classList.contains('disabled')) onCmd('prev'); });
     q('.next-icon').addEventListener('click', (e) => { if (!e.target.classList.contains('disabled')) onCmd('next'); });
     // Playback: a button that opens a short list (it opens upwards, the bar is at the foot of the page)
+    let closePanels = () => {};
     const setPlaybackMenu = (on) => { q('.pb-menu').hidden = !on; q('.pb-btn').classList.toggle('open', on); q('.pb-btn').setAttribute('aria-expanded', String(on)); };
     q('.pb-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); setPlaybackMenu(q('.pb-menu').hidden); });
     q('.pb-menu').addEventListener('click', (e) => {
@@ -139,6 +140,9 @@
     const setSaved = (on) => { if (on) setQueue(false); q('.saved').classList.toggle('show', on); q('.x-saved').classList.toggle('active', on); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
     q('.x-saved').addEventListener('click', (e) => { e.preventDefault(); setSaved(!q('.saved').classList.contains('show')); });
+    // a click outside the bar closes the panels too (the page inside the frame reports its clicks through closeMenus)
+    document.addEventListener('click', (e) => { if (!e.composedPath().includes(el)) { setQueue(false); setSaved(false); } });
+    closePanels = () => { setQueue(false); setSaved(false); };
     q('.q-close').addEventListener('click', () => setQueue(false));
     q('.l-close').addEventListener('click', () => setSaved(false));
     q('.queue ol').addEventListener('click', (e) => {
@@ -240,7 +244,7 @@
         option.classList.toggle('sel', on); option.setAttribute('aria-checked', String(on));
       }
     }
-    return { el, update, closeMenus: () => setPlaybackMenu(false) };
+    return { el, update, closeMenus: () => { setPlaybackMenu(false); closePanels(); } };
   }
   globalThis.BCPlayer = { create };
 })();

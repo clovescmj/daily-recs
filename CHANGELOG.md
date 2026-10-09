@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.8
+- The queue and Liked Songs panels close when you click outside them: anywhere on the Bandcamp page or inside the recs page.
+
 ## 0.15.7
 - Next to the cover, the player bar shows the name of the song with the artist under it (it was the album's name), and the cover and the
   name link to the song's own page on Bandcamp instead of the album's.
