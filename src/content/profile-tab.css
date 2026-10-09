@@ -22,3 +22,6 @@ body.dr-player-on { padding-bottom: 92px; }
   opacity: 0; pointer-events: none; transition: opacity .15s;
 }
 #dr-toast.show { opacity: 1; }
+/* Opened straight on the daily recs tab (#dailyrecs): Bandcamp's own collection stays out of sight until the panel is there (see early.js). The tab bar stays. */
+html.dr-pending #grids { visibility: hidden; }
+html.dr-pending #grids #grid-tabs { visibility: visible; }

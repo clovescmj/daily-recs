@@ -15,6 +15,9 @@
 
   const WAIT_FOR_TABS_MS = 10000;
 
+  /** Lifts the early "keep the collection out of sight" mark (early.js): the panel is open, or there is no panel to wait for. */
+  const showProfile = () => document.documentElement.classList.remove('dr-pending');
+
   /** Calls `callback` with the profile's tab bar as soon as it exists (Bandcamp renders it client-side). */
   function whenTabsExist(callback) {
     const found = document.getElementById('grid-tabs');
@@ -26,7 +29,7 @@
       callback(tabs);
     });
     observer.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), WAIT_FOR_TABS_MS); // not a collection page: stop looking
+    setTimeout(() => { observer.disconnect(); showProfile(); }, WAIT_FOR_TABS_MS); // not a collection page: stop looking
   }
 
   function start(tabsContainer) {
@@ -214,6 +217,7 @@
     hideToolbars();
     renderBar();
     history.replaceState(null, '', HASH);
+    showProfile();
   }
 
   function closePanel() {
@@ -228,7 +232,7 @@
 
   async function injectTab() {
     if (tabsContainer.querySelector(`.${TAB_CLASS}`)) return;
-    if (!(await isOwnPage(readPageData()))) return;
+    if (!(await isOwnPage(readPageData()))) { showProfile(); return; }
     const tab = document.createElement('li');
     tab.className = TAB_CLASS;
     tab.dataset.tab = 'dailyrecs';
@@ -243,7 +247,7 @@
     state.tab = tab;
     state.countEl = badge;
     updateTabCount();
-    if (location.hash === HASH) openPanel();
+    if (location.hash === HASH) openPanel(); else showProfile();
   }
 
   /** "daily recs 35 new": the number follows the albums being opened or rejected. */

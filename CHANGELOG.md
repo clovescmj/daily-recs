@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.2
+- Fixed: opening the profile straight on the daily recs tab (the toolbar icon, or a reload on that tab) showed Bandcamp's own collection for a moment before our tab
+  replaced it. The collection is now kept out of sight from the first moment (a small script that runs as the page starts loading), and shown again if the
+  tab can't be opened (not your profile, or the page takes too long).
+
 ## 0.17.1
 - Fixed: when the page opened, it first drew the Best matches list and, a moment later, replaced it with the list you had chosen today (or with the
   opening screen). Now the first drawing is already the right one: the page stays blank until it knows what to show, today's choice is applied before
