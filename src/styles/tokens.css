@@ -109,7 +109,7 @@
   --dr-ease: ease;
   --dr-ease-out: cubic-bezier(.2, .8, .2, 1);
   --dr-dur-fast: .1s;
-  --dr-menu-dur: .15s;                     /* menus (genres, playback) fade and slide this much */
+  --dr-menu-dur: .15s;                     /* menus (genres, play mode) fade and slide this much */
   --dr-menu-shift: 6px;
   --dr-dur-base: .3s;                      /* texts and bars that change */
   --dr-dur-slow: .5s;                      /* the placeholders come in */

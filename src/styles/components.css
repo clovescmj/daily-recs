@@ -1,6 +1,6 @@
 /* Components shared by the recs page and the player bar. They only use the tokens of tokens.css. */
 
-/* ── Select: the button that opens a menu or picks a list (My tags, Best matches, Playback) ── */
+/* ── Select: the button that opens a menu or picks a list (My tags, Best matches, Play mode) ── */
 .dr-select {
   display: inline-flex; align-items: center; gap: 6px; height: var(--dr-control-h); padding: 6px var(--dr-menu-pad-x);
   font: inherit; font-size: var(--dr-font-s); line-height: var(--dr-line-s); color: var(--dr-text); white-space: nowrap; cursor: pointer;

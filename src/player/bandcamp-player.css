@@ -151,7 +151,7 @@
 #dr-player .queue .empty .ci { display: inline-block; width: var(--dr-icon-size); height: var(--dr-icon-size); vertical-align: -4px; fill: var(--dr-icon); } /* the + as it is before it turns green */
 #dr-player .queue .empty:hover { background: transparent; }
 
-/* Playback: a button with the name of the mode that opens a short list upwards */
+/* Play mode: a button with the name of the mode that opens a short list upwards */
 #dr-player .pb-wrap { position: relative; }
 #dr-player .pb-btn { margin: -6px 0 0; opacity: 1; color: var(--dr-text); } /* looks come from .dr-select; the icons next to it are 20px tall and sit at the top: this centres the button on them */
 #dr-player .pb-chev { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }

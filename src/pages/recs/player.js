@@ -6,6 +6,7 @@ import { loadState, send } from './data.js';
 import { session } from './session.js';
 import { postToHost } from './host-bridge.js';
 import { MSG } from '../../lib/messages.js';
+import { createPlayPlan } from '../../lib/play-plan.js';
 import { waiting } from './waiting.js';
 
 const TRACKS_TTL_MS = 20 * 60 * 1000;      // stream URLs expire, so cached track lists only live a few minutes
@@ -19,11 +20,14 @@ audio.preload = 'none';
 const player = {
   current: { id: null, tracks: [], index: 0 },
   album: null,          // candidate being played (for the bar and Media Session)
-  mode: 'one',          // 'one': a song per album (its featured track, or the first), in the order of the list; 'album': whole albums
+  mode: 'one',          // 'one': a song per album, in the order of the list; 'shuffle': the same with the albums in a random order; 'album': whole albums
   busy: false,          // loading tracks
   message: '',          // error text for the bar
   waiting: false,       // a random song of the collection, played while a list is being built (it is not part of any list)
 };
+const plan = createPlayPlan();   // which songs have played (the modes 'one' and 'shuffle' never play one twice)
+const history = [];              // the songs that played, in order: { id, index } (the previous button goes back along it)
+const MODES = ['one', 'shuffle', 'album'];
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
@@ -66,6 +70,11 @@ function playTrack(index) {
   player.busy = false;
   player.message = '';
   recoveredAt = null;
+  if (!player.waiting && !String(player.current.id).startsWith('w:')) {
+    plan.mark(player.current.id, index, tracks.length);
+    history.push({ id: player.current.id, index });
+    if (history.length > 500) history.shift();
+  }
   audio.src = tracks[index].src;
   audio.play().catch(() => {});
   setMediaSession();
@@ -85,7 +94,8 @@ export async function playAlbum(id, startIndex = null) {
   try {
     const tracks = await fetchTracks(album);
     if (!tracks.length) throw new Error('no streamable tracks');
-    const first = startIndex !== null && startIndex < tracks.length ? startIndex : startingTrack(tracks);
+    const chosen = player.mode === 'album' ? -1 : plan.pick(id, tracks.length, startingTrack(tracks)); // (-1: no song of it left: the highlighted one again)
+    const first = startIndex !== null && startIndex < tracks.length ? startIndex : chosen >= 0 ? chosen : startingTrack(tracks);
     player.current = { id, tracks, index: first };
     send({ type: MSG.MARK_OPENED, id });
     playTrack(first);
@@ -175,10 +185,17 @@ let waitingKey = '';
 // ── Transport ───────────────────────────────────────────────────────────────────────────────────────────────────
 
 const nextAlbumId = () => { const ids = visibleCardIds(); return ids[ids.indexOf(player.current.id) + 1]; };
-const startFirst = () => visibleCardIds()[0] && playAlbum(visibleCardIds()[0]);
+/** The album that plays after `fromId`: the next one of the list, or what the mode says (null at the end of everything). */
+const albumAfter = (fromId) => (player.mode === 'album' ? visibleCardIds()[visibleCardIds().indexOf(fromId) + 1] : plan.next(player.mode, visibleCardIds(), fromId)) || null;
+const startFirst = () => { const first = albumAfter(null); return first && playAlbum(first); };
+/** True when the last song of the list has played (play then starts everything again). */
+const listFinished = () => (player.mode === 'album'
+  ? player.current.index + 1 >= player.current.tracks.length && !nextAlbumId()
+  : !plan.hasMore(visibleCardIds()));
 
 export const togglePlay = () => {
   if (!player.current.id) return startFirst();
+  if (!player.waiting && audio.ended && listFinished()) { plan.reset(); history.length = 0; return startFirst(); }
   return audio.paused ? audio.play().catch(() => {}) : audio.pause();
 };
 export const pause = () => audio.pause();
@@ -186,7 +203,7 @@ export const pause = () => audio.pause();
 export function nextTrack() {
   if (player.waiting) return session.running ? playWaitingSong() : skipAlbum();
   if (!player.current.id) return startFirst();
-  if (player.mode === 'one') return skipAlbum(); // a song per album: the next one is the next album's
+  if (player.mode !== 'album') return skipAlbum(); // a song per album: the next one is the next album's
   if (player.current.index + 1 < player.current.tracks.length) return playTrack(player.current.index + 1);
   const next = nextAlbumId();
   return next && playAlbum(next);
@@ -194,17 +211,17 @@ export function nextTrack() {
 
 function skipAlbum() {
   if (!player.current.id) return startFirst();
-  const next = nextAlbumId();
+  const next = albumAfter(player.current.id);
   return next && playAlbum(next);
 }
 
 export async function previousTrack() {
   if (player.waiting) { audio.currentTime = 0; return; }
-  if (player.mode === 'one') { // back to the previous album's song (or to the start of this one, when it has been playing a while)
-    const ids = visibleCardIds();
-    const before = ids[ids.indexOf(player.current.id) - 1];
-    if (audio.currentTime > 3 || !before) { audio.currentTime = 0; return; }
-    playAlbum(before);
+  if (player.mode !== 'album') { // back along the songs that played (or to the start of this one, when it has been playing a while)
+    if (audio.currentTime > 3 || history.length < 2) { audio.currentTime = 0; return; }
+    history.pop();
+    const before = history.pop();
+    playAlbum(before.id, before.index);
     return;
   }
   if (audio.currentTime > 3 || player.current.index === 0) { audio.currentTime = 0; return; }
@@ -223,9 +240,9 @@ export function setVolume(value) {
 }
 export const toggleMute = () => { audio.muted = !audio.muted; };
 
-/** 'one' (a song per album, the way Bandcamp's own lists play) or 'album'. */
+/** 'one' (a song per album, in the order of the list), 'shuffle' (the same, in a random order) or 'album' (whole albums). */
 export function setMode(mode) {
-  if (mode !== 'one' && mode !== 'album') return;
+  if (!MODES.includes(mode)) return;
   player.mode = mode;
   try { localStorage.setItem(MODE_KEY, player.mode); } catch { /* storage unavailable */ }
   emit(true);
@@ -284,7 +301,7 @@ export function markPlaying() {
 const hasSavedSong = (id) => session.savedAlbums.has(id);
 
 function queueItems() {
-  const ids = visibleCardIds();
+  const ids = player.mode === 'shuffle' ? plan.order('shuffle', visibleCardIds()) : visibleCardIds(); // (in shuffle: the random order of the round)
   // the heart of each item is part of the key, so the bar redraws when one of them changes
   const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${hasSavedSong(id) ? 's' : ''}`).join(',');
   if (key !== queueCache.key) {
@@ -347,8 +364,8 @@ function snapshot() {
     isSaved: Boolean(album && track) && session.saved.has(`${album.id}:${current.index}`),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     mode: player.mode,
-    hasPrev: player.waiting ? false : player.mode === 'one' ? albumIndex > 0 : current.index > 0,
-    hasNext: player.waiting ? true : player.mode === 'one' ? albumIndex + 1 < queue.items.length : current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
+    hasPrev: player.waiting ? false : player.mode !== 'album' ? history.length > 1 : current.index > 0,
+    hasNext: player.waiting ? true : player.mode !== 'album' ? plan.hasMore(visibleCardIds()) : current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;
@@ -398,7 +415,8 @@ async function recoverFromAudioError() {
 
 export function initPlayer() {
   try {
-    player.mode = localStorage.getItem(MODE_KEY) === 'album' ? 'album' : 'one';
+    const savedMode = localStorage.getItem(MODE_KEY);
+    player.mode = MODES.includes(savedMode) ? savedMode : 'one';
     const saved = localStorage.getItem(VOLUME_KEY);
     if (saved !== null && Number.isFinite(+saved)) audio.volume = Math.max(0, Math.min(1, +saved));
   } catch { /* storage unavailable */ }

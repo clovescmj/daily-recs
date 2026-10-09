@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.0
+- "Playback" is now **Play mode**, with a third option, **Shuffle**. In "One song per album" and in "Shuffle" a song plays only once. The first time an album plays,
+  it plays the song its artist highlights; later rounds draw one of the songs that have not played. "One song per album" keeps the order of the list and starts over
+  at the end; "Shuffle" plays the albums in a random order, with a new order for each round. An album with no song left is skipped, and the player stops when every
+  song has played; Play then starts everything again. The queue follows the mode (in Shuffle it shows the order of the round), and the previous button goes back along
+  the songs that played. "Full album" is unchanged.
+
 ## 1.0.9
 - When the list is ready while a song of your collection is playing, the song is no longer stopped: it keeps playing and now shows in the player bar (without the
   wishlist, Liked Songs and hide icons, since it is on no list). Next, or the end of the song, moves on to the first album of the list. (This replaces the fade out

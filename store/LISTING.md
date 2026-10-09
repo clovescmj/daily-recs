@@ -23,7 +23,7 @@ New music every day, built from your own taste. Never shows what you already own
 > • The heart adds an album to your Bandcamp wishlist, and the + saves songs to your own Liked Songs list
 > • "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
 > • Three lists: "My tags" (explore new music by genre), "Best matches" (perfect matches with your collection) and "Surprise me" (go beyond your collection)
-> • A built-in player in Bandcamp's own style, with a playback choice (one song per album, or whole albums), queue, Liked Songs and media keys
+> • A built-in player in Bandcamp's own style, with a play mode (one song per album, shuffle, or whole albums), queue, Liked Songs and media keys
 > • While your list is being built, play a random song from your own collection
 > • The albums you hide sync across your computers through your Google account
 >
