@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.7
+- The page no longer scrolls by itself when a list finishes loading: it stays where you left it. (The scroll to the top of the list was sent after the
+  search ended, so it fired right when the albums appeared.)
+
 ## 0.16.6
 - Clean-up, nothing changes on screen: unused styles removed (`.sr-only`, `.button--ghost`, and the toast of the page, which has been drawn by the
   Bandcamp page for a long time), duplicated style rules merged, an unused function removed, and a stale comment fixed.

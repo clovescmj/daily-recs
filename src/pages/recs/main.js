@@ -3,7 +3,6 @@ import { reportBugUrl, supportUrl } from '../../lib/config.js';
 import { MSG } from '../../lib/messages.js';
 import { runCommand } from './commands.js';
 import { loadState, loadStatus, pickedToday, savePicked, send, watchStorage } from './data.js';
-import { $ } from './dom.js';
 import { listenToHost } from './host-bridge.js';
 import { initPlayer, playAlbum, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
@@ -46,7 +45,6 @@ async function chooseView(view, keys = []) {
   session.pending = { view, keys, sawRunning: false };
   await refreshView();   // the toggle already shows the new choice
   await send({ type: MSG.REFRESH, mode: view, tags: keys });
-  scrollToTop();
 }
 
 /** "Start digging" on the opening screen: remember the choice for today and show the list. */
@@ -56,8 +54,6 @@ async function startFromLanding(view, keys) {
   await refreshView();   // a run that is already going on now shows its progress
   await chooseView(view, keys);
 }
-
-const scrollToTop = () => $('album-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
 function onGridClick(event) {
   const card = event.target.closest('.album-card');
