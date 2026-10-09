@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.7
+- The button of the loading box is as wide as its text again, up to 260 px (before, 1.1.6, it had one fixed width). A name longer than that scrolls inside it.
+
 ## 1.1.6
 - The button of the loading box (a song from your collection while the list is built) is a square-cornered button like Bandcamp's, always the same width (250 px, it shrinks
   in a narrow window). It reads "Play a song while waiting" and shows Material's plain play and pause icons. While a song plays it shows "Artist - Song" (no "Now playing"),
