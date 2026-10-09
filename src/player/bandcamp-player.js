@@ -38,7 +38,7 @@
       <div class="col col-4-15 now-playing">
         <a class="np-art" target="_blank" rel="noopener" aria-label="Open album on Bandcamp"><img alt="No album playing"></a>
         <div class="info"><a class="np-link" target="_blank" rel="noopener"><div class="title"></div><div class="artist">by <span></span></div></a>
-          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><span class="dot" aria-hidden="true">·</span><a class="save" href="#" title="Add to Liked Songs" aria-label="Add to Liked Songs">${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
+          <div class="collect"><a class="wish" href="#" title="Add to wishlist" aria-label="Add to wishlist">${svg(P.heart, 'ci', '', 'Add to wishlist')}</a><a class="save" href="#" title="Add to Liked Songs" aria-label="Add to Liked Songs">${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')}</a><a class="dislike" href="#" title="Don't show music like this" aria-label="Don't show music like this">${svg(P.block, 'ci', '', 'Don\'t show music like this')}</a></div></div>
       </div>
       <div class="col col-7-15 progress-transport">
         <div class="playpause" role="button" tabindex="0" aria-label="Play" title="Play"><div class="play"></div><div class="pause"></div><div class="busy" role="img" aria-label="Loading"></div></div>

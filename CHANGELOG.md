@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.9
+- The dot after the heart in the player bar is gone: the heart, the + and the ⊘ are evenly spaced (12 px).
+
 ## 0.15.8
 - The queue and Liked Songs panels close when you click outside them: anywhere on the Bandcamp page or inside the recs page.
 
