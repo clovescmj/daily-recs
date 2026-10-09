@@ -190,9 +190,16 @@
           + '</span></li>').join('');
       }
       if (s.savedList !== undefined) {
-        // a song was added: the Liked Songs icon bumps up twice
+        // a song was added: the Liked Songs icon jumps and wobbles
         if (savedCount !== null && s.savedList.length > savedCount) {
-          const ic = q('.x-saved .x-icon'); ic.classList.remove('bump'); void ic.getBoundingClientRect(); ic.classList.add('bump');
+          // one bump at a time: songs that arrive while it plays (an album adds many, one after the other) don't restart it halfway
+          const ic = q('.x-saved .x-icon');
+          if (!ic.classList.contains('bump')) {
+            const done = () => ic.classList.remove('bump');
+            ic.classList.add('bump');
+            ic.addEventListener('animationend', done, { once: true });
+            setTimeout(done, 900); // (no animationend when motion is reduced or the bar is out of sight)
+          }
         }
         savedCount = s.savedList.length;
         q('.saved ol').innerHTML = s.savedList.length

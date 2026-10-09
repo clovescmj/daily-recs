@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.4
+- The Liked Songs icon no longer restarts its jump halfway when several songs are added in a row (an album adds all its songs one after the other): one jump at
+  a time, and a new one only after it has finished.
+
 ## 0.17.3
 - Fixed: the genre menu had no fade and slide when it opened and closed. A general rule of the page (`[hidden]` means `display: none`) was stronger than the menu's
   own closed state, so the menu was removed instead of animated. Menus are now the exception to that rule.
