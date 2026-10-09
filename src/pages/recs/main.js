@@ -7,7 +7,7 @@ import { listenToHost } from './host-bridge.js';
 import { initPlayer, playAlbum, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
 import { session } from './session.js';
-import { initLanding, refreshLanding, setLandingVisible } from './landing.js';
+import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
 import { $ } from './dom.js';
 import { initViewSwitch } from './views.js';
 import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-actions.js';
@@ -51,7 +51,7 @@ async function chooseView(view, keys = []) {
 /** "Start digging" on the opening screen: remember the choice for today and show the list. */
 async function startFromLanding(view, keys) {
   session.pending = { view, keys, sawRunning: false };   // the toggle shows the choice right away, before the list is ready
-  setLandingVisible(false);
+  await leaveLanding();
   await refreshView();   // a run that is already going on now shows its progress
   await chooseView(view, keys);
 }

@@ -95,7 +95,10 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* ── Opening screen ──────────────────────────────────────────────────────────────────────────────────────────────── */
 .is-landing .page-header, .is-landing .album-grid { display: none; }
-.landing { text-align: center; padding: 36px 0 28px; min-height: 380px; }   /* room for the genre menu (landing.js measures it): no jump when it opens */
+.landing { text-align: center; padding: 36px 0 28px; min-height: 380px; transition: opacity var(--dr-dur-base) var(--dr-ease); }
+.landing.is-leaving { opacity: 0; pointer-events: none; }  /* "Start digging": it fades out, then the list fades in (is-revealing) */
+.is-revealing .page-header, .is-revealing .status-box, .is-revealing .album-grid { animation: dr-fade-in var(--dr-dur-base) var(--dr-ease); }
+@keyframes dr-fade-in { from { opacity: 0; } to { opacity: 1; } }   /* room for the genre menu (landing.js measures it): no jump when it opens */
 .landing-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
 .landing-options { justify-content: center; }
@@ -154,7 +157,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .skeleton-line.wide { width: 70%; } .skeleton-line.short { width: 30%; }
 @keyframes shimmer { from { background-position: -300px 0; } to { background-position: 300px 0; } }
 @keyframes skeleton-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .loading-text strong.is-new, .wait-label.is-new { animation: none; } .loading-sub { transition: none; } .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .landing { transition: none; } .is-revealing .page-header, .is-revealing .status-box, .is-revealing .album-grid { animation: none; } .loading-text strong.is-new, .wait-label.is-new { animation: none; } .loading-sub { transition: none; } .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
 
 /* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
 .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }

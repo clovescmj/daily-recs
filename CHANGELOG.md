@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.16
+- From the opening screen to the loading: "Start digging" fades the opening screen out (0.3 s) and then fades the list in (its header, the progress and the placeholders, 0.3 s),
+  instead of swapping at once. With "reduce motion" on, it still swaps at once.
+
 ## 0.18.15
 - The icons that are used in the player bar are SVG now, not images: the previous and next arrows and the spinner of the song that is loading. The spinner is one
   drawing that turns in nine steps (like the nine pictures it replaces), so it is sharp at any zoom, uses the tokens, and stops when the system asks for less motion.

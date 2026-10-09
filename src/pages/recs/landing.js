@@ -86,9 +86,28 @@ export function initLanding(onStart) {
   renderChoice();
 }
 
+const FADE_MS = 300; // = --dr-dur-base
+
+/**
+ * "Start digging": the opening screen fades out, then the list (its header, the progress and the placeholders) fades in.
+ * Resolves when the opening screen is gone; with "reduce motion" on, at once.
+ */
+export async function leaveLanding() {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduced) {
+    $('landing').classList.add('is-leaving');
+    await new Promise((resolve) => setTimeout(resolve, FADE_MS));
+  }
+  setLandingVisible(false);
+  if (reduced) return;
+  document.body.classList.add('is-revealing');
+  setTimeout(() => document.body.classList.remove('is-revealing'), FADE_MS + 50);
+}
+
 /** Shows or hides the opening screen (and, with it, the list and its header). */
 export function setLandingVisible(visible) {
   session.landing = visible;
+  $('landing').classList.remove('is-leaving');
   $('landing').hidden = !visible;
   document.body.classList.toggle('is-landing', visible);
   if (visible) { renderChoice(); reserveMenuRoom(); } else closeMenu();
