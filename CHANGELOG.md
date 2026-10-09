@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.2
+- The text of the loading button says where the song comes from: "Play a song from your collection while waiting".
+
 ## 0.16.1
 - The player bar no longer shows up while a song plays during the loading: the button of the loading box is the only control (the bar appears when the list is ready, as always).
 

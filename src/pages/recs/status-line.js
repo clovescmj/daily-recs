@@ -64,7 +64,7 @@ const EQUALIZER = '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i><
 // Material's play_circle and pause_circle
 const WAIT_PLAY = '<svg class="wait-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>';
 const WAIT_PAUSE = '<svg class="wait-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>';
-const WAIT_IDLE = 'Play a song while waiting';
+const WAIT_IDLE = 'Play a song from your collection while waiting';
 
 /** The right side of the loading box: a song of the collection to listen to while the list is built. */
 function paintWait(info = waiting.info()) {
@@ -79,7 +79,7 @@ function paintWait(info = waiting.info()) {
     label.classList.remove('is-new'); void label.offsetWidth; label.classList.add('is-new');
   }
   const button = wait.querySelector('.wait-btn');
-  const action = info.playing ? 'Pause' : 'Play a song while waiting';
+  const action = info.playing ? 'Pause' : 'Play a song from your collection while waiting';
   button.classList.toggle('is-playing', info.playing);
   button.setAttribute('aria-label', action);
   button.title = action;
