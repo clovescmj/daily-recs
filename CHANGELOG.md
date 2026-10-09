@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.3
+- Play mode icons: Shuffle is now Material's own icon (it looked too big), and Full album is a disc inside Material's empty square. Both use the same 960 box as the other Material icons.
+
 ## 1.1.2
 - Play mode: the two icons (Full album, Shuffle) now have the same size as the other icons on the right of the bar (a 20 px box, a glyph of about 15 px, like the queue icon).
 
