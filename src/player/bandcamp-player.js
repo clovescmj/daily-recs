@@ -231,9 +231,8 @@
           : EMPTY_LIKED;
         q('.l-count').textContent = s.savedList.length ? `${s.savedList.length} ${s.savedList.length === 1 ? 'song' : 'songs'}` : '';
       }
-      // the count: albums in the list, and in Shuffle songs (it plays one song of each album)
-      const noun = s.mode === 'shuffle' ? 'song' : 'album';
-      setText(q('.q-count'), queue.length ? `${queue.length} ${noun}${queue.length === 1 ? '' : 's'}` : '');
+      // the count: albums in the list, in either play mode (the number of songs is not known before the albums are opened)
+      setText(q('.q-count'), queue.length ? `${queue.length} album${queue.length === 1 ? '' : 's'}` : '');
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart and thumb down: each one has its own icon and label
       const paint = (selector, on, offLabel, onLabel, offPath, onPath) => {
