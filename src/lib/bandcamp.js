@@ -11,13 +11,13 @@ const MAX_COLLECTION_PAGES = 200; // hard stop in case the pagination token neve
 const MAX_TEXT_LENGTH = 300;
 
 export class NotLoggedInError extends Error {
-  constructor() { super('Not signed in to Bandcamp'); this.name = 'NotLoggedInError'; }
+  constructor() { super("You're not signed in to Bandcamp."); this.name = 'NotLoggedInError'; }
 }
 export class HttpError extends Error {
   constructor(status, url) { super(`HTTP ${status}`); this.name = 'HttpError'; this.status = status; this.url = url; }
 }
 export class RateLimitedError extends Error {
-  constructor() { super('Bandcamp is limiting requests right now'); this.name = 'RateLimitedError'; }
+  constructor() { super('Bandcamp asked us to slow down.'); this.name = 'RateLimitedError'; }
 }
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

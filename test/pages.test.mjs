@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { cardHtml } from '../src/pages/recs/cards.js';
-import { progressParts, progressText } from '../src/pages/recs/status-line.js';
+import { progressParts } from '../src/pages/recs/status-line.js';
 import { esc, formatTime, safeUrl } from '../src/pages/recs/dom.js';
 import { PHASE } from '../src/lib/recommender.js';
 import { parseMessage } from '../src/lib/messages.js';
@@ -51,16 +51,6 @@ test('cardHtml reflects liked / disliked state', () => {
 test('cardHtml never puts a non-https url into href/src', () => {
   const html = cardHtml({ ...album, url: 'javascript:alert(1)', art: 'data:text/html,x' }, { liked: false, disliked: false });
   assert.ok(!/javascript:/.test(html) && !/data:text/.test(html));
-});
-
-test('progressText describes every phase', () => {
-  assert.match(progressText({ phase: PHASE.SIGNING_IN }), /Signing in/);
-  assert.match(progressText({ phase: PHASE.LIBRARY }), /Reading your collection/);
-  assert.match(progressText({ phase: PHASE.SAMPLING, picked: 40, library: 1200, likedPicked: 2, done: 3, total: 40 }), /Picking and analyzing 40 of your 1,200 albums \(2 you liked\) · 3\/40/);
-  assert.match(progressText({ phase: PHASE.SAMPLING, mode: 'surprise', picked: 5, done: 1, total: 5 }), /Digging for surprises in 5 random albums/);
-  assert.match(progressText({ phase: PHASE.RANKING, candidates: 1500 }), /Ranking 1,500 candidates/);
-  assert.match(progressText({ phase: PHASE.PICKING }), new RegExp(`Picking your ${DAILY_COUNT}`));
-  assert.match(progressText({ phase: PHASE.PICKING, mode: 'surprise' }), /Digging below/);
 });
 
 test('the page only sends messages the service worker accepts', () => {

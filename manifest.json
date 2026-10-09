@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Daily Recs for Bandcamp",
-  "version": "1.0.1",
-  "description": "Fresh Bandcamp recommendations every day, based on your own collection. Never shows what you already own.",
+  "version": "1.0.2",
+  "description": "New music every day, built from your own taste. Never shows what you already own on Bandcamp.",
   "minimum_chrome_version": "109",
   "icons": {
     "16": "icons/app-16.png",

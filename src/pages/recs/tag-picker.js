@@ -17,7 +17,7 @@ export const labelOf = (state, key) => (state && state.tagLabels && state.tagLab
  */
 export function createTagPicker(root, { withButton = false, onGo = () => {}, onChange = () => {} } = {}) {
   root.innerHTML = `<div class="dr-menu-head tags-coverage"></div>
-    <input class="tags-input" type="search" placeholder="Type a genre…" aria-label="Find or add a genre" autocomplete="off">
+    <input class="tags-input" type="search" placeholder="Type a tag…" aria-label="Find or add a tag" autocomplete="off">
     <ul class="tags-list"></ul>${withButton ? '<div class="tags-foot"><button type="button" class="button tags-go">Find music</button><p class="tags-note">This will refresh your list with a new search.</p></div>' : ''}`;
   const $in = (selector) => root.querySelector(selector);
   let selected = new Set();
@@ -26,7 +26,7 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
     const go = $in('.tags-go');
     if (go) {
       go.disabled = !selected.size;
-      go.textContent = selected.size > 1 ? `Find music (${selected.size} genres)` : 'Find music';
+      go.textContent = selected.size > 1 ? `Find music (${selected.size} tags)` : 'Find music';
     }
     onChange([...selected].sort());
   };
@@ -35,8 +35,8 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
     const state = session.state;
     const { scanned, total } = state ? scanProgress(state) : { scanned: 0, total: 0 };
     $in('.tags-coverage').textContent = total
-      ? `Genres found so far · ${formatNumber(scanned)} of ${formatNumber(total)} albums scanned`
-      : 'Your genres will show up as your albums are scanned';
+      ? `Tags found so far · ${formatNumber(scanned)} of ${formatNumber(total)} albums scanned`
+      : 'Your tags will show up as your albums are scanned';
     const typed = $in('.tags-input').value.trim();
     const typedKey = normalizeTag(typed);
     const known = state ? selectableTags(state) : [];
@@ -55,7 +55,7 @@ export function createTagPicker(root, { withButton = false, onGo = () => {}, onC
         <input type="checkbox" value="${esc(row.key)}" data-label="${esc(row.label)}"${selected.has(row.key) ? ' checked' : ''}>
         <span class="tag-name">${esc(row.label)}</span>
         ${row.count ? `<span class="tag-count">${formatNumber(row.count)}</span>` : ''}</label></li>`)).join('')
-      : '<li class="tags-empty">No genres yet. Type one to look for it in your albums.</li>';
+      : '<li class="tags-empty">No tags yet. Type one to look for it in your albums.</li>';
     update();
   }
 

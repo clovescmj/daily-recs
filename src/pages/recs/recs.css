@@ -95,10 +95,10 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 
 /* ── Opening screen ──────────────────────────────────────────────────────────────────────────────────────────────── */
 .is-landing .page-header, .is-landing .album-grid { display: none; }
-.landing { text-align: center; padding: 36px 0 28px; min-height: 380px; transition: opacity var(--dr-dur-base) var(--dr-ease); }
+.landing { text-align: center; padding: 36px 0 28px; min-height: 380px; transition: opacity var(--dr-dur-base) var(--dr-ease); } /* min-height: room for the tags menu (landing.js measures it): no jump when it opens */
 .landing.is-leaving { opacity: 0; pointer-events: none; }  /* "Start digging": it fades out, then the list fades in (is-revealing) */
 .is-revealing .page-header, .is-revealing .status-box, .is-revealing .album-grid { animation: dr-fade-in var(--dr-dur-base) var(--dr-ease); }
-@keyframes dr-fade-in { from { opacity: 0; } to { opacity: 1; } }   /* room for the genre menu (landing.js measures it): no jump when it opens */
+@keyframes dr-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .landing-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
 .landing-options { justify-content: center; }

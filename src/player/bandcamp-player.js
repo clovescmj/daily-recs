@@ -19,7 +19,7 @@
     album: `<svg class="pb-ico" viewBox="2.67 5.15 19.5 19.5" aria-hidden="true" focusable="false"><g transform="rotate(90 12.42 14.9)"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.925 7.041H18.91a1.268 1.268 0 0 1 1.268 1.268V21.497a1.268 1.268 0 0 1-1.268 1.268H5.925a1.268 1.268 0 0 1-1.268-1.268V8.309a1.268 1.268 0 0 1 1.268-1.268zM6.178 8.563H18.657V21.243H6.178zM7.724 14.903a4.694 4.739 0 1 1 9.388 0 4.694 4.739 0 1 1-9.388 0zM10.889 14.903a1.529 1.573 0 1 1 3.057 0 1.529 1.573 0 1 1-3.057 0z"/></g></svg>`,
   };
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
-  const LIKED_ICON = `<svg class="x-icon" viewBox="0 -960 960 960" role="img" aria-label="Liked songs"><title>Liked songs</title><path d="M500-360q42 0 71-29t29-71v-220h120v-80H560v220q-13-10-28-15t-32-5q-42 0-71 29t-29 71q0 42 29 71t71 29ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z"/></svg>`;
+  const LIKED_ICON = `<svg class="x-icon" viewBox="0 -960 960 960" role="img" aria-label="Liked Songs"><title>Liked Songs</title><path d="M500-360q42 0 71-29t29-71v-220h120v-80H560v220q-13-10-28-15t-32-5q-42 0-71 29t-29 71q0 42 29 71t71 29ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z"/></svg>`;
   const LIKED_PATH = 'M500-360q42 0 71-29t29-71v-220h120v-80H560v220q-13-10-28-15t-32-5q-42 0-71 29t-29 71q0 42 29 71t71 29ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z';
   const EMPTY_LIKED = `<li class="empty"><svg class="empty-icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="${LIKED_PATH}"/></svg><strong>No liked songs yet</strong><span>Click the ${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')} on an album or in the player to save songs here.</span></li>`;
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
@@ -64,8 +64,8 @@
           </div>
         </div>
         <span class="x-sep" aria-hidden="true"></span>
-        <a href="#" class="x-btn x-queue" title="Today's queue" aria-label="Today's queue">${svg(P.queue, 'x-icon', '', 'Today\'s queue')}</a>
-        <a href="#" class="x-btn x-saved" title="Liked songs" aria-label="Liked songs">${LIKED_ICON}</a>
+        <a href="#" class="x-btn x-queue" title="Recommendations queue" aria-label="Recommendations queue">${svg(P.queue, 'x-icon', '', 'Recommendations queue')}</a>
+        <a href="#" class="x-btn x-saved" title="Liked Songs" aria-label="Liked Songs">${LIKED_ICON}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <div class="vol">
           <div class="vol-icon-wrapper" role="button" tabindex="0" aria-label="Mute or unmute" title="Mute or unmute">${svg(P.vol, 'vol-icon', '', 'Volume')}</div>
@@ -77,8 +77,8 @@
         <div class="queue-header"><h2>now playing <b>recommendations</b></h2><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
         <ol></ol>
       </div>
-      <div class="queue saved" role="dialog" aria-label="Liked">
-        <div class="queue-header"><h2>your <b>liked</b> songs</h2><span class="l-close" role="button" tabindex="0" aria-label="Close Liked" title="Close Liked">${svg(P.close, 'close-icon', '', 'Close Liked')}</span></div>
+      <div class="queue saved" role="dialog" aria-label="Liked Songs">
+        <div class="queue-header"><h2>your <b>liked</b> songs</h2><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
         <ol>${EMPTY_LIKED}</ol>
       </div>`;
     const q = (s) => el.querySelector(s);

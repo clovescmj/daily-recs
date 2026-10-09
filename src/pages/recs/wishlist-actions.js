@@ -29,7 +29,7 @@ export async function setWish(id, on) {
       toast("Couldn't add it to your wishlist. Try again.");
       return;
     }
-    toast(result.ok ? (on ? 'Album added to your wishlist. Reload the page to see it in your wishlist tab.' : 'Album removed from your wishlist') : "Couldn't confirm the wishlist removal.");
+    toast(result.ok ? (on ? 'Added to your wishlist. Reload the page to see it there.' : 'Removed from your wishlist') : "Couldn't confirm the wishlist removal.");
     if (on) session.wished.add(id); else session.wished.delete(id);
     send({ type: MSG.FEEDBACK, id, kind: on ? 'wish' : 'unwish' });
     emit(true);
@@ -116,7 +116,7 @@ export async function flushWishlistQueue() {
       if (result.ok && entry.op === 'add') added++;
       await send({ type: MSG.WISHLIST_DONE, id: entry.id });
     }
-    if (added) toast(added === 1 ? 'Album added to your wishlist. Reload the page to see it there.' : `${added} albums added to your wishlist. Reload the page to see them there.`);
+    if (added) toast(added === 1 ? 'Added to your wishlist. Reload the page to see it there.' : `${added} albums added to your wishlist. Reload the page to see them there.`);
   } finally {
     flushing = false;
   }

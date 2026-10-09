@@ -3,6 +3,14 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.2
+- Wording review: one name per thing. "Liked Songs" everywhere (the button, the panel and its close button), the button of the queue is "Recommendations queue", the tags menu says
+  "tags" (Type a tag…, Tags found so far, Find music (2 tags)), loading step "Checking tags", wishlist messages are "Added to your wishlist" / "Removed from your wishlist"
+  (one reload hint instead of two), and the error texts match the screens ("You're not signed in to Bandcamp.", "Bandcamp asked us to slow down.").
+- The summary of the extension (manifest and store) says the same as the page: "New music every day, built from your own taste. Never shows what you already own on Bandcamp."
+  The store description names the three lists with the same words as the app, and the old "Hide what you don't" bullet is gone.
+- The old progress texts that were kept only for a test are removed.
+
 ## 1.0.1
 - A "What's new" page, opened from the About page, with a short note per release (`src/pages/about/whats-new.html`). The full history is this file, which now also
   travels inside the zip. Docs and store texts are all in English.

@@ -10,32 +10,8 @@ import { onWaitingChange, waiting } from './waiting.js';
 
 const SAMPLING_PHASES = new Set([PHASE.SAMPLING]);
 
-export function progressText(status) {
-  const surprise = status.mode === 'surprise';
-  const genres = (status.tagLabels || []).join(' + ');
-  if (status.mode === 'tags') {
-    const count = `${formatNumber(status.done)}/${formatNumber(status.total)}`;
-    if (status.phase === PHASE.SCANNING) return `Looking for your ${genres} albums · ${count}`;
-    if (SAMPLING_PHASES.has(status.phase)) return `Digging into your ${genres} albums · ${count}`;
-  }
-  if (SAMPLING_PHASES.has(status.phase)) {
-    if (status.bootstrap) return `Learning your taste, first time only (takes a few minutes) · ${formatNumber(status.done)}/${formatNumber(status.total)}`;
-    const liked = status.likedPicked ? ` (${status.likedPicked} you liked)` : '';
-    const what = `${formatNumber(status.picked)} ${status.library ? `of your ${formatNumber(status.library)} albums` : 'random albums'}${liked}`;
-    return `${surprise ? 'Digging for surprises in' : 'Picking and analyzing'} ${what} · ${formatNumber(status.done)}/${formatNumber(status.total)}`;
-  }
-  switch (status.phase) {
-    case PHASE.SIGNING_IN: return 'Signing in to Bandcamp…';
-    case PHASE.LIBRARY: return 'Reading your collection and wishlist…';
-    case PHASE.TASTE: return `Checking ${formatNumber(status.done)}/${formatNumber(status.total)} candidates against your taste…`;
-    case PHASE.RANKING: return `Ranking ${formatNumber(status.candidates)} candidates…`;
-    case PHASE.PICKING: return surprise ? 'Digging below the obvious picks…' : `Picking your ${DAILY_COUNT}…`;
-    default: return 'Working…';
-  }
-}
-
 /**
- * The same progress, split for the loading box: a title (what is being done) and, only when there is something worth saying,
+ * What the loading box says: a title (what is being done) and, only when there is something worth saying,
  * a detail line (how far it is). `detail` is empty otherwise, and the box shows no second line.
  */
 export function progressParts(status) {
@@ -51,7 +27,7 @@ export function progressParts(status) {
   switch (status.phase) {
     case PHASE.SIGNING_IN: return { title: 'Signing in', detail: '' };
     case PHASE.LIBRARY: return { title: 'Reading your library', detail: '' };
-    case PHASE.TASTE: return { title: 'Checking genres', detail: albums };
+    case PHASE.TASTE: return { title: 'Checking tags', detail: albums };
     case PHASE.RANKING: return { title: 'Ranking candidates', detail: status.candidates ? `${formatNumber(status.candidates)} found` : '' };
     case PHASE.PICKING: return { title: `Choosing your ${DAILY_COUNT}`, detail: '' };
     default: return { title: 'Working', detail: '' };
@@ -145,8 +121,8 @@ export function renderStatus(status) {
   } else if (status.error === 'no_seeds') {
     const { scanned, total } = session.state ? scanProgress(session.state) : { scanned: 0, total: 0 };
     box.hidden = false;
-    box.innerHTML = `<strong>None of your albums has ${esc((status.tagLabels || []).join(' + ') || 'this genre')} yet.</strong>
-      <p>${total ? `${formatNumber(scanned)} of ${formatNumber(total)} albums scanned so far. The scan keeps going in the background: try again later, or pick another genre.` : 'Pick another genre.'}</p>`;
+    box.innerHTML = `<strong>None of your albums has ${esc((status.tagLabels || []).join(' + ') || 'this tag')} yet.</strong>
+      <p>${total ? `${formatNumber(scanned)} of ${formatNumber(total)} albums scanned so far. The scan keeps going in the background: try again later, or pick another tag.` : 'Pick another tag.'}</p>`;
   } else if (status.error === 'rate_limited') {
     box.hidden = false;
     box.innerHTML = `<strong>Bandcamp asked us to slow down.</strong><p id="retry-countdown">${status.retryAt ? '' : 'Try again in a few minutes.'}</p>`;
