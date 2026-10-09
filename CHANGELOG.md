@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.6
+- The button of the loading box (a song from your collection while the list is built) is a square-cornered button like Bandcamp's, always the same width (250 px, it shrinks
+  in a narrow window). It reads "Play a song while waiting" and shows Material's plain play and pause icons. While a song plays it shows "Artist - Song" (no "Now playing"),
+  with the same fade between the two texts; a name wider than the button scrolls inside it, to the end and back (not with reduced motion: it is cut with an ellipsis).
+
 ## 1.1.5
 - The full stop at the end of sentences stays only in the two lines at the top of the genre menu. The "first time only" note, the toasts (wishlist and Liked Songs) and
   the note in the footer of Liked Songs are back to how they were, without it.

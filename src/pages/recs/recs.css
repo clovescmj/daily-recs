@@ -127,16 +127,22 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .loading-text { flex: 1; min-width: 0; }
 .loading-text strong { display: block; font-size: var(--bc-font-size-200); }
 .loading-text strong.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); }
-.loading-wait { display: flex; align-items: center; gap: 4px; flex: 0 1 auto; min-width: 0; max-width: 46%; font-size: var(--bc-font-size-100); color: var(--muted); }
+.loading-wait { flex: 0 1 250px; min-width: 120px; } /* one size; in a narrow window it shrinks with the box */
 .loading-wait[hidden] { display: none; }
-.wait-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wait-label.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); } /* the same fade as the title of the steps */
-.wait-btn { flex: none; width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; color: var(--gray700); }
-.wait-btn:hover { color: var(--link-blue); }
-.wait-btn svg { width: 18px; height: 18px; fill: currentColor; display: block; }
+.wait-btn { width: 100%; height: var(--dr-control-h); box-sizing: border-box; display: flex; align-items: center; gap: 6px; padding: 0 12px 0 8px; font: inherit; font-size: var(--bc-font-size-100); color: var(--dr-text); white-space: nowrap; cursor: pointer; background: var(--dr-surface); border: 1px solid var(--dr-border); border-radius: var(--dr-radius); }
+.wait-btn:hover { background: var(--dr-button-plain-hover); }
+.wait-btn:active { background: var(--dr-button-plain-active); }
+.wait-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wait-btn svg { flex: none; width: 20px; height: 20px; fill: currentColor; display: block; }
 .wait-btn .wait-pause, .wait-btn.is-playing .wait-play { display: none; }
 .wait-btn.is-playing .wait-pause { display: block; }
-@media (max-width: 640px) { .wait-label { display: none; } } /* narrow window: only the button (its title says what it does) */
+.wait-label { flex: 1; min-width: 0; overflow: hidden; text-align: left; }
+.wait-label.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); } /* the same fade as the title of the steps */
+.wait-text { display: inline-block; white-space: nowrap; }
+.wait-label.is-run { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); }
+.wait-label.is-run .wait-text { animation: wait-scroll var(--wait-dur, 8s) linear infinite; } /* a long name runs to its end and back */
+@keyframes wait-scroll { 0%, 12% { transform: none; } 88%, 100% { transform: translateX(var(--wait-x)); } }
+@media (prefers-reduced-motion: reduce) { .wait-label.is-run .wait-text { animation: none; } .wait-label.is-run { -webkit-mask-image: none; mask-image: none; } .wait-label.is-run .wait-text { display: block; overflow: hidden; text-overflow: ellipsis; } }
 .loading-sub { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows var(--dr-dur-base) var(--dr-ease), opacity var(--dr-dur-base) var(--dr-ease), margin-top var(--dr-dur-base) var(--dr-ease); }
 .loading-sub.is-on { grid-template-rows: 1fr; opacity: 1; margin-top: 2px; }
 .loading-sub span { overflow: hidden; min-height: 0; font-size: var(--bc-font-size-100); color: var(--muted); }
