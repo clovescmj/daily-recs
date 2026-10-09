@@ -140,9 +140,9 @@
 #dr-player .pb-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 1; color: #333; border: 1px solid #d9d9d9; border-radius: 4px; padding: 6px 8px; margin: -5px 0 0; /* the icons next to it are 20px tall and sit at the top: this centres the button on them */ opacity: 1; background: #fff; white-space: nowrap; cursor: pointer; }
 #dr-player .pb-btn:hover, #dr-player .pb-btn.open { border-color: #999; text-decoration: none; }
 #dr-player .pb-chev { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-#dr-player .pb-menu { position: absolute; left: 0; bottom: calc(100% + 6px); min-width: 210px; width: max-content; background: #fff; border-radius: 5px 5px 0 0; box-shadow: 0 0 3px 0 rgba(0,0,0,0.2); padding: 6px 0; z-index: 112; }
+#dr-player .pb-menu { position: absolute; left: 0; bottom: calc(100% + 11px); /* 6px above the button (it sticks out 5px above its box) */ min-width: 210px; width: max-content; background: #fff; border: 1px solid rgb(34 34 34 / 32%); border-radius: 4px; box-shadow: 0 4px 16px rgb(34 34 34 / 16%); padding: 0 0 6px; z-index: 112; } /* same border, corners and shadow as the genre menu */
 #dr-player .pb-menu[hidden] { display: none; }
-#dr-player .pb-head { padding: 6px 12px 10px; border-bottom: 1px solid rgba(0,0,0,.08); margin-bottom: 4px; }
+#dr-player .pb-head { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,.08); margin-bottom: 4px; }
 #dr-player .pb-head b { display: block; font-size: 13px; font-weight: 600; color: #333; }
 #dr-player .pb-head span { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: #777; }
 #dr-player .pb-opt { display: flex; align-items: center; gap: 8px; white-space: nowrap; padding: 8px 12px; font-size: 13px; color: #333; }

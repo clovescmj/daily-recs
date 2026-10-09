@@ -25,6 +25,7 @@ export function listenToHost(onCommand) {
   const postHeight = () => postToHost({ dr: 'height', h: Math.ceil(document.body.getBoundingClientRect().height) });
   new ResizeObserver(postHeight).observe(document.body);
   postHeight();
+  addEventListener('pointerdown', () => postToHost({ dr: 'close' })); // clicks here never reach the player bar's own page
 
   addEventListener('message', (event) => {
     const message = event.data;

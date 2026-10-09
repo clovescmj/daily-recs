@@ -240,7 +240,7 @@
         option.classList.toggle('sel', on); option.setAttribute('aria-checked', String(on));
       }
     }
-    return { el, update };
+    return { el, update, closeMenus: () => setPlaybackMenu(false) };
   }
   globalThis.BCPlayer = { create };
 })();

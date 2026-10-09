@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.6
+- The Playback menu has the same border, corners, shadow and distance from its button as the genre menu.
+- The Playback menu closes when you click anywhere in the recs page, not only on the Bandcamp page around it.
+
 ## 0.15.5
 - Loading texts are shorter and consistent ("Signing in", "Reading your library", "Sampling your collection", "Ranking candidates", "Checking genres",
   "Choosing your 8"). The second line only shows when there is something to say (how many albums are done, how many candidates were found); it

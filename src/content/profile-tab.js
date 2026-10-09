@@ -155,6 +155,9 @@
       case 'toast':
         if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH));
         break;
+      case 'close': // a click inside the page: the menu of the player bar closes too
+        if (state.bar) state.bar.closeMenus();
+        break;
       case 'now':
         // Updates are partial: the queue is only included when it changed, so keep the last one.
         state.lastNow = { ...message, queue: message.queue !== undefined ? message.queue : state.lastNow && state.lastNow.queue };
