@@ -3,8 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.12
+- Icons inside buttons are 18 px (they were 16 px, which rendered a little rough): the list buttons, Play mode, the song while waiting and the arrow of the genre button.
+  Icons on their own stay at 20 px. Token `--dr-icon-size-button`.
+
 ## 1.1.11
-- Two sizes for the icons: **16 px** for an icon inside a button (the list buttons, Play mode, the song while waiting, and the arrow of the genre button) and **20 px** for an
+- Two sizes for the icons: **16 px** (made 18 px in 1.1.12) for an icon inside a button (the list buttons, Play mode, the song while waiting, and the arrow of the genre button) and **20 px** for an
   icon on its own (the heart, the + and the block icon, the queue, Liked Songs, volume and the close icon). The big play and pause and the previous and next arrows
   keep their own sizes. New tokens `--dr-icon-size` (20 px) and `--dr-icon-size-button` (16 px).
 - The arrow of the genre button is Material's `arrow_drop_down` (a small solid triangle) instead of a thin chevron.
