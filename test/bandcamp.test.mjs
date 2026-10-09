@@ -216,3 +216,8 @@ test('parseTags splits a list of hashtags into tags and drops the names of place
   assert.deepEqual(parseTagsFromPage(tag('punk #ebm #lofi #post-punk')), ['punk', 'ebm', 'lofi', 'postpunk']);
   assert.deepEqual(parseTagsFromPage(['tbilisi', 'brazil', 'berlin', 'ebm'].map(tag).join('')), ['ebm']);
 });
+
+test('parseTags also splits tags written with commas, semicolons and slashes', () => {
+  const tag = (text) => `<a class="tag" href="https://bandcamp.com/discover/x">${text}</a>`;
+  assert.deepEqual(parseTagsFromPage(tag('rock, punk') + tag('hip-hop/rap') + tag('synthpop; darkwave') + tag('Los Angeles, California')), ['rock', 'punk', 'hiphop', 'rap', 'synthpop', 'darkwave']);
+});

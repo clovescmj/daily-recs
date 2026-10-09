@@ -1,6 +1,6 @@
 // Shape of the persisted state, its schema version, and migrations from older versions.
 import { migrateTaste } from './taste-sync.js';
-import { normalizeTasteTags } from './taste-profile.js';
+import { normalizeTasteTags, splitMergedTags } from './taste-profile.js';
 
 export const SCHEMA_VERSION = 3;
 export const DAILY_COUNT = 50;
@@ -51,6 +51,7 @@ export function migrateState(state) {
   state.saved ||= [];
   state.wishlisted ||= [...(state.liked || [])]; // before the two were separated, a like was also a wishlist entry
   normalizeTasteTags(state);
+  splitMergedTags(state);
   if (state.owned && state.owned.count !== undefined) { // legacy names
     state.owned.collectionCount = state.owned.count;
     state.owned.wishlistCount = state.owned.wishCount || 0;

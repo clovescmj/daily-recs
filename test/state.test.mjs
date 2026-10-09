@@ -5,6 +5,22 @@ import { hashSource } from '../src/lib/taste-sync.js';
 import { wishlistOpInPage } from '../src/background/wishlist-in-page.js';
 
 describe('migrateState', () => {
+  test('a tag that is a list is split into its tags, and places are dropped, in what was already stored', () => {
+    const state = migrateState({
+      albumTags: { h1: 'punk#ebm#lofi#postpunk|tbilisi|darkwave', h2: 'ebm|brazil' },
+      tagCache: { 1: { t: 'rock/punk|berlin', at: 1 } },
+      tagLabels: { 'punk#ebm#lofi#postpunk': 'punk #ebm #lofi #post-punk', ebm: 'ebm', tbilisi: 'tbilisi' },
+      tasteTags: { 'punk#ebm#lofi#postpunk': 4, tbilisi: 2, ebm: 1 },
+    });
+    assert.equal(state.albumTags.h1, 'punk|ebm|lofi|postpunk|darkwave');
+    assert.equal(state.albumTags.h2, 'ebm');
+    assert.equal(state.tagCache[1].t, 'rock|punk');
+    assert.deepEqual(Object.keys(state.tasteTags).sort(), ['ebm', 'lofi', 'postpunk', 'punk']);
+    assert.equal(state.tasteTags.ebm, 2);   // 1 of its own + a quarter of 4
+    assert.equal(state.tagLabels.tbilisi, undefined);
+    assert.equal(migrateState(state).albumTags.h1, 'punk|ebm|lofi|postpunk|darkwave'); // running it again changes nothing
+  });
+
   test('upgrades a state saved by an older version without losing data', () => {
     const legacy = {
       pool: { a: { id: 'a' } }, liked: ['1'], dismissed: ['2'], shown: ['3'], shownArtists: [],

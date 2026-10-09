@@ -213,6 +213,7 @@ export function parseRecommendations(html) {
 import { isPlace } from './places.js';
 
 const MAX_TAGS = 8;
+export const TAG_SEPARATORS = /[#,;/]/;
 
 // The same genre is written many ways ("e.b.m", "EBM", "electronic body music"; "dark wave", "darkwave"): they must count as one.
 const TAG_ALIASES = Object.freeze({ electronicbodymusic: 'ebm' });
@@ -233,9 +234,9 @@ export function parseTagLabels(html) {
   while ((match = pattern.exec(html)) && tags.length < MAX_TAGS) {
     const [, href, label] = match;
     if (!/\/discover\//.test(href)) continue;
-    // some artists write a whole list in one tag ("punk #ebm #lofi"): each word is a tag of its own
-    for (const text of decodeHtmlEntities(label).split('#').map((part) => part.trim())) {
-      if (!text || /^\p{Lu}/u.test(text) || text.includes(',') || text.length > 40 || tags.length >= MAX_TAGS) continue;
+    // some artists write a whole list in one tag ("punk #ebm #lofi", "rock, punk", "hip-hop/rap"): each one is a tag of its own
+    for (const text of decodeHtmlEntities(label).split(TAG_SEPARATORS).map((part) => part.trim())) {
+      if (text.length < 2 || /^\p{Lu}/u.test(text) || text.length > 40 || tags.length >= MAX_TAGS) continue;
       const key = normalizeTag(text);
       if (isPlace(key) || tags.some((tag) => tag.key === key)) continue; // a city or a country says where the music is from, not what it sounds like
       tags.push({ key, label: text.toLowerCase() });

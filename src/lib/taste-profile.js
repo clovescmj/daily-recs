@@ -30,6 +30,31 @@ export function createSourceWeigher(state) {
   return (url) => (base.get(url) ?? 1) * (likedUrls.has(url) ? LIKED_BONUS : wishlistedUrls.has(url) ? WISHLISTED_BONUS : 1);
 }
 
+const MERGED = /[#,;/]/;
+
+/**
+ * Tags stored before the reader learned to split lists ("punk#ebm#lofi") and to ignore places: each list becomes its own tags
+ * (the weight of the taste profile is shared among them) and places are dropped, in the albums, the labels, the profile and the cache.
+ * Safe to run on every load.
+ */
+export function splitMergedTags(state) {
+  const pieces = (key) => (MERGED.test(key) ? key.split(MERGED).map(normalizeTag).filter((piece) => piece.length >= 2) : [key]).filter((piece) => !isPlace(piece));
+  const rewrite = (stored) => [...new Set(stored.split('|').flatMap(pieces))].join('|');
+  for (const [hash, stored] of Object.entries(state.albumTags || {})) if (stored && (MERGED.test(stored) || stored.split('|').some(isPlace))) state.albumTags[hash] = rewrite(stored);
+  for (const entry of Object.values(state.tagCache || {})) if (entry && entry.t && (MERGED.test(entry.t) || entry.t.split('|').some(isPlace))) entry.t = rewrite(entry.t);
+  const labels = (state.tagLabels ||= {});
+  const taste = (state.tasteTags ||= {});
+  for (const key of Object.keys(taste)) {
+    if (MERGED.test(key)) {
+      const parts = pieces(key);
+      for (const part of parts) taste[part] = Math.round(((taste[part] || 0) + taste[key] / parts.length) * 1000) / 1000;
+      delete taste[key];
+    } else if (isPlace(key)) delete taste[key];
+  }
+  for (const key of Object.keys(labels)) if (MERGED.test(key) || isPlace(key)) delete labels[key];
+  for (const stored of Object.values(state.albumTags || {})) for (const key of stored ? stored.split('|') : []) if (!labels[key]) labels[key] = key;
+}
+
 /** Merges spellings of the same tag that were stored before they were normalised ("e.b.m" + "ebm"). */
 export function normalizeTasteTags(state) {
   const merged = {};

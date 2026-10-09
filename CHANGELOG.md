@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.12
+- A tag that holds several genres is now split into those genres, for all the usual ways of writing a list: `#hashtags`, commas, semicolons and slashes ("rock, punk",
+  "hip-hop/rap", "punk #ebm #lofi"). It also fixes what was already stored: the albums you had scanned, the genre labels, the taste profile (the weight of the list is shared
+  among its genres) and the cache are cleaned the next time the extension loads, and places are removed from them. Nothing is read again.
+
 ## 0.18.11
 - Cleaner genres in the picker. Junk like "punk #ebm #lofi #post-punk", "tbilisi", "khidi" or "othr" no longer shows up:
   - a tag where the artist wrote a list of #hashtags is read as the separate tags (punk, ebm, lofi, post-punk) instead of one odd tag;
