@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.15
+- The close icon (the X of the queue and Liked Songs) and the mute icon are the 18 px variants of Material Symbols (`close`, `volume_off`), like the other icons.
+
 ## 1.1.14
 - The icons are the 18 px variants of Material Symbols (optical size 20), downloaded from the site and converted to the 24 grid of the code: the heart (outline and filled), the +,
   the check circle, the block icon, the queue (`playlist_play`), Liked Songs (`library_music`, filled), volume, shuffle, Full album (Material's `full_album`, in place of the
