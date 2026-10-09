@@ -1,0 +1,96 @@
+DAILY RECS FOR BANDCAMP: TEXTS TO PASTE INTO THE CHROME WEB STORE
+(plain text, no formatting; paste each block into the field it names)
+
+
+=== STORE LISTING TAB ===
+
+NAME
+Daily Recs for Bandcamp
+
+SUMMARY (max 132 characters)
+New Bandcamp albums every day, picked from your own collection. Never shows what you already own.
+
+CATEGORY
+Entertainment (or the closest music option available)
+
+LANGUAGE
+English
+
+DESCRIPTION
+Find new music every day, without losing the evening.
+
+Daily Recs starts from what you own and what you've saved on Bandcamp, finds albums that fans of those records love, and keeps the ones that fit your taste. Every list is made of albums you don't own, from artists you don't have, and nothing repeats.
+
+• A fresh list of 50 albums every day, right inside your Bandcamp profile, in a new "daily recs" tab
+• The heart adds an album to your Bandcamp wishlist, and the + saves songs to your own Liked Songs list
+• "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
+• Hide what you don't: it never comes back
+• Three lists: "My tags" (the genres you pick), "Best matches" and "Surprise me" (go beyond your collection)
+• A built-in player in Bandcamp's own style, with a playback choice (one song per album, or whole albums), queue, Liked Songs and media keys
+• While your list is being built, play a random song from your own collection
+• The albums you hide sync across your computers through your Google account
+
+Private by design: everything runs in your browser and only talks to Bandcamp (bandcamp.com and its media servers). No analytics, no ads, no accounts.
+
+You need to be signed in to Bandcamp. This is an independent project. It is not made, endorsed or supported by Bandcamp.
+
+SUPPORT URL
+https://github.com/clovescmj/daily-recs/issues
+
+HOMEPAGE URL
+https://github.com/clovescmj/daily-recs
+
+IMAGES (folder store/images)
+Screenshot: screenshot-1-1280x800.png
+Small promo tile: promo-440x280.png
+Marquee: marquee-1400x560.png
+
+
+=== PRIVACY PRACTICES TAB ===
+
+SINGLE PURPOSE
+Show a daily list of new album recommendations on the user's own Bandcamp profile, based on their collection and wishlist.
+
+PERMISSION JUSTIFICATIONS
+
+storage
+Keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs hidden albums through the user's Google account.
+
+alarms
+Checks once every few hours whether a new day has started, to prepare the day's list in the background, and schedules a retry when Bandcamp asks to slow down.
+
+offscreen (new permission in this version)
+Opens a hidden page that only checks whether the browser is in dark or light mode, so the toolbar icon can use the symbol that is visible on the user's toolbar (the service worker cannot check this itself). It reads and sends no other data.
+
+contextMenus
+Adds the right-click menu on the toolbar icon (Open Daily Recs, Feedback, Report a bug, About).
+
+scripting
+When the user clicks the heart, runs Bandcamp's own "add to wishlist" function in the user's Bandcamp tab, so the wishlist changes exactly as if they had clicked Bandcamp's button.
+
+HOST PERMISSION (https://*.bandcamp.com/*)
+Reads the user's collection and wishlist, and the "you may also like" section, tags and songs of album pages (these live on artists' subdomains). Nothing else is accessed. The audio and covers it plays come from Bandcamp's own media servers (bcbits.com), loaded by the page as any image or audio; no access is needed for that.
+
+CONTENT SCRIPT (https://bandcamp.com/*)
+Adds the "daily recs" tab and the player bar to the user's own profile page.
+
+REMOTE CODE
+No, I am not using remote code.
+
+DATA USAGE
+The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides and the user's Liked Songs. All of it stays on the device or in the user's own Chrome sync; none of it is sent to the developer or to any third party. Check the three final certifications: the data is not sold to third parties, not used for purposes unrelated to the single purpose, and not used for creditworthiness or lending.
+
+PRIVACY POLICY URL
+https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md
+
+
+=== CHANGELOG / WHAT'S NEW (if the dashboard has the field) ===
+
+Version 1.0
+
+First stable release.
+• New "daily recs" tab on your Bandcamp profile, with three lists: My tags, Best matches and Surprise me
+• Heart to add an album to your wishlist, + to save songs to Liked Songs, and a button to hide music you don't want
+• Built-in player: one song per album or full albums, queue and Liked Songs
+• Play a random song from your collection while your list loads
+• Cleaner genre suggestions, and a look that follows Bandcamp's own style

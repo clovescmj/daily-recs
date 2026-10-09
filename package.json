@@ -7,7 +7,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "check": "for f in $(find src -name '*.js'); do node --check \"$f\" || exit 1; done",
-    "package": "mkdir -p dist && V=$(node -p \"require('./manifest.json').version\") && rm -f dist/daily-recs-$V.zip && zip -qr dist/daily-recs-$V.zip manifest.json icons src -x '*.DS_Store' && echo dist/daily-recs-$V.zip"
+    "package": "mkdir -p dist && V=$(node -p \"require('./manifest.json').version\") && rm -f dist/daily-recs-$V.zip && zip -qr dist/daily-recs-$V.zip manifest.json CHANGELOG.md icons src -x '*.DS_Store' && echo dist/daily-recs-$V.zip"
   },
   "engines": {
     "node": ">=20"
