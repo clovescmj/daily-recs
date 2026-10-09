@@ -73,6 +73,14 @@ describe('parseTracks', () => {
     assert.deepEqual(tracks.map((t) => t.title), ['ok']);
   });
 
+  test('keeps the address of each song\'s own page', () => {
+    const tracks = parseTracks(page([
+      { title: 'a', title_link: '/track/a', file: { 'mp3-128': 'https://t4.bcbits.com/stream/a' } },
+      { title: 'b', file: { 'mp3-128': 'https://t4.bcbits.com/stream/b' } },
+    ]));
+    assert.deepEqual(tracks.map((t) => t.link), ['/track/a', '']);
+  });
+
   test('marks the track the artist chose to highlight', () => {
     const file = (n) => ({ 'mp3-128': `https://t4.bcbits.com/stream/${n}` });
     const tracks = parseTracks(page([

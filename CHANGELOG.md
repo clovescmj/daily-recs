@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.15.7
+- Next to the cover, the player bar shows the name of the song with the artist under it (it was the album's name), and the cover and the
+  name link to the song's own page on Bandcamp instead of the album's.
+
 ## 0.15.6
 - The Playback menu has the same border, corners, shadow and distance from its button as the genre menu.
 - The Playback menu closes when you click anywhere in the recs page, not only on the Bandcamp page around it.

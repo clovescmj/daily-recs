@@ -166,7 +166,7 @@
       if (s.art) { if (img.getAttribute('src') !== s.art) img.src = s.art; } else img.removeAttribute('src');
       q('.np-art').href = q('.np-link').href = s.url || '#';
       img.alt = s.albumTitle ? `Cover of ${s.albumTitle}${s.artist ? ` by ${s.artist}` : ''}` : 'No album playing';
-      setText(q('.now-playing .title'), s.albumTitle || '');
+      setText(q('.now-playing .title'), s.songTitle || s.albumTitle || ''); // the song, with the artist under it
       setText(q('.now-playing .artist span'), s.artist || '');
       q('.now-playing .artist').style.display = s.artist ? '' : 'none';
       q('.collect').style.visibility = s.artist ? '' : 'hidden';

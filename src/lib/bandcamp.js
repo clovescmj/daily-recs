@@ -260,6 +260,7 @@ export function parseEmbeddedTracks(html) {
   return (data.tracks || [])
     .map((track) => ({
       title: toLabel(track.title),
+      link: typeof track.title_link === 'string' ? track.title_link : '', // the song's own page (relative to the album's site)
       src: toHttpsUrl(track.file && track.file['mp3-128']),
       duration: track.duration,
       featured: Boolean(data.featured_track_id) && String(track.id) === String(data.featured_track_id),
@@ -278,6 +279,7 @@ export function parseTracks(html) {
   return (tralbum.trackinfo || [])
     .map((track) => ({
       title: toLabel(track.title),
+      link: typeof track.title_link === 'string' ? track.title_link : '', // the song's own page (relative to the album's site)
       src: toHttpsUrl(track.file && track.file['mp3-128']),
       duration: track.duration,
       featured: Boolean(tralbum.featured_track_id) && String(track.track_id ?? track.id) === String(tralbum.featured_track_id),

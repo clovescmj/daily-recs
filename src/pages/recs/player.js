@@ -258,6 +258,15 @@ function savedItems() {
   return savedCache;
 }
 
+/** Page of the song that is playing; the album's page when the song has none (or its address looks odd). */
+function trackUrl(album, track) {
+  if (!album) return '';
+  try {
+    const url = new URL((track && track.link) || '', album.url);
+    return /^https?:$/.test(url.protocol) && track && track.link ? url.href : album.url;
+  } catch { return album.url; }
+}
+
 function snapshot() {
   const { current, album } = player;
   const track = current.tracks[current.index];
@@ -265,8 +274,8 @@ function snapshot() {
   const albumIndex = visibleCardIds().indexOf(current.id);
   const snap = {
     has: session.hasList,
-    art: album ? album.art : '', url: album ? album.url : '',
-    albumTitle: album ? album.title : '', artist: album ? album.artist : '',
+    art: album ? album.art : '', url: trackUrl(album, track),
+    albumTitle: album ? album.title : '', songTitle: track ? track.title : '', artist: album ? album.artist : '',
     trackNo: track ? current.index + 1 : 0, track: track ? track.title : '', msg: player.message,
     busy: player.busy || (!audio.paused && audio.readyState < 3),
     playing: !audio.paused, cur: audio.currentTime || 0, dur: audio.duration || 0,
