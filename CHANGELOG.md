@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.16.1
+- The player bar no longer shows up while a song plays during the loading: the button of the loading box is the only control (the bar appears when the list is ready, as always).
+
 ## 0.16.0
 - **A song while you wait.** On the right of the loading box there is "Play a song while waiting" and a small play button (Material's play and
   pause circles). It plays a random song from an album of your own collection (not the wishlist or the recommendations). While it plays, the

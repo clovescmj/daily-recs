@@ -334,7 +334,7 @@ function snapshot() {
   const queue = queueItems();
   const albumIndex = visibleCardIds().indexOf(current.id);
   const snap = {
-    has: session.hasList || player.waiting, plain: player.waiting,
+    has: session.hasList, plain: player.waiting, // (the bar stays hidden while the list is built: the loading box has the button)
     art: album ? album.art : '', url: trackUrl(album, track),
     albumTitle: album ? album.title : '', songTitle: track ? track.title : '', artist: album ? album.artist : '',
     trackNo: track ? current.index + 1 : 0, track: track ? track.title : '', msg: player.message,
