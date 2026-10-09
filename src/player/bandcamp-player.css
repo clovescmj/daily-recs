@@ -100,20 +100,31 @@
   opacity: 0; visibility: hidden; transform: translateY(var(--dr-panel-shift)); pointer-events: none; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s var(--dr-panel-rise);
   border: 1px solid var(--dr-border-bar); border-bottom: 0; /* the bar's own line closes it at the bottom */ box-shadow: var(--dr-shadow-menu); border-radius: var(--dr-radius) var(--dr-radius) 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
 #dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s; }
-#dr-player .queue-header { margin: 16px 16px 10px; display: flex; justify-content: space-between; }
-#dr-player .queue-header h2 { margin: 0; font-size: var(--dr-font-title); font-weight: var(--dr-weight-medium); }
-#dr-player .queue-header h2 b { font-weight: var(--dr-weight-bold); }
-#dr-player .close-icon { height: 20px; width: 20px; margin-top: 2px; cursor: pointer; fill: var(--dr-glyph); display: block; }
+#dr-player .queue { display: flex; flex-direction: column; }
+#dr-player .queue-header { margin: 0; padding: 14px 16px 10px; display: flex; align-items: center; gap: 8px; }
+#dr-player .queue-header h2 { flex: 1; margin: 0; font-size: var(--dr-font-title); font-weight: var(--dr-weight-medium); }
+#dr-player .queue-header .q-count, #dr-player .queue-header .l-count { font-size: var(--dr-font-s); color: var(--dr-text-muted); }
+#dr-player .close-icon { height: 20px; width: 20px; cursor: pointer; fill: var(--dr-glyph); display: block; }
 #dr-player .queue ol, #dr-player .queue li { list-style: none; padding: 0; margin: 0; }
-#dr-player .queue ol { height: calc(100% - 54px); overflow-y: auto; }
-#dr-player .queue li { padding: 8px 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; }
-#dr-player .queue .qlabel { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-#dr-player .queue .qact { flex: none; display: inline-flex; align-items: center; gap: var(--dr-icon-gap); margin-left: 12px; }
+#dr-player .queue ol { flex: 1; min-height: 0; overflow-y: auto; }
+#dr-player .queue li { padding: 6px 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+#dr-player .queue li.qsec { padding: 8px 16px 4px; cursor: default; font-size: var(--dr-font-s); letter-spacing: .04em; text-transform: uppercase; color: var(--dr-text-muted); }
+#dr-player .queue li.qsec:hover { background: transparent; }
+#dr-player .queue .qcover { position: relative; flex: none; width: 40px; height: 40px; border-radius: 2px; overflow: hidden; background: var(--dr-hover); }
+#dr-player .queue .qcover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+#dr-player .queue .qeq { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 2px; background: rgba(0, 0, 0, .45); }
+#dr-player .queue .qeq i { display: block; width: 3px; height: 12px; background: var(--dr-white); }
+#dr-player .queue .qeq i:nth-child(2) { height: 18px; }
+#dr-player .queue .qeq i:nth-child(3) { height: 8px; }
+#dr-player .queue:not(.audible) .qeq i { height: 3px; }
+#dr-player .queue .qtext { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+#dr-player .queue .qtext b { font-weight: var(--dr-weight-medium); overflow: hidden; text-overflow: ellipsis; }
+#dr-player .queue .qtext span { font-size: var(--dr-font-s); color: var(--dr-text-muted); overflow: hidden; text-overflow: ellipsis; }
+#dr-player .queue .qact { flex: none; display: inline-flex; align-items: center; gap: var(--dr-icon-gap); }
+#dr-player .queue .qact .q-dislike { visibility: hidden; }
+#dr-player .queue li:hover .qact .q-dislike { visibility: visible; }
 #dr-player .queue li.active, #dr-player .queue li:hover { background: var(--dr-hover); }
-#dr-player .queue .qpp { flex: none; display: inline-block; vertical-align: middle; width: 14px; margin-right: 8px; height: 12px; visibility: hidden; }
-#dr-player .queue li.active .qpp, #dr-player .queue li:hover .qpp { visibility: visible; }
-#dr-player .queue .qpp::before { content: ""; box-sizing: content-box; display: inline-block; width: 0; height: 0; border-top: 6px inset transparent; border-bottom: 6px inset transparent; border-left: 9px solid var(--dr-text); }
-#dr-player .queue.audible li.active .qpp::before { border: 0; border-left: 3px solid var(--dr-glyph); border-right: 3px solid var(--dr-glyph); height: 12px; width: 2px; }
+#dr-player .queue-foot { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-top: 1px solid var(--dr-border-bar); font-size: var(--dr-font-s); color: var(--dr-text-muted); }
 #dr-player .now-playing img:not([src]) { visibility: hidden; }
 
 /* Slide transition when the bar appears / disappears (tab switch) */

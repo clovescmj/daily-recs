@@ -29,6 +29,9 @@
   /** One icon of a row of the queue or of the Liked list. */
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}`).join(',');
+  /** The cover of a row (the same box when there is none, so the rows keep their height). */
+  const rowCover = (art, playing) => `<span class="qcover">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}</span>`;
+  const rowText = (title, sub) => `<span class="qtext"><b>${esc(title)}</b><span>${esc(sub)}</span></span>`;
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
   function create({ onCmd }) {
@@ -73,13 +76,15 @@
             <div class="vol-control-outer"><div class="vol-control"></div></div></div>
         </div>
       </div></div>
-      <div class="queue" role="dialog" aria-label="Now playing recommendations">
-        <div class="queue-header"><h2>now playing <b>recommendations</b></h2><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
+      <div class="queue" role="dialog" aria-label="Recommendations queue">
+        <div class="queue-header"><h2>Recommendations queue</h2><span class="q-count"></span><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
         <ol></ol>
+        <div class="queue-foot"><span class="q-foot"></span></div>
       </div>
       <div class="queue saved" role="dialog" aria-label="Liked Songs">
-        <div class="queue-header"><h2>your <b>liked</b> songs</h2><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
+        <div class="queue-header"><h2>Liked Songs</h2><span class="l-count"></span><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
         <ol>${EMPTY_LIKED}</ol>
+        <div class="queue-foot"><span>Stored on this computer</span></div>
       </div>`;
     const q = (s) => el.querySelector(s);
     /** The cover of a song just added: it shows above the icon and shrinks into it (see .liked-fly). It lives in the bar, not in the button, so it does not get the button's fade. */
@@ -194,12 +199,16 @@
       const sig = `${s.curId}|${queueKey}`;
       if (sig !== queueSig) {
         queueSig = sig;
-        q('.queue ol').innerHTML = queue.map((it, i) =>
-          `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}"><span class="qpp"></span><span class="qlabel">${i + 1}. ${esc(it.label)}</span><span class="qact">`
+        const at = queue.findIndex((it) => it.id === s.curId);
+        const heading = (i) => (i === 0 && at > 0 ? '<li class="qsec">Played</li>' : '') + (at < 0 ? (i === 0 ? '<li class="qsec">Up next</li>' : '') : i === at ? '<li class="qsec">Playing now</li>' : i === at + 1 ? '<li class="qsec">Up next</li>' : '');
+        q('.queue ol').innerHTML = queue.map((it, i) => heading(i)
+          + `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}">${rowCover(it.art, it.id === s.curId)}${rowText(it.title, it.artist)}<span class="qact">`
           + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
           + action('saveAlbum', it.saved, 'Add album to Liked Songs', 'Remove album from Liked Songs', P.addCircle, P.checkCircle)
           + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
           + '</span></li>').join('');
+        q('.q-count').textContent = queue.length ? `${queue.length} albums` : '';
+        q('.q-foot').textContent = queue.length ? `${Math.max(0, at)} of ${queue.length} played` : '';
       }
       if (s.savedList !== undefined) {
         // a song was added: its cover appears above the Liked Songs icon and shrinks into it, and the icon jumps and wobbles as if it kept it
@@ -218,11 +227,12 @@
         }
         savedCount = s.savedList.length;
         q('.saved ol').innerHTML = s.savedList.length
-          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}"><span class="qlabel">${esc(it.label)}</span><span class="qact">`
+          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}">${rowCover(it.art, false)}${rowText(it.title, `${it.artist} · ${it.album}`)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + action('save', true, '', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
             + '</span></li>').join('')
           : EMPTY_LIKED;
+        q('.l-count').textContent = s.savedList.length ? `${s.savedList.length} ${s.savedList.length === 1 ? 'song' : 'songs'}` : '';
       }
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart and thumb down: each one has its own icon and label

@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.7
+- The Recommendations queue and Liked Songs lists now share one layout: the same header (title, count, close), rows with the cover, the title and a second line
+  (artist, or artist and album for a song), the same icons and hover, and a footer. The queue groups its rows under "Played", "Playing now" and "Up next" (the playing
+  album shows equaliser bars on its cover) and its footer counts the albums played; the footer of Liked Songs says where the list is stored. The don't-show icon
+  appears on hover.
+
 ## 1.0.6
 - A card only shows its album as added to Liked Songs when the whole album was added with the + of the card. Saving a single song from the player no longer ticks the
   album. Each song added with its album carries a mark (`all`) that is cleared as soon as you take one of its songs out. Albums added before this version show as not added

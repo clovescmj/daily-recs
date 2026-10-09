@@ -314,8 +314,9 @@ function queueItems() {
       key,
       items: ids.map((id) => {
         const card = findCard(id);
+        const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
         return {
-          id, label: `${card.querySelector('.album-artist').textContent} - ${card.querySelector('.album-title').textContent}`,
+          id, title: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '',
           wished: session.wished.has(id), saved: hasSavedSong(id),
         };
       }),
@@ -333,7 +334,7 @@ function savedItems() {
     savedCache = {
       key,
       items: entries.map((entry) => ({
-        id: entry.id, i: entry.i, title: entry.title, art: state.pool[entry.id].art || '', label: `${entry.title || `Track ${entry.i + 1}`} · ${state.pool[entry.id].artist}`, wished: session.wished.has(entry.id),
+        id: entry.id, i: entry.i, title: entry.title || `Track ${entry.i + 1}`, art: state.pool[entry.id].art || '', artist: state.pool[entry.id].artist, album: state.pool[entry.id].title || '', wished: session.wished.has(entry.id),
       })),
     };
   }
