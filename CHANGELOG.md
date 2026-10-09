@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.21
+- Changing the play mode shows a notice above the player bar, like the one for adding to Liked Songs: "Albums play in order, every song" for Full album and "One song from each
+  album, in random order" for Shuffle. Clicking the mode that is already on says nothing.
+
 ## 1.1.20
 - The count at the top of the queue says "X albums" again in Shuffle too (1.1.19 had made it "X songs"): the number of songs is not known until the albums are opened.
 

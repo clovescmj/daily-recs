@@ -5,6 +5,7 @@ import { findCard, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { session } from './session.js';
 import { postToHost } from './host-bridge.js';
+import { toast } from './toast.js';
 import { MSG } from '../../lib/messages.js';
 import { createPlayPlan } from '../../lib/play-plan.js';
 import { waiting } from './waiting.js';
@@ -28,6 +29,7 @@ const player = {
 const plan = createPlayPlan();   // which songs have played (shuffle never plays one twice)
 const history = [];              // the songs that played, in order: { id, index } (the previous button goes back along it)
 const MODES = ['album', 'shuffle'];
+const MODE_NOTICE = { album: 'Albums play in order, every song', shuffle: 'One song from each album, in random order' }; // the notice when the play mode changes
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
@@ -244,7 +246,9 @@ export const toggleMute = () => { audio.muted = !audio.muted; };
 /** 'album' (the albums in order, every song) or 'shuffle' (one song of each album, in a random order). */
 export function setMode(mode) {
   if (!MODES.includes(mode)) return;
+  const changed = mode !== player.mode;
   player.mode = mode;
+  if (changed) toast(MODE_NOTICE[mode]); // (clicking the mode that is already on says nothing)
   try { localStorage.setItem(MODE_KEY, player.mode); } catch { /* storage unavailable */ }
   emit(true);
 }
