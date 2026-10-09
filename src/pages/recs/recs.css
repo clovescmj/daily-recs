@@ -46,8 +46,9 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .play-all { flex: none; width: 41px; height: 41px; padding: 0; border: 1px solid var(--dr-border-soft); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .play-all:hover { border-color: var(--dr-border); }
 .play-all:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.play-all-icon { box-sizing: content-box; /* the page-wide border-box would squash the two pause bars into one */ width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 15px solid var(--gray700); margin-left: 3px; }
-.play-all.is-playing .play-all-icon { width: 4px; height: 18px; border: 0; border-left: 5px solid var(--dr-glyph); border-right: 5px solid var(--dr-glyph); margin: 0; }
+.play-all svg { width: 28px; height: 28px; fill: var(--gray700); display: block; } /* Material's play and pause: the glyph takes about half of the box */
+.play-all .play-all-pause, .play-all.is-playing .play-all-play { display: none; }
+.play-all.is-playing .play-all-pause { display: block; }
 .page-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .page-subtitle { margin: 0; font-size: var(--bc-font-size-200); line-height: var(--bc-line-height-200); color: var(--muted); }
 .page-actions { display: flex; }
@@ -61,6 +62,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .button:active:not(:disabled) { background: var(--dr-button-bg-active); border-color: var(--dr-button-bg-active); }
 .button:disabled { background: var(--dr-profile-button-disabled); border-color: var(--dr-profile-button-disabled); color: var(--dr-button-text); cursor: default; }
 .button:focus-visible, .view-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.icon-fill { width: 20px; height: 20px; fill: currentColor; display: block; flex: none; } /* the list buttons: the box of the icons of the player */
 .icon-stroke { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ── The lists of the day: a toggle that works like radio buttons (My tags with its genre picker, Best matches, Surprise me) ── */

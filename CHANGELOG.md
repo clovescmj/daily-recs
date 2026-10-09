@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.8
+- New filled icons (Material Symbols, made solid from the outline files): the list buttons (My tags, Best matches, Surprise me) in a 20 px box, the same as the icons of the
+  player; the play and pause of the page header and of the player bar (a 28 px box, since the glyph takes about half of it); and the volume icon. The heart, the + and the
+  block icon stay as they were.
+
 ## 1.1.7
 - The button of the loading box is as wide as its text again, up to 260 px (before, 1.1.6, it had one fixed width). A name longer than that scrolls inside it.
 
