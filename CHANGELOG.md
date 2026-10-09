@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.4
+- Your Liked Songs are safer. They now live under a storage key of their own (`likedSongs`), apart from the big state, and they only change when you add or take out a
+  song: a search, an update of the extension or a state that has to be rebuilt can no longer touch them. They are also written the moment you click the +, straight from
+  the page, instead of waiting in the queue of the service worker behind a search (or being lost if the browser stops the worker). A search that ends with an old copy of the
+  state no longer undoes what you liked meanwhile. The first time, the list you already had moves to the new key by itself. They still stay on this browser only (an
+  export / import is planned).
+
 ## 1.0.3
 - A bolder animation when a song goes to Liked Songs: the cover of its album appears above the Liked Songs icon, shrinks into it, and the icon jumps and wobbles as if it kept
   the cover. Songs added one after the other (an album adds all its songs) play one animation, not many. With "reduce motion" on, there is no animation.

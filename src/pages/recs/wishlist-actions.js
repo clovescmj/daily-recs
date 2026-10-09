@@ -2,7 +2,7 @@
 // thumb down says "don't show music like this". Wishlist changes are made by Bandcamp's own function, run inside the profile tab.
 import { MSG } from '../../lib/messages.js';
 import { findCard, paintDislike, paintWish, visibleCardIds } from './cards.js';
-import { loadState, send } from './data.js';
+import { loadState, send, updateLiked } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
 import { albumSongs, continueAfterRemoval, currentId, emit, playAlbum } from './player.js';
 import { session } from './session.js';
@@ -47,6 +47,7 @@ async function setSongs(songs, on, message) {
   for (const { id, i } of songs) { if (on) session.saved.add(`${id}:${i}`); else session.saved.delete(`${id}:${i}`); }
   emit(true);
   toast(message);
+  await updateLiked(songs.map(({ id, i, title }) => ({ id, i, title: String(title || '').slice(0, 200) })), on); // saved for good before anything else
   for (const { id, i, title } of songs) await send({ type: MSG.FEEDBACK, id, kind: on ? 'save' : 'unsave', index: i, track: String(title || '').slice(0, 200) });
 }
 

@@ -1,12 +1,17 @@
 // Reading from storage and talking to the service worker.
-import { PICKED_KEY, STATE_KEY, STATUS_KEY, isStatusStale } from '../../lib/storage-keys.js';
+import { LIKED_KEY, PICKED_KEY, STATE_KEY, STATUS_KEY, isStatusStale } from '../../lib/storage-keys.js';
+import { changeLiked, mirrorLiked } from '../../lib/liked.js';
 import { todayKey } from '../../lib/state.js';
 
 export const send = (message) => chrome.runtime.sendMessage(message);
 
 export async function loadState() {
-  return (await chrome.storage.local.get(STATE_KEY))[STATE_KEY] || null;
+  const stored = await chrome.storage.local.get([STATE_KEY, LIKED_KEY]);
+  return mirrorLiked(stored[STATE_KEY] || null, stored[LIKED_KEY]);   // the Liked Songs come from their own key
 }
+
+/** Adds or removes songs of the Liked Songs and writes them at once: it does not wait for the service worker, which may be busy with a run. */
+export const updateLiked = (songs, on) => changeLiked(chrome.storage.local, songs, on, async () => ((await loadState()) || {}).saved || []);
 
 export async function loadStatus() {
   const status = (await chrome.storage.session.get(STATUS_KEY))[STATUS_KEY] || null;
@@ -24,6 +29,6 @@ export const savePicked = (view, tags = []) => chrome.storage.local.set({ [PICKE
 /** Calls `onChange` whenever the stored state or the run status changes. */
 export function watchStorage(onChange) {
   chrome.storage.onChanged.addListener((changes, area) => {
-    if ((area === 'local' && changes[STATE_KEY]) || (area === 'session' && changes[STATUS_KEY])) onChange();
+    if ((area === 'local' && (changes[STATE_KEY] || changes[LIKED_KEY])) || (area === 'session' && changes[STATUS_KEY])) onChange();
   });
 }
