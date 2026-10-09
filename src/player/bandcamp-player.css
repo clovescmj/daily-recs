@@ -118,8 +118,18 @@
 #dr-player { transition: transform .3s ease .12s, visibility 0s linear 0s; }
 #dr-player.is-offscreen { transform: translateY(100%); visibility: hidden; transition: transform .3s ease, visibility 0s linear .3s; }
 @keyframes dr-bump { 0% { transform: none; } 15% { transform: translateY(-8px) rotate(-14deg); } 35% { transform: translateY(-8px) rotate(12deg); } 55% { transform: translateY(-4px) rotate(-8deg); } 75% { transform: rotate(4deg); } 100% { transform: none; } } /* jumps and wobbles, like a bell */
-#dr-player .x-icon.bump { animation: dr-bump var(--dr-dur-bump) ease-out; transform-origin: 50% 100%; }
-@media (prefers-reduced-motion: reduce) { #dr-player .x-icon.bump, #dr-player .busy g { animation: none; } }
+#dr-player .x-icon.bump { animation: dr-bump var(--dr-dur-bump) ease-out var(--dr-bump-delay, 0s); transform-origin: 50% 100%; }
+/* the cover of the song just added: it shows above the icon and shrinks into it, then the icon jumps (the delay of the bump) */
+#dr-player .liked-fly { position: absolute; width: 44px; height: 44px; z-index: 113; pointer-events: none; opacity: 0; animation: dr-fly var(--dr-dur-fly) both; }
+#dr-player .liked-fly img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@keyframes dr-fly {
+  0% { opacity: 0; transform: translateY(10px) scale(.7); }
+  20% { opacity: 1; transform: none; }
+  45% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.5, 0, .9, .6); }
+  90% { opacity: .95; transform: translateY(var(--dr-fly-dy)) scale(.2); }
+  100% { opacity: 0; transform: translateY(calc(var(--dr-fly-dy) + 2px)) scale(.1); }
+}
+@media (prefers-reduced-motion: reduce) { #dr-player .x-icon.bump, #dr-player .busy g { animation: none; } #dr-player .liked-fly { display: none; } }
 @media (prefers-reduced-motion: reduce) { #dr-player, #dr-player.is-offscreen { transition: none; } }
 #dr-player .queue .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 0 40px 40px; text-align: center; cursor: default; color: var(--dr-text-muted); white-space: normal; font-size: var(--dr-font-s); line-height: 1.5; }
 #dr-player .queue .empty .empty-icon { width: 48px; height: 48px; margin-bottom: 12px; fill: var(--dr-icon); }

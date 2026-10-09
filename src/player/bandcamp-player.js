@@ -82,6 +82,19 @@
         <ol>${EMPTY_LIKED}</ol>
       </div>`;
     const q = (s) => el.querySelector(s);
+    /** The cover of a song just added: it shows above the icon and shrinks into it (see .liked-fly). It lives in the bar, not in the button, so it does not get the button's fade. */
+    const flyCover = (icon, art) => {
+      const cover = document.createElement('span');
+      const img = document.createElement('img');
+      img.alt = ''; img.src = art;
+      cover.className = 'liked-fly'; cover.setAttribute('aria-hidden', 'true'); cover.append(img);
+      const ir = icon.getBoundingClientRect(); const er = el.getBoundingClientRect();
+      cover.style.left = `${ir.left + ir.width / 2 - 22 - er.left}px`;
+      cover.style.top = `${ir.top - 56 - er.top}px`;
+      cover.style.setProperty('--dr-fly-dy', `${34 + ir.height / 2}px`);
+      el.append(cover);
+      return cover;
+    };
     el.addEventListener('keydown', (e) => { // Enter/Space activate role=button controls
       const t = e.target.closest('[role=button]');
       if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); t.click(); }
@@ -189,15 +202,18 @@
           + '</span></li>').join('');
       }
       if (s.savedList !== undefined) {
-        // a song was added: the Liked Songs icon jumps and wobbles
+        // a song was added: its cover appears above the Liked Songs icon and shrinks into it, and the icon jumps and wobbles as if it kept it
         if (savedCount !== null && s.savedList.length > savedCount) {
-          // one bump at a time: songs that arrive while it plays (an album adds many, one after the other) don't restart it halfway
+          // one at a time: songs that arrive while it plays (an album adds many, one after the other) don't restart it halfway
           const ic = q('.x-saved .x-icon');
           if (!ic.classList.contains('bump')) {
-            const done = () => ic.classList.remove('bump');
+            const art = (s.savedList[0] || {}).art;
+            const cover = typeof art === 'string' && art.startsWith('https://') ? flyCover(ic, art) : null;
+            ic.style.setProperty('--dr-bump-delay', cover ? 'var(--dr-fly-land)' : '0s'); // with a cover, it lands first
+            const done = () => { ic.classList.remove('bump'); if (cover) cover.remove(); };
             ic.classList.add('bump');
             ic.addEventListener('animationend', done, { once: true });
-            setTimeout(done, 900); // (no animationend when motion is reduced or the bar is out of sight)
+            setTimeout(done, 1600); // (no animationend when motion is reduced or the bar is out of sight)
           }
         }
         savedCount = s.savedList.length;

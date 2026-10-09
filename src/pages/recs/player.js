@@ -333,7 +333,7 @@ function savedItems() {
     savedCache = {
       key,
       items: entries.map((entry) => ({
-        id: entry.id, i: entry.i, title: entry.title, label: `${entry.title || `Track ${entry.i + 1}`} · ${state.pool[entry.id].artist}`, wished: session.wished.has(entry.id),
+        id: entry.id, i: entry.i, title: entry.title, art: state.pool[entry.id].art || '', label: `${entry.title || `Track ${entry.i + 1}`} · ${state.pool[entry.id].artist}`, wished: session.wished.has(entry.id),
       })),
     };
   }

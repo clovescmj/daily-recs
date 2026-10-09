@@ -115,6 +115,8 @@
   --dr-dur-slow: .5s;                      /* the placeholders come in */
   --dr-stagger: 70ms;                      /* one after the other */
   --dr-dur-bump: .7s;                      /* the Liked Songs icon jumps */
+  --dr-dur-fly: .6s;                       /* the cover of a song that is added shrinks into that icon... */
+  --dr-fly-land: .45s;                     /* ...and the icon jumps when it lands */
   --dr-panel-fade: .12s;                   /* queue and Liked Songs rise from the bar */
   --dr-panel-rise: .22s;
   --dr-panel-shift: 14px;

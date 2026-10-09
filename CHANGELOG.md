@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.0.3
+- A bolder animation when a song goes to Liked Songs: the cover of its album appears above the Liked Songs icon, shrinks into it, and the icon jumps and wobbles as if it kept
+  the cover. Songs added one after the other (an album adds all its songs) play one animation, not many. With "reduce motion" on, there is no animation.
+
 ## 1.0.2
 - Wording review: one name per thing. "Liked Songs" everywhere (the button, the panel and its close button), the button of the queue is "Recommendations queue", the tags menu says
   "tags" (Type a tag…, Tags found so far, Find music (2 tags)), loading step "Checking tags", wishlist messages are "Added to your wishlist" / "Removed from your wishlist"
