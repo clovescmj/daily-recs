@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.3
+- The primary button (Start digging, Find music) is the blue button of the Bandcamp profile (`#309fc3`, like "Send message"), with a darker hover and pressed look; disabled
+  stays grey. Its colours are tokens of their own (`--dr-profile-button*`). The hover and pressed colours are my estimate of the profile's, not read from it.
+
 ## 0.18.2
 - The accent blue is the blue of the profile's own tabs again (`#00a1c6`), now a token of its own (`--dr-profile-blue`), since the profile uses it and Bandcamp's design system
   does not have it. Links, checks and the progress of the loading use it, so they match the tab bar next to them.
