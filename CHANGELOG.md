@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.19
+- The count at the top of the queue says "X songs" in Shuffle (it plays one song of each album) and "X albums" in Full album ("1 song" and "1 album" for one).
+
 ## 1.1.18
 - The tooltips of the Play mode buttons have two lines: "Play mode", then the text of the mode ("Full album: albums in order, every song" or "Shuffle: one song from each album, in random order").
 

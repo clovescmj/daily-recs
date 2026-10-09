@@ -205,7 +205,6 @@
           + action('saveAlbum', it.saved, 'Add album to Liked Songs', 'Remove album from Liked Songs', P.addCircle, P.checkCircle)
           + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
           + '</span></li>').join('');
-        q('.q-count').textContent = queue.length ? `${queue.length} albums` : '';
         q('.q-foot').textContent = queue.length ? `${Math.max(0, at)} of ${queue.length} played` : '';
       }
       if (s.savedList !== undefined) {
@@ -232,6 +231,9 @@
           : EMPTY_LIKED;
         q('.l-count').textContent = s.savedList.length ? `${s.savedList.length} ${s.savedList.length === 1 ? 'song' : 'songs'}` : '';
       }
+      // the count: albums in the list, and in Shuffle songs (it plays one song of each album)
+      const noun = s.mode === 'shuffle' ? 'song' : 'album';
+      setText(q('.q-count'), queue.length ? `${queue.length} ${noun}${queue.length === 1 ? '' : 's'}` : '');
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart and thumb down: each one has its own icon and label
       const paint = (selector, on, offLabel, onLabel, offPath, onPath) => {
