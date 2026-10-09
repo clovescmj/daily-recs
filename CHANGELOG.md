@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.6
+- About page updated: Liked Songs and the + button, the ⊘ inside genre lists, a short "Listening" section (playback modes, the queue, the song while the list loads), and the
+  privacy line says that the audio comes from Bandcamp's own servers.
+
 ## 0.18.5
 - The primary button when it can't be pressed is the light blue of the profile's disabled button (`#95cddf`, white text), not grey.
 
