@@ -47,7 +47,7 @@ export function listFor(state, view, keys = []) {
 const hasSavedSong = (id) => [...session.saved].some((key) => key.startsWith(`${id}:`));
 
 /** The list on screen. */
-export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' ? null : listFor(state, 'best'));
+export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' || session.fresh ? null : listFor(state, 'best'));
 
 /** Albums of the current list that should be on the page: not hidden (unless hidden during this visit). */
 function visibleAlbumIds(state, list) {
@@ -61,7 +61,8 @@ function renderGrid(state, status) {
   session.wished = new Set(state ? state.wishlisted || [] : []);
   session.saved = new Set((state ? state.saved || [] : []).map((entry) => `${entry.id}:${entry.i}`)); // the Liked list: tracks
 
-  if (!list && status.running && !session.landing) { setSkeleton(); return; }
+  if (list) session.fresh = false;
+  if (!list && (status.running || session.pending) && !session.landing) { setSkeleton(); return; } // a list was asked for: its placeholders, not a message
   if (!list) { setEmpty(status.error ? '' : 'Getting your recommendations ready…'); return; }
   if (!ids.length) { setEmpty('Nothing new for now. Come back tomorrow.'); return; }
 

@@ -21,6 +21,8 @@ export const session = {
   wished: new Set(),
   /** True when a list for today exists, which is when the player bar is shown even if nothing is playing. */
   hasList: false,
+  /** True until a list has been drawn: nothing was on screen yet, so there is no other list to show while the chosen one is built. */
+  fresh: true,
   /** True while a run is building a list: the loading box offers a song to listen to meanwhile. */
   running: false,
 };

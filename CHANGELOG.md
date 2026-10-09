@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.17.1
+- Fixed: when the page opened, it first drew the Best matches list and, a moment later, replaced it with the list you had chosen today (or with the
+  opening screen). Now the first drawing is already the right one: the page stays blank until it knows what to show, today's choice is applied before
+  the first drawing, and a list that is still being built shows its placeholders instead of another list or a message.
+
 ## 0.17.0
 - **Design system.** The colours, sizes and timings used by more than one element now live in one place, `src/styles/tokens.css` (`--dr-*`), used by the
   recs page and by the player bar. The page and the bar no longer repeat the same hex values.

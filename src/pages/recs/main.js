@@ -86,6 +86,7 @@ async function leaveToProfile() {
 async function init() {
   if (window.parent === window) { leaveToProfile(); return; }
   document.title = 'Daily Recs';
+  setTimeout(() => document.documentElement.classList.remove('is-booting'), 3000); // never stays blank, whatever happens below
   $('version').textContent = chrome.runtime.getManifest().version;
   $('feedback-link').href = supportUrl(chrome.runtime.id);
   $('bug-link').href = reportBugUrl(chrome.runtime.getManifest().version, navigator.userAgent);
@@ -99,9 +100,11 @@ async function init() {
   listenToHost(runCommand);
 
   const picked = await pickedToday();
+  if (picked) { session.view = picked.view; session.tagKeys = picked.tags; } // the first drawing is already the list of today's choice
   setLandingVisible(!picked);   // once a day: the first time the tab is opened. Nothing is loaded until the user presses the button
   watchStorage(refreshView);
   await refreshView();
+  document.documentElement.classList.remove('is-booting');
   if (picked) await chooseView(picked.view, picked.tags);   // already chose today: show that list (build it if it's missing)
 }
 
