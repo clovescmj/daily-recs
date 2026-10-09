@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 0.18.5
+- The primary button when it can't be pressed is the light blue of the profile's disabled button (`#95cddf`, white text), not grey.
+
 ## 0.18.4
 - The text of the primary button is bold, like the blue button of the profile.
 

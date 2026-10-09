@@ -51,14 +51,13 @@
   --dr-profile-button: #309fc3;            /* the blue button of the fan profile ("Send message"), the page we live in: read from its pixels, not a design-system token */
   --dr-profile-button-hover: #2a8aaa;
   --dr-profile-button-active: #257696;
+  --dr-profile-button-disabled: #95cddf;   /* the same button when it can't be pressed (read from the pixels of "Save changes") */
   --dr-button-bg: var(--dr-profile-button);
   --dr-button-bg-hover: var(--dr-profile-button-hover);
   --dr-button-bg-active: var(--dr-profile-button-active);
   --dr-button-text: var(--dr-white);
   --dr-button-plain-hover: var(--dr-ink-8);
   --dr-button-plain-active: var(--dr-ink-16);
-  --dr-disabled-bg: var(--dr-ink-8);
-  --dr-disabled-text: var(--dr-gray-400);
 
   /* lines */
   --dr-line: var(--dr-gray-200);           /* separators of the page */

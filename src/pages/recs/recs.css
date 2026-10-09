@@ -59,7 +59,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 }
 .button:hover:not(:disabled) { background: var(--dr-button-bg-hover); border-color: var(--dr-button-bg-hover); }
 .button:active:not(:disabled) { background: var(--dr-button-bg-active); border-color: var(--dr-button-bg-active); }
-.button:disabled { background: var(--dr-disabled-bg); border-color: var(--dr-disabled-bg); color: var(--dr-disabled-text); cursor: default; }
+.button:disabled { background: var(--dr-profile-button-disabled); border-color: var(--dr-profile-button-disabled); color: var(--dr-button-text); cursor: default; }
 .button:focus-visible, .view-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .icon-stroke { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
