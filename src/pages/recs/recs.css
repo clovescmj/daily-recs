@@ -62,8 +62,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .button:active:not(:disabled) { background: var(--dr-button-bg-active); border-color: var(--dr-button-bg-active); }
 .button:disabled { background: var(--dr-profile-button-disabled); border-color: var(--dr-profile-button-disabled); color: var(--dr-button-text); cursor: default; }
 .button:focus-visible, .view-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.icon-fill { width: 20px; height: 20px; fill: currentColor; display: block; flex: none; } /* the list buttons: the box of the icons of the player */
-.icon-stroke { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-fill { width: var(--dr-icon-size-button); height: var(--dr-icon-size-button); fill: currentColor; display: block; flex: none; } /* the list buttons: an icon inside a button */
 
 /* ── The lists of the day: a toggle that works like radio buttons (My tags with its genre picker, Best matches, Surprise me) ── */
 .view-switch { display: flex; }
@@ -73,7 +72,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .view-switch > .view-button:last-child { border-radius: 0 var(--bc-radius) var(--bc-radius) 0; }
 .view-button.is-active, .view-button.is-active:hover:not(:disabled) { background: var(--gray700); border-color: var(--gray700); color: var(--white); position: relative; z-index: 1; } /* stays dark on hover */
 .view-button:disabled { opacity: .6; cursor: default; }
-.view-button .icon-stroke:last-child { width: 12px; height: 12px; }
+.view-button .icon-chevron { margin-left: -4px; } /* the box of the arrow has its own margin */
 .tags-picker { position: relative; }
 .tags-menu { top: calc(100% + 6px); left: 0; z-index: 25; width: 340px; max-width: calc(100vw - 32px); } /* looks and opening come from .dr-menu */
 .tags-menu.align-right { left: auto; right: 0; }   /* when the left-aligned menu would run past the window */
@@ -135,7 +134,7 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .wait-btn:hover { background: var(--dr-button-plain-hover); }
 .wait-btn:active { background: var(--dr-button-plain-active); }
 .wait-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.wait-btn svg { flex: none; width: 20px; height: 20px; fill: currentColor; display: block; }
+.wait-btn svg { flex: none; width: var(--dr-icon-size-button); height: var(--dr-icon-size-button); fill: currentColor; display: block; }
 .wait-btn .wait-pause, .wait-btn.is-playing .wait-play { display: none; }
 .wait-btn.is-playing .wait-pause { display: block; }
 .wait-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-align: left; }

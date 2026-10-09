@@ -13,10 +13,10 @@
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // Icons of the two ways to play (each one centred in its own box and of a similar size): shuffle, and a disc (our own drawing) inside Material's empty square (whole albums).
+  // Icons of the two ways to play (each one centred in its own box and of a similar size): shuffle, and a disc (our own drawing) in the shape of the Liked Songs icon (whole albums).
   const MODE_ICON = {
     shuffle: `<svg class="pb-ico" viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="M560-160v-80h104L537-367l57-57 126 126v-102h80v240H560Zm-344 0-56-56 504-504H560v-80h240v240h-80v-104L216-160Zm151-377L160-744l56-56 207 207-56 56Z"/></svg>`,
-    album: `<svg class="pb-ico" viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560ZM270-480a210 210 0 1 0 420 0 210 210 0 1 0-420 0ZM412-480a68 68 0 1 0 136 0 68 68 0 1 0-136 0Z"/></svg>`,
+    album: `<svg class="pb-ico" viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M370-560a190 190 0 1 0 380 0 190 190 0 1 0-380 0ZM498-560a62 62 0 1 0 124 0 62 62 0 1 0-124 0ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Z"/></svg>`,
   };
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
   const LIKED_ICON = `<svg class="x-icon" viewBox="0 -960 960 960" role="img" aria-label="Liked Songs"><title>Liked Songs</title><path d="M500-360q42 0 71-29t29-71v-220h120v-80H560v220q-13-10-28-15t-32-5q-42 0-71 29t-29 71q0 42 29 71t71 29ZM320-240q-33 0-56.5-23.5T240-320v-480q0-33 23.5-56.5T320-880h480q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H320Zm0-80h480v-480H320v480ZM160-80q-33 0-56.5-23.5T80-160v-560h80v560h560v80H160Zm160-720v480-480Z"/></svg>`;

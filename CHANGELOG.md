@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.11
+- Two sizes for the icons: **16 px** for an icon inside a button (the list buttons, Play mode, the song while waiting, and the arrow of the genre button) and **20 px** for an
+  icon on its own (the heart, the + and the block icon, the queue, Liked Songs, volume and the close icon). The big play and pause and the previous and next arrows
+  keep their own sizes. New tokens `--dr-icon-size` (20 px) and `--dr-icon-size-button` (16 px).
+- The arrow of the genre button is Material's `arrow_drop_down` (a small solid triangle) instead of a thin chevron.
+- The Full album icon has the shape of the Liked Songs icon, with a disc in place of the music note.
+
 ## 1.1.10
 - The icons are back to the sizes of 1.1.8: the heart, the + and the block icon are 18 px again (1.1.9 had made them 20 px). The rest is as it was.
 
