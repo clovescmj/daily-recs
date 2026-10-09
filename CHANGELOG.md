@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.16
+- Play mode: the icon of the selected button is white again (the bar's `a { color: inherit }` rule was beating the component's colour, so it showed grey on the dark
+  button), and the two buttons touch each other (the space between them showed, because the bar made the control `inline-block`).
+- The Full album icon has a disc (a circle with a small dot) cut out of the card, in place of the play triangle.
+- The tooltips of both buttons start with "Play mode".
+
 ## 1.1.15
 - The close icon (the X of the queue and Liked Songs) and the mute icon are the 18 px variants of Material Symbols (`close`, `volume_off`), like the other icons.
 

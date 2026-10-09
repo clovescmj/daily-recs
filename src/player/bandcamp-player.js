@@ -13,10 +13,10 @@
     close: 'M6.75 18.667l-1.417 -1.417 5.25 -5.25 -5.25 -5.25 1.417 -1.417 5.25 5.25 5.25 -5.25 1.417 1.417 -5.25 5.25 5.25 5.25 -1.417 1.417 -5.25 -5.25 -5.25 5.25Z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // Icons of the two ways to play (each one centred in its own box and of a similar size): shuffle, and Material's full_album (whole albums).
+  // Icons of the two ways to play (each one centred in its own box and of a similar size): shuffle, and Material's full_album with a disc in place of the play (whole albums).
   const MODE_ICON = {
     shuffle: `<svg class="pb-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.667 20v-2h1.917L13.417 14.833l1.417 -1.417 3.167 3.167v-1.917h2v5.333H14.667Zm-9.25 0 -1.417 -1.417 12.583 -12.583h-1.917v-2h5.333v5.333h-2v-1.917L5.417 20Zm3.75 -9.417L4 5.417l1.417 -1.417 5.167 5.167 -1.417 1.417Z"/></svg>`,
-    album: `<svg class="pb-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11.333 14.667l7.333 -4.667 -7.333 -4.667v9.333ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z"/></svg>`,
+    album: `<svg class="pb-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M9 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0ZM12.3 10a1.7 1.7 0 1 0 3.4 0 1.7 1.7 0 1 0-3.4 0ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z"/></svg>`,
   };
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
   const LIKED_ICON = `<svg class="x-icon" viewBox="0 0 24 24" role="img" aria-label="Liked Songs"><title>Liked Songs</title><path d="M12.66 15.333Q13.778 15.333 14.556 14.56q0.778 -0.773 0.778 -1.893v-5.333h3.333v-2.667H14v5.694q-0.306 -0.167 -0.625 -0.264T12.667 10q-1.12 0 -1.893 0.771 -0.773 0.772 -0.773 1.889Q10 13.778 10.771 14.556q0.772 0.778 1.889 0.778ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z"/></svg>`;
@@ -59,8 +59,8 @@
       </div>
       <div class="col col-4-15 controls-extra">
         <div class="dr-segment pb-seg" role="radiogroup" aria-label="Play mode">
-          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="album" title="Full album: albums in order, every song" aria-label="Full album: albums in order, every song">${MODE_ICON.album}</a>
-          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="shuffle" title="Shuffle: one song from each album, in random order" aria-label="Shuffle: one song from each album, in random order">${MODE_ICON.shuffle}</a>
+          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="album" title="Play mode: Full album (albums in order, every song)" aria-label="Play mode: Full album (albums in order, every song)">${MODE_ICON.album}</a>
+          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="shuffle" title="Play mode: Shuffle (one song from each album, in random order)" aria-label="Play mode: Shuffle (one song from each album, in random order)">${MODE_ICON.shuffle}</a>
         </div>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Recommendations queue" aria-label="Recommendations queue">${svg(P.queue, 'x-icon', '', 'Recommendations queue')}</a>

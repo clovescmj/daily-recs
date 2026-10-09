@@ -150,7 +150,9 @@
 #dr-player .queue .empty:hover { background: transparent; }
 
 /* Play mode: two buttons (a segmented control); the icons next to it are 20px tall and sit at the top: the margin centres it on them */
-#dr-player .pb-seg { margin-top: -6px; }
+#dr-player .pb-seg { display: inline-flex; margin-top: -6px; } /* (`.controls-extra > *` makes it inline-block, and the space between the two buttons would show) */
+#dr-player .dr-seg { color: var(--dr-text); } /* the bar sets `a { color: inherit }`, which would beat the component's colours */
+#dr-player .dr-seg.sel, #dr-player .dr-seg.sel:hover { color: var(--dr-white); }
 #dr-player .pb-ico { width: var(--dr-icon-size-button); height: var(--dr-icon-size-button); fill: currentColor; flex: none; display: block; }
 
 /* No grey flash or box on the icons when they are clicked (the keyboard focus ring stays) */
