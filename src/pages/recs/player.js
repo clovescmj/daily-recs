@@ -20,14 +20,14 @@ audio.preload = 'none';
 const player = {
   current: { id: null, tracks: [], index: 0 },
   album: null,          // candidate being played (for the bar and Media Session)
-  mode: 'one',          // 'one': a song per album, in the order of the list; 'shuffle': the same with the albums in a random order; 'album': whole albums
+  mode: 'album',        // 'album': the albums of the list in order, every song; 'shuffle': one song of each album, in a random order, never the same twice
   busy: false,          // loading tracks
   message: '',          // error text for the bar
   waiting: false,       // a random song of the collection, played while a list is being built (it is not part of any list)
 };
-const plan = createPlayPlan();   // which songs have played (the modes 'one' and 'shuffle' never play one twice)
+const plan = createPlayPlan();   // which songs have played (shuffle never plays one twice)
 const history = [];              // the songs that played, in order: { id, index } (the previous button goes back along it)
-const MODES = ['one', 'shuffle', 'album'];
+const MODES = ['album', 'shuffle'];
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
@@ -94,7 +94,8 @@ export async function playAlbum(id, startIndex = null) {
   try {
     const tracks = await fetchTracks(album);
     if (!tracks.length) throw new Error('no streamable tracks');
-    const chosen = player.mode === 'album' ? -1 : plan.pick(id, tracks.length, startingTrack(tracks)); // (-1: no song of it left: the highlighted one again)
+    // Full album starts at the first song; Shuffle at the one the artist highlights, then at one that has not played (-1: none left, the highlighted one again)
+    const chosen = player.mode === 'album' ? 0 : plan.pick(id, tracks.length, startingTrack(tracks));
     const first = startIndex !== null && startIndex < tracks.length ? startIndex : chosen >= 0 ? chosen : startingTrack(tracks);
     player.current = { id, tracks, index: first };
     send({ type: MSG.MARK_OPENED, id });
@@ -240,7 +241,7 @@ export function setVolume(value) {
 }
 export const toggleMute = () => { audio.muted = !audio.muted; };
 
-/** 'one' (a song per album, in the order of the list), 'shuffle' (the same, in a random order) or 'album' (whole albums). */
+/** 'album' (the albums in order, every song) or 'shuffle' (one song of each album, in a random order). */
 export function setMode(mode) {
   if (!MODES.includes(mode)) return;
   player.mode = mode;
@@ -416,7 +417,7 @@ async function recoverFromAudioError() {
 export function initPlayer() {
   try {
     const savedMode = localStorage.getItem(MODE_KEY);
-    player.mode = MODES.includes(savedMode) ? savedMode : 'one';
+    player.mode = MODES.includes(savedMode) ? savedMode : 'album'; // (an older 'one' also lands here)
     const saved = localStorage.getItem(VOLUME_KEY);
     if (saved !== null && Number.isFinite(+saved)) audio.volume = Math.max(0, Math.min(1, +saved));
   } catch { /* storage unavailable */ }

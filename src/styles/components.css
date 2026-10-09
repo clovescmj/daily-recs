@@ -9,6 +9,19 @@
 .dr-select:hover:not(:disabled) { background: var(--dr-button-plain-hover); text-decoration: none; }
 .dr-select:active:not(:disabled) { background: var(--dr-button-plain-active); }
 
+/* ── Segment: a row of buttons that work like radio buttons (the play mode of the player bar). The one that is on is dark; only its two ends are rounded. ── */
+.dr-segment { display: inline-flex; }
+.dr-seg {
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: var(--dr-control-h); height: var(--dr-control-h); padding: 0;
+  color: var(--dr-text); cursor: pointer; background: var(--dr-surface); border: 1px solid var(--dr-border); border-radius: 0;
+}
+.dr-seg + .dr-seg { margin-left: -1px; }
+.dr-seg:first-child { border-radius: var(--dr-radius) 0 0 var(--dr-radius); }
+.dr-seg:last-child { border-radius: 0 var(--dr-radius) var(--dr-radius) 0; }
+.dr-seg:hover { background: var(--dr-button-plain-hover); text-decoration: none; }
+.dr-seg.sel, .dr-seg.sel:hover { background: var(--dr-gray-700); border-color: var(--dr-gray-700); color: var(--dr-white); position: relative; z-index: 1; } /* stays dark on hover */
+.dr-seg:focus-visible { outline: 2px solid var(--dr-profile-blue); outline-offset: 2px; }
+
 /* ── Menu: a floating box with an optional header and rows. Opens and closes with a short fade and slide; closed, it takes no room and
    cannot be clicked (display:none cannot be animated). `--up` is for menus that open above their button. ── */
 .dr-menu {

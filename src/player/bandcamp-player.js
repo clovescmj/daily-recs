@@ -13,10 +13,9 @@
     close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // Icons of the three ways to play (each one centred in its own box and of a similar size): a music note (one song per album), and a record box (our own drawing) turned 90° to the right (whole albums).
+  // Icons of the two ways to play (each one centred in its own box and of a similar size): shuffle, and a record box (our own drawing) turned 90° to the right (whole albums).
   const MODE_ICON = {
     shuffle: `<svg class="pb-ico" viewBox="3 3 18 18" aria-hidden="true" focusable="false"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`,
-    one: `<svg class="pb-ico" viewBox="4 2 14 20" aria-hidden="true" focusable="false"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`,
     album: `<svg class="pb-ico" viewBox="2.67 5.15 19.5 19.5" aria-hidden="true" focusable="false"><g transform="rotate(90 12.42 14.9)"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.925 7.041H18.91a1.268 1.268 0 0 1 1.268 1.268V21.497a1.268 1.268 0 0 1-1.268 1.268H5.925a1.268 1.268 0 0 1-1.268-1.268V8.309a1.268 1.268 0 0 1 1.268-1.268zM6.178 8.563H18.657V21.243H6.178zM7.724 14.903a4.694 4.739 0 1 1 9.388 0 4.694 4.739 0 1 1-9.388 0zM10.889 14.903a1.529 1.573 0 1 1 3.057 0 1.529 1.573 0 1 1-3.057 0z"/></g></svg>`,
   };
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
@@ -59,14 +58,9 @@
         <div class="transport"><div class="prev"><div class="icon prev-icon" role="button" tabindex="0" aria-label="Previous track" title="Previous track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M4 2h4v20H4zM8 12 24 2v20zM22 12 38 2v20z"/></svg></div></div><div class="next"><div class="icon next-icon" role="button" tabindex="0" aria-label="Next track" title="Next track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M34 2h4v20h-4zM4 2l16 10L4 22zM18 2l16 10L18 22z"/></svg></div></div></div>
       </div>
       <div class="col col-4-15 controls-extra">
-        <div class="pb-wrap">
-          <a href="#" class="x-btn dr-select pb-btn" role="button" aria-haspopup="true" aria-expanded="false" title="Play mode" aria-label="Play mode"><span class="pb-slot">${MODE_ICON.one}</span><span class="pb-label">One per album</span><svg class="pb-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
-          <div class="dr-menu dr-menu--up pb-menu" role="menu" aria-label="Play mode" hidden>
-            <div class="dr-menu-head pb-head"><b>Play mode</b><span>Choose how the list plays.</span></div>
-            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="one"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.939 14.498 7.468 19.593 20.03 7.03 18.97 5.97 7.532 17.407 4.061 13.502z"/></svg></span>${MODE_ICON.one}One song per album</a>
-            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="shuffle"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.939 14.498 7.468 19.593 20.03 7.03 18.97 5.97 7.532 17.407 4.061 13.502z"/></svg></span>${MODE_ICON.shuffle}Shuffle</a>
-            <a href="#" class="dr-menu-row pb-opt" role="menuitemradio" data-mode="album"><span class="pb-check"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.03 7.03 7.468 19.593l-4.529-5.095 1.122-.996 3.471 3.905L18.97 5.97z"/></svg></span>${MODE_ICON.album}Full album</a>
-          </div>
+        <div class="dr-segment pb-seg" role="radiogroup" aria-label="Play mode">
+          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="album" title="Full album: albums in order, every song" aria-label="Full album: albums in order, every song">${MODE_ICON.album}</a>
+          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="shuffle" title="Shuffle: one song from each album, in random order" aria-label="Shuffle: one song from each album, in random order">${MODE_ICON.shuffle}</a>
         </div>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Recommendations queue" aria-label="Recommendations queue">${svg(P.queue, 'x-icon', '', 'Recommendations queue')}</a>
@@ -141,19 +135,14 @@
     q('.playpause').addEventListener('click', () => onCmd('toggle'));
     q('.prev-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('prev'); });
     q('.next-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('next'); });
-    // Play mode: a button that opens a short list (it opens upwards, the bar is at the foot of the page)
+    // Play mode: two buttons, one of them always on
     let closePanels = () => {};
-    const setModeMenu = (on) => { q('.pb-menu').hidden = !on; q('.pb-btn').classList.toggle('open', on); q('.pb-btn').setAttribute('aria-expanded', String(on)); };
-    q('.pb-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); setModeMenu(q('.pb-menu').hidden); });
-    q('.pb-menu').addEventListener('click', (e) => {
+    q('.pb-seg').addEventListener('click', (e) => {
       const option = e.target.closest('[data-mode]');
       if (!option) return;
       e.preventDefault();
       onCmd('mode', option.dataset.mode);
-      setModeMenu(false);
     });
-    document.addEventListener('click', () => setModeMenu(false));
-    el.addEventListener('keydown', (e) => { if (e.key === 'Escape') setModeMenu(false); });
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
     q('.save').addEventListener('click', (e) => { e.preventDefault(); onCmd('save'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
@@ -269,17 +258,14 @@
       q('.vol-amt').style.width = pct(s.vol); q('.vol-control').style.left = pct(s.vol);
       const icon = q('.vol-icon path'); const want = s.vol > 0 ? P.vol : P.mute;
       if (icon.getAttribute('d') !== want) icon.setAttribute('d', want);
-      // Play mode: the label of the button is the mode that is on
-      const modeIcon = s.mode === 'album' || s.mode === 'shuffle' ? s.mode : 'one';
-      setText(q('.pb-label'), { one: 'One per album', shuffle: 'Shuffle', album: 'Full album' }[modeIcon]); // short on the button, the list has the full names
-      const slot = q('.pb-slot');
-      if (slot.dataset.icon !== modeIcon) { slot.innerHTML = MODE_ICON[modeIcon]; slot.dataset.icon = modeIcon; }
+      // Play mode: the button of the mode that is on is dark
+      const mode = s.mode === 'shuffle' ? 'shuffle' : 'album';
       for (const option of el.querySelectorAll('.pb-opt')) {
-        const on = option.dataset.mode === modeIcon;
+        const on = option.dataset.mode === mode;
         option.classList.toggle('sel', on); option.setAttribute('aria-checked', String(on));
       }
     }
-    return { el, update, closeMenus: () => { setModeMenu(false); closePanels(); } };
+    return { el, update, closeMenus: () => { closePanels(); } };
   }
   globalThis.BCPlayer = { create };
 })();

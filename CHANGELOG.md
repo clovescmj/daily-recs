@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.1
+- Play mode has two options now, shown as a pair of buttons with icons (a tooltip says what each does) instead of a menu: **Full album** (the default: the albums
+  in order, every song, starting at the first song of the first album) and **Shuffle** (one song of each album in a random order, never the same song twice, with new
+  rounds until everything has played). "One song per album" is gone; if it was your saved choice, you get Full album. Shuffle still starts each album with the song
+  its artist highlights.
+
 ## 1.1.0
 - "Playback" is now **Play mode**, with a third option, **Shuffle**. In "One song per album" and in "Shuffle" a song plays only once. The first time an album plays,
   it plays the song its artist highlights; later rounds draw one of the songs that have not played. "One song per album" keeps the order of the list and starts over

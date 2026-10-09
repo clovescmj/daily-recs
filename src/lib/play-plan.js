@@ -1,4 +1,4 @@
-// What plays next in the modes 'one' (a song per album, in the order of the list) and 'shuffle' (the same, with the albums in a random order).
+// What plays next in Shuffle (one song of each album, in a random order); the same walk in the order of the list is mode 'one' (not offered by the player).
 // A song plays once: it is marked when it starts, and an album with no unplayed song left is skipped. The list is walked in rounds, one song
 // per album in each round; when a round ends the next one starts over, until every song of every album has played.
 
