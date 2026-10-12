@@ -1,6 +1,6 @@
 /* Components shared by the recs page and the player bar. They only use the tokens of tokens.css. */
 
-/* ── Select: the button that opens a menu or picks a list (My tags, Best matches, Play mode) ── */
+/* ── Select: the button that opens a menu or picks a list (My tags, Best matches, Surprise me) ── */
 .dr-select {
   display: inline-flex; align-items: center; gap: 6px; height: var(--dr-control-h); padding: 6px var(--dr-menu-pad-x);
   font: inherit; font-size: var(--dr-font-s); line-height: var(--dr-line-s); color: var(--dr-text); white-space: nowrap; cursor: pointer;
@@ -10,7 +10,7 @@
 .dr-select:active:not(:disabled) { background: var(--dr-button-plain-active); }
 
 /* ── Menu: a floating box with an optional header and rows. Opens and closes with a short fade and slide; closed, it takes no room and
-   cannot be clicked (display:none cannot be animated). `--up` is for menus that open above their button. ── */
+   cannot be clicked (display:none cannot be animated). ── */
 .dr-menu {
   position: absolute; background: var(--dr-surface); color: var(--dr-text); text-align: left;
   border: 1px solid var(--dr-border-menu); border-radius: var(--dr-radius); box-shadow: var(--dr-shadow-menu);
@@ -21,7 +21,6 @@
   pointer-events: none; border-width: 0;
   transition: opacity var(--dr-menu-dur) var(--dr-ease), transform var(--dr-menu-dur) var(--dr-ease), visibility 0s var(--dr-menu-dur), max-height 0s var(--dr-menu-dur);
 }
-.dr-menu--up[hidden] { transform: translateY(var(--dr-menu-shift)); }
 @media (prefers-reduced-motion: reduce) { .dr-menu, .dr-menu[hidden] { transition: none; } }
 
 .dr-menu-head { padding: 10px var(--dr-menu-pad-x); font-size: var(--dr-font-s); line-height: var(--dr-line-s); color: var(--dr-text-muted); border-bottom: 1px solid var(--dr-divider); }

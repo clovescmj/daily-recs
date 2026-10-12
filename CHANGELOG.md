@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.21
+- Comments brought up to date after the changes of 1.1 and 1.2 (the play mode, the queue of songs, the icons, the tag of the tab), and a rule of the stylesheet that nothing used any more
+  (`.dr-menu--up`, from the old Playback menu) removed. The size of the tag of the tab is read from its token (`--dr-font-xs`, 10px, the same value). No change in behaviour.
+
 ## 1.2.20
 - The list buttons (My tags, Best matches, Surprise me) are in the middle between the line under the tabs and the line that ends the header: they were 10 px lower, 37 px from one line and
   17 px from the other.

@@ -4,7 +4,7 @@
 /* "35 new" after the tab name, with Bandcamp's own values for the "New" tag of the playlists tab (.grids ol.tabs .tab-title .tab-new-badge) */
 #grid-tabs li.dr-tab .dr-new-tag {
   display: inline-flex; vertical-align: middle; margin-left: 8px; padding: 2px 5px; border-radius: 4px;
-  background: var(--dr-tag-bg); color: var(--dr-tag-text); font: 700 10px/1.5 "Helvetica Neue", var(--dr-font-family); /* (1.5: Bandcamp's tag is 19px tall, 15 of text and 2+2 of padding) */
+  background: var(--dr-tag-bg); color: var(--dr-tag-text); font: 700 var(--dr-font-xs)/1.5 "Helvetica Neue", var(--dr-font-family); /* (1.5: Bandcamp's tag is 19px tall, 15 of text and 2+2 of padding) */
   letter-spacing: .4px; text-transform: uppercase;
 }
 #grid-tabs li.dr-tab .dr-new-tag:empty { display: none; }

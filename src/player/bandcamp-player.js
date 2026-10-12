@@ -1,6 +1,7 @@
 // Player that looks identical to Bandcamp's own. Classic script (no imports), used by the content script.
 // It never touches audio: it receives state via update() and returns commands via onCmd().
 (() => {
+  // Paths on a 24 grid: Material Symbols (the 18 px variants), converted. The Liked Songs icon, the play and pause of the big button and the spinner are in the markup below.
   const P = {
     vol: 'M14 21.111v-2.083q2.389 -0.639 3.861 -2.597T19.333 12q0 -2.472 -1.486 -4.403T14 4.944v-2.083q3.222 0.694 5.278 3.25t2.056 5.861q0 3.306 -2.042 5.875T14 21.111ZM2.667 14.639v-5.333h4l5.333 -5.333v16L6.667 14.639H2.667Zm11.333 1.528v-8.389q1.25 0.556 1.958 1.694t0.708 2.5q0 1.361 -0.708 2.486T14 16.167Z',
     mute: 'M20 22.833 17.028 19.861q-0.611 0.389 -1.458 0.736T14 21.111v-2.056q0.333 -0.139 0.792 -0.319T15.556 18.389L12 14.833v5.194L6.667 14.694H2.667v-5.333h3.833L1.167 4l1.417 -1.417 18.833 18.833 -1.417 1.417Zm-0.167 -5.806 -1.444 -1.444q0.444 -0.806 0.694 -1.708t0.25 -1.847q0 -2.472 -1.486 -4.403T14 4.972v-2.056q3.25 0.639 5.292 3.222T21.333 12.028q0 1.333 -0.389 2.597T19.833 17.028ZM16.389 13.583l-2.389 -2.389v-3.389q1.25 0.556 1.958 1.708T16.667 12.028q0 0.389 -0.056 0.778t-0.222 0.778ZM12 9.194l-2.583 -2.583 2.583 -2.583v5.167Z',
@@ -200,7 +201,7 @@
       setText(q('.now-playing .artist span'), s.artist || '');
       q('.now-playing .artist').style.display = s.artist ? '' : 'none';
       q('.collect').style.visibility = s.artist && !s.plain ? '' : 'hidden'; // a song played while waiting is not on any list: nothing to wish, like or skip
-      // queue: only redraw when the list or the current album change (`queue` omitted = unchanged)
+      // queue: only redraw when the rows, the song that plays or the play mode change (`queue` omitted = unchanged)
       if (s.queue != null) { queue = s.queue; queueKey = queueVersion(queue); }
       const sig = `${s.curId}|${queueKey}|${s.mode}|${s.queueMore ? 1 : 0}|${s.queuePlayed || 0}|${s.queueAlbums || 0}`;
       if (sig !== queueSig) {

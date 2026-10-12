@@ -55,7 +55,7 @@
 #dr-player .transport .icon:hover { opacity: 1; }
 #dr-player .transport .icon.disabled { opacity: 0.1; cursor: default; }
 
-/* "♡ wishlist · go to album", same place and style as Bandcamp's player (below the artist) */
+/* the icons of the album under the artist (wishlist heart, + for Liked Songs, block), in the place where Bandcamp's player has its links */
 #dr-player .now-playing .collect { margin-top: auto; }
 #dr-player .collect { color: var(--dr-accent); font-weight: var(--dr-weight-medium); font-size: var(--dr-font-s); line-height: var(--dr-line-s); white-space: nowrap; display: flex; align-items: center; gap: var(--dr-icon-gap); }
 #dr-player .collect a { color: var(--dr-accent); vertical-align: middle; }
@@ -92,7 +92,7 @@
   #dr-player .now-playing .title, #dr-player .now-playing .artist { max-width: 200px; }
 }
 
-/* queue ("now playing albums"): Bandcamp's .queue rules, opening upwards from the bar */
+/* the queue and Liked Songs panels: Bandcamp's .queue rules, opening upwards from the bar */
 #dr-player .queue { position: absolute; right: 0; bottom: 100%; width: 388px; height: 400px; max-height: 70vh; z-index: 111; background: var(--dr-white);
   opacity: 0; visibility: hidden; transform: translateY(var(--dr-panel-shift)); pointer-events: none; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s var(--dr-panel-rise);
   border: 1px solid var(--dr-border-bar); border-bottom: 0; /* the bar's own line closes it at the bottom */ box-shadow: var(--dr-shadow-menu); border-radius: var(--dr-radius) var(--dr-radius) 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
@@ -164,7 +164,7 @@
 #dr-player .queue li.qmore { display: block; margin-top: 4px; padding: 12px; border-top: 1px dashed var(--dr-border-bar); text-align: center; cursor: default; font-size: var(--dr-font-s); color: var(--dr-text-muted); }
 #dr-player .queue li.qmore:hover { background: transparent; }
 
-/* A row of the queue and of Liked Songs under the pointer: a play over a dark layer on the cover; the song and the artist are links to the album */
+/* A row of the queue and of Liked Songs under the pointer: a play over a dark layer on the cover; the song and the artist are one link to the album */
 #dr-player .queue .qplay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .5); opacity: 0; transition: opacity var(--dr-menu-dur) var(--dr-ease); pointer-events: none; }
 #dr-player .queue .qplay svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-white); display: block; }
 #dr-player .queue li:hover .qplay { opacity: 1; }
