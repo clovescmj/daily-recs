@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.5
+- The text of the toolbar icon (its tooltip and the first item of its right-click menu) says "27 new albums to listen to" (it said "27 new recommendations"; "1 new album to listen to" for
+  one) and, when you opened them all, "You've opened all of today's albums". The tag of the tab keeps "27 NEW".
+
 ## 1.2.4
 - The animation of the Liked Songs icon (the cover that flies into it) also plays for the **first** song you add. The bar never knew that the list was empty (an empty list was not sent, and
   the page that carries the messages kept only the last update, which has no list), so the first song arrived with nothing to compare it to. Now the first message carries the list, even
