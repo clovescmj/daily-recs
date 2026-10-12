@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.14
+- Liked Songs: each row has a button, before the heart, that opens the album on Bandcamp in a new tab (Material's `open_in_new`). A click on it does not start the song.
+
 ## 1.2.13
 - The sequence of the queue no longer changes after a reload: in Shuffle the order of the round and the song chosen for each album are kept with what played (they were drawn again at each
   reload), and what was waiting in the short delay before the history is written goes out when the page closes. (A first version of this lost the kept round at the start, because the
