@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.22
+- Play mode is a single **Shuffle** button, like in any player, instead of the pair of Full album and Shuffle buttons: Full album (the albums in order, every song) is simply what
+  plays when Shuffle is off. The button is an icon on its own (Material's `shuffle`); when it is on it shows `shuffle_on`, in the blue of the other active icons. Tooltip:
+  "Shuffle" and, on the second line, "One song from each album, in random order". The notices are "Shuffle on" and "Shuffle off". The saved choice is the same as before.
+
 ## 1.1.21
 - Changing the play mode shows a notice above the player bar, like the one for adding to Liked Songs: "Albums play in order, every song" for Full album and "One song from each
   album, in random order" for Shuffle. Clicking the mode that is already on says nothing.

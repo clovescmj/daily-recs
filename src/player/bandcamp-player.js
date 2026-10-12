@@ -11,13 +11,10 @@
     block: 'M7.861 21.833q-1.944 -0.833 -3.403 -2.292T2.167 16.139q-0.833 -1.944 -0.833 -4.139 0 -2.222 0.833 -4.153t2.292 -3.389Q5.917 3 7.861 2.167t4.153 -0.833q2.208 0 4.139 0.833t3.389 2.292Q21 5.917 21.833 7.847T22.667 12q0 2.194 -0.833 4.139t-2.292 3.403Q18.083 21 16.153 21.833t-4.139 0.833Q9.806 22.667 7.861 21.833Zm4.139 -1.167q1.528 0 2.889 -0.5t2.472 -1.389L5.222 6.639q-0.889 1.111 -1.389 2.472t-0.5 2.889q0 3.611 2.528 6.139t6.139 2.528Zm6.778 -3.306q0.889 -1.111 1.389 -2.472t0.5 -2.889q0 -3.611 -2.528 -6.139t-6.139 -2.528q-1.528 0 -2.889 0.5t-2.472 1.389l12.139 12.139ZM12 12Z',
     queue: 'M2.667 14.333v-2h8v2H2.667Zm0 -4.167v-2h12v2H2.667Zm0 -4.167v-2h12v2H2.667Zm13.333 14v-8.667l6.667 4.333 -6.667 4.333Z',
     close: 'M6.75 18.667l-1.417 -1.417 5.25 -5.25 -5.25 -5.25 1.417 -1.417 5.25 5.25 5.25 -5.25 1.417 1.417 -5.25 5.25 5.25 5.25 -1.417 1.417 -5.25 -5.25 -5.25 5.25Z',
+    shuffle: 'M14.667 20v-2h1.917L13.417 14.833l1.417 -1.417 3.167 3.167v-1.917h2v5.333H14.667Zm-9.25 0 -1.417 -1.417 12.583 -12.583h-1.917v-2h5.333v5.333h-2v-1.917L5.417 20Zm3.75 -9.417L4 5.417l1.417 -1.417 5.167 5.167 -1.417 1.417Z',
+    shuffleOn: 'M2 24q-0.825 0 -1.412 -0.587Q0 22.825 0 22v-20q0 -0.825 0.587 -1.412Q1.175 0 2 0h20q0.825 0 1.412 0.587Q24 1.175 24 2v20q0 0.825 -0.587 1.412Q22.825 24 22 24H2Zm12.667 -4h5.333v-5.333h-2v1.917L14.833 13.417l-1.417 1.417 3.167 3.167h-1.917v2Zm-9.25 0 12.583 -12.583v1.917h2v-5.333H14.667v2h1.917L4 18.583l1.417 1.417Zm3.75 -9.417 1.417 -1.417 -5.167 -5.167 -1.417 1.417 5.167 5.167Z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
-  // Icons of the two ways to play (each one centred in its own box and of a similar size): shuffle, and Material's full_album with a disc in place of the play (whole albums).
-  const MODE_ICON = {
-    shuffle: `<svg class="pb-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.667 20v-2h1.917L13.417 14.833l1.417 -1.417 3.167 3.167v-1.917h2v5.333H14.667Zm-9.25 0 -1.417 -1.417 12.583 -12.583h-1.917v-2h5.333v5.333h-2v-1.917L5.417 20Zm3.75 -9.417L4 5.417l1.417 -1.417 5.167 5.167 -1.417 1.417Z"/></svg>`,
-    album: `<svg class="pb-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M9 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0ZM12.3 10a1.7 1.7 0 1 0 3.4 0 1.7 1.7 0 1 0-3.4 0ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z"/></svg>`,
-  };
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
   const LIKED_ICON = `<svg class="x-icon" viewBox="0 0 24 24" role="img" aria-label="Liked Songs"><title>Liked Songs</title><path d="M12.66 15.333Q13.778 15.333 14.556 14.56q0.778 -0.773 0.778 -1.893v-5.333h3.333v-2.667H14v5.694q-0.306 -0.167 -0.625 -0.264T12.667 10q-1.12 0 -1.893 0.771 -0.773 0.772 -0.773 1.889Q10 13.778 10.771 14.556q0.772 0.778 1.889 0.778ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z"/></svg>`;
   const LIKED_PATH = 'M12.66 15.333Q13.778 15.333 14.556 14.56q0.778 -0.773 0.778 -1.893v-5.333h3.333v-2.667H14v5.694q-0.306 -0.167 -0.625 -0.264T12.667 10q-1.12 0 -1.893 0.771 -0.773 0.772 -0.773 1.889Q10 13.778 10.771 14.556q0.772 0.778 1.889 0.778ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z';
@@ -58,10 +55,7 @@
         <div class="transport"><div class="prev"><div class="icon prev-icon" role="button" tabindex="0" aria-label="Previous track" title="Previous track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M4 2h4v20H4zM8 12 24 2v20zM22 12 38 2v20z"/></svg></div></div><div class="next"><div class="icon next-icon" role="button" tabindex="0" aria-label="Next track" title="Next track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M34 2h4v20h-4zM4 2l16 10L4 22zM18 2l16 10L18 22z"/></svg></div></div></div>
       </div>
       <div class="col col-4-15 controls-extra">
-        <div class="dr-segment pb-seg" role="radiogroup" aria-label="Play mode">
-          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="album" title="Play mode&#10;Full album: albums in order, every song" aria-label="Play mode: Full album, albums in order, every song">${MODE_ICON.album}</a>
-          <a href="#" class="dr-seg pb-opt" role="radio" aria-checked="false" data-mode="shuffle" title="Play mode&#10;Shuffle: one song from each album, in random order" aria-label="Play mode: Shuffle, one song from each album, in random order">${MODE_ICON.shuffle}</a>
-        </div>
+        <a href="#" class="x-btn x-shuffle" role="button" aria-pressed="false" title="Shuffle&#10;One song from each album, in random order" aria-label="Shuffle: one song from each album, in random order">${svg(P.shuffle, 'x-icon', '', 'Shuffle')}</a>
         <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Recommendations queue" aria-label="Recommendations queue">${svg(P.queue, 'x-icon', '', 'Recommendations queue')}</a>
         <a href="#" class="x-btn x-saved" title="Liked Songs" aria-label="Liked Songs">${LIKED_ICON}</a>
@@ -135,14 +129,10 @@
     q('.playpause').addEventListener('click', () => onCmd('toggle'));
     q('.prev-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('prev'); });
     q('.next-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('next'); });
-    // Play mode: two buttons, one of them always on
+    // Shuffle: one button that is on or off (Full album, the other way to play, is the default)
     let closePanels = () => {};
-    q('.pb-seg').addEventListener('click', (e) => {
-      const option = e.target.closest('[data-mode]');
-      if (!option) return;
-      e.preventDefault();
-      onCmd('mode', option.dataset.mode);
-    });
+    let shuffleOn = false;
+    q('.x-shuffle').addEventListener('click', (e) => { e.preventDefault(); onCmd('mode', shuffleOn ? 'album' : 'shuffle'); });
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
     q('.save').addEventListener('click', (e) => { e.preventDefault(); onCmd('save'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
@@ -266,12 +256,12 @@
       q('.vol-amt').style.width = pct(s.vol); q('.vol-control').style.left = pct(s.vol);
       const icon = q('.vol-icon path'); const want = s.vol > 0 ? P.vol : P.mute;
       if (icon.getAttribute('d') !== want) icon.setAttribute('d', want);
-      // Play mode: the button of the mode that is on is dark
-      const mode = s.mode === 'shuffle' ? 'shuffle' : 'album';
-      for (const option of el.querySelectorAll('.pb-opt')) {
-        const on = option.dataset.mode === mode;
-        option.classList.toggle('sel', on); option.setAttribute('aria-checked', String(on));
-      }
+      // Shuffle: its own icon and the blue of the active icons when it is on
+      shuffleOn = s.mode === 'shuffle';
+      const shuffleBtn = q('.x-shuffle');
+      shuffleBtn.classList.toggle('active', shuffleOn); shuffleBtn.setAttribute('aria-pressed', String(shuffleOn));
+      const shufflePath = shuffleBtn.querySelector('path'); const wantShuffle = shuffleOn ? P.shuffleOn : P.shuffle;
+      if (shufflePath.getAttribute('d') !== wantShuffle) shufflePath.setAttribute('d', wantShuffle);
     }
     return { el, update, closeMenus: () => { closePanels(); } };
   }
