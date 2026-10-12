@@ -15,6 +15,15 @@ describe('the play plan', () => {
     assert.equal(plan.pick('a', 4, 2), -1);
   });
 
+  test('songs restored after a reload do not play again', () => {
+    const plan = createPlayPlan(seeded(5));
+    plan.restore([{ id: 'a', index: 0 }, { id: 'a', index: 2 }]);
+    const picks = [];
+    for (let n = 0; n < 2; n += 1) { const i = plan.pick('a', 4, 0); picks.push(i); plan.mark('a', i, 4); }
+    assert.deepEqual(picks.sort(), [1, 3], 'only the songs that had not played');
+    assert.equal(plan.pick('a', 4, 0), -1);
+  });
+
   test('the track chosen for an album stays the same until it plays (the queue shows what will play)', () => {
     const plan = createPlayPlan(seeded(9));
     plan.mark('a', 0, 6);

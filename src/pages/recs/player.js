@@ -29,6 +29,26 @@ const player = {
 const plan = createPlayPlan();   // which songs have played (shuffle never plays one twice)
 const history = [];              // the songs that played, in order: { id, index } (the previous button goes back along it)
 const MODES = ['album', 'shuffle'];
+const PLAYED_KEY = 'playedToday';   // chrome.storage.session: what played today, so a reload of the page does not forget it (it goes when the browser closes)
+const todayKey = () => { const d = new Date(); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+let saveTimer = null;
+function savePlayed() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { chrome.storage.session.set({ [PLAYED_KEY]: { date: todayKey(), history: history.slice(-500) } }); } catch { /* storage unavailable */ }
+  }, 300);
+}
+async function restorePlayed() {
+  try {
+    const saved = (await chrome.storage.session.get(PLAYED_KEY))[PLAYED_KEY];
+    if (!saved || saved.date !== todayKey() || !Array.isArray(saved.history) || history.length) return;
+    const valid = saved.history.filter((h) => h && h.id !== undefined && Number.isInteger(h.index) && h.index >= 0 && h.index < 1000)
+      .map((h) => ({ id: String(h.id), index: h.index, title: typeof h.title === 'string' ? h.title.slice(0, 200) : '' }));
+    history.push(...valid);
+    plan.restore(valid);
+    emit(true);
+  } catch { /* storage unavailable */ }
+}
 const MODE_NOTICE = { album: 'Shuffle off', shuffle: 'Shuffle on' }; // the notice when the play mode changes
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
@@ -74,8 +94,9 @@ function playTrack(index) {
   recoveredAt = null;
   if (!player.waiting && !String(player.current.id).startsWith('w:')) {
     plan.mark(player.current.id, index, tracks.length);
-    history.push({ id: player.current.id, index });
+    history.push({ id: player.current.id, index, title: tracks[index].title });
     if (history.length > 500) history.shift();
+    savePlayed();
   }
   audio.src = tracks[index].src;
   audio.play().catch(() => {});
@@ -228,7 +249,7 @@ const listFinished = () => (player.mode === 'album'
 
 export const togglePlay = () => {
   if (!player.current.id) return startFirst();
-  if (!player.waiting && audio.ended && listFinished()) { plan.reset(); history.length = 0; return startFirst(); }
+  if (!player.waiting && audio.ended && listFinished()) { plan.reset(); history.length = 0; savePlayed(); return startFirst(); }
   return audio.paused ? audio.play().catch(() => {}) : audio.pause();
 };
 export const pause = () => audio.pause();
@@ -405,15 +426,15 @@ function queueItems() {
     const win = queueWindow(order);
     more = win.more;
     queuePlayed = Math.max(0, win.at);
-    const songRow = (id, i, tracks, sec) => {
+    const songRow = (id, i, tracks, sec, fallback = '') => {
       const row = base(id);
-      return row ? { ...row, i, title: tracks[i] ? tracks[i].title : `Track ${i + 1}`, track: true, sec, saved: session.saved.has(`${id}:${i}`) } : null;
+      return row ? { ...row, i, title: tracks[i] ? tracks[i].title : (fallback || `Track ${i + 1}`), track: true, sec, saved: session.saved.has(`${id}:${i}`) } : null;
     };
     const push = (row) => { if (row) items.push(row); };
     // what already played, in the order it played (the song that plays now is not in it)
     const played = new Map();
     for (const h of history) { const k = `${h.id}:${h.index}`; played.delete(k); played.set(k, h); }
-    for (const h of played.values()) if (!(h.id === cur.id && h.index === cur.index)) push(songRow(h.id, h.index, tracksOf(h.id) || [], 'played'));
+    for (const h of played.values()) if (!(h.id === cur.id && h.index === cur.index)) push(songRow(h.id, h.index, tracksOf(h.id) || [], 'played', h.title));
     if (win.at >= 0) cur.tracks.forEach((track, i) => { if (i >= cur.index) push(songRow(cur.id, i, cur.tracks, i === cur.index ? 'now' : 'next')); });
     for (const id of win.ahead) {
       const tracks = tracksOf(id);
@@ -529,6 +550,7 @@ export function initPlayer() {
     if (saved !== null && Number.isFinite(+saved)) audio.volume = Math.max(0, Math.min(1, +saved));
   } catch { /* storage unavailable */ }
   registerMediaSessionHandlers();
+  restorePlayed();
   audio.addEventListener('ended', nextTrack); // (a song while waiting: another one, until the list is ready)
   audio.addEventListener('error', recoverFromAudioError);
   audio.addEventListener('play', markPlaying);

@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.6
+- The history of what played today survives a reload of the page: "Played" in the queue keeps its songs, and Shuffle does not play them again. It is kept in `chrome.storage.session`
+  (it goes when the browser closes, and it is for today only); the Liked Songs are not touched by this, they stay in `chrome.storage.local`.
+- The tooltip of the toolbar icon and the first item of its menu say "27 new albums for today" ("1 new album for today"); 1.2.5 had "to listen to".
+
 ## 1.2.5
 - The text of the toolbar icon (its tooltip and the first item of its right-click menu) says "27 new albums to listen to" (it said "27 new recommendations"; "1 new album to listen to" for
   one) and, when you opened them all, "You've opened all of today's albums". The tag of the tab keeps "27 NEW".

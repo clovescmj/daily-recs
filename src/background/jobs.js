@@ -20,7 +20,7 @@ export const COUNT_MENU_ID = 'count';
 
 /** Plain-language meaning of the number on the icon: today's albums you haven't opened yet. */
 export function describeCount({ total, unopened }) {
-  if (unopened) return `${unopened} new album${unopened === 1 ? '' : 's'} to listen to`;
+  if (unopened) return `${unopened} new album${unopened === 1 ? '' : 's'} for today`;
   return total ? "You've opened all of today's albums" : 'No recommendations yet';
 }
 

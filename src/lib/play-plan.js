@@ -76,5 +76,13 @@ export function createPlayPlan(random = Math.random) {
 
     /** Everything is new again (the user played the list once through and wants it again). */
     reset() { played.clear(); pending.clear(); round = []; },
+
+    /** The songs that had played before the page was reloaded: they do not play again. (How many tracks an album has is learnt when it is opened.) */
+    restore(entries) {
+      for (const { id, index } of entries) {
+        if (!played.has(id)) played.set(id, new Set());
+        played.get(id).add(index);
+      }
+    },
   };
 }
