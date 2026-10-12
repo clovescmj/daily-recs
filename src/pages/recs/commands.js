@@ -25,8 +25,9 @@ const COMMANDS = {
   wish: (v) => { const id = targetId(v); return id && setWish(id, !session.wished.has(id)); },
   // the + : the track that is playing, or the one named in the command (from the Liked list)
   save: (v) => { const track = isTrack(v) ? v : player.currentTrack(); return track && setSave(track, !session.saved.has(`${track.id}:${track.i}`)); },
-  // the + of a queue item: the whole album, like on the cards; in Shuffle only the song of that album
-  saveAlbum: (v) => isAlbumId(v) && (player.playMode() === 'shuffle' ? saveRowSong(String(v)) : saveAlbumSong(String(v))),
+  // the + of a queue item that stands for an album: the whole album, like on the cards
+  saveAlbum: (v) => isAlbumId(v) && saveAlbumSong(String(v)),
+  saveSong: (v) => isAlbumId(v) && saveRowSong(String(v)), // the + of a Shuffle row: the song of that album, not the whole album
   playTrack: (v) => isTrack(v) && player.playSavedTrack(String(v.id), v.i),
   dislike: (v) => {
     const id = targetId(v);

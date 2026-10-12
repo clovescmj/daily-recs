@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.23
+- Keyboard: the close buttons of the queue and of Liked Songs answer Enter and Space, and the cover of each row is a button that can be focused (Tab) and plays the song with Enter or
+  Space (the play shows on it, as it does under the pointer).
+- The + of the queue has two explicit commands: one for the whole album (`saveAlbum`) and one for the song of a Shuffle row (`saveSong`); the page no longer decides by the play mode.
+
 ## 1.2.22
 - Simpler code, same behaviour: the queue is built by two small functions (one for Full album, one for Shuffle) instead of one long one; the previous and next buttons and the headings
   of the queue use `if` chains instead of nested ternaries; the check of an `https` address is written once. The queue gives the same rows in the three situations that were compared

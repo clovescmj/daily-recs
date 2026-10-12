@@ -25,12 +25,12 @@
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let savedCount = null;
-  const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', dislike: 'dislike' };
+  const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', saveSong: 'save', dislike: 'dislike' };
   /** One icon of a row of the queue or of the Liked list. */
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',');
   /** The cover of a row (the same box when there is none, so the rows keep their height). */
-  const rowCover = (art, playing) => `<span class="qcover">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}<span class="qplay"><svg class="qp-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg><svg class="qp-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.pause}"/></svg></span></span>`;
+  const rowCover = (art, playing) => `<span class="qcover" role="button" tabindex="0" aria-label="Play song">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}<span class="qplay"><svg class="qp-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg><svg class="qp-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.pause}"/></svg></span></span>`;
   /**
    * The song and the artist (or the album) of a row: one link to the album, in a new tab, that wraps both lines and is underlined under the pointer.
    * Without an address, the same two lines as plain text.
@@ -165,6 +165,14 @@
     closePanels = () => { setQueue(false); setSaved(false); };
     q('.q-close').addEventListener('click', () => setQueue(false));
     q('.l-close').addEventListener('click', () => setSaved(false));
+    // the elements with role="button" that are not links or buttons answer Enter and Space like a click
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const target = e.target.closest('.q-close, .l-close, .qcover');
+      if (!target) return;
+      e.preventDefault();
+      target.click();
+    });
     q('.queue ol').addEventListener('click', (e) => {
       const li = e.target.closest('li[data-id]');
       if (!li) return;
@@ -232,13 +240,17 @@
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + (song
               ? action('save', it.saved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
-              : action('saveAlbum', it.saved, s.mode === 'shuffle' ? 'Add song to Liked Songs' : 'Add album to Liked Songs', s.mode === 'shuffle' ? 'Remove song from Liked Songs' : 'Remove album from Liked Songs', P.addCircle, P.checkCircle))
+              : action(s.mode === 'shuffle' ? 'saveSong' : 'saveAlbum', it.saved, s.mode === 'shuffle' ? 'Add song to Liked Songs' : 'Add album to Liked Songs', s.mode === 'shuffle' ? 'Remove song from Liked Songs' : 'Remove album from Liked Songs', P.addCircle, P.checkCircle))
             + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
             + '</span></li>';
         }).join('') + (s.queueMore ? '<li class="qmore">More songs load as you listen</li>' : '');
       }
       const playingRow = q('.queue ol li.active');
-      if (playingRow) playingRow.title = s.playing ? 'Pause' : 'Play'; // (the song that plays: its click pauses or resumes it)
+      if (playingRow) {
+        const label = s.playing ? 'Pause' : 'Play'; // (the song that plays: its click pauses or resumes it)
+        playingRow.title = label;
+        playingRow.querySelector('.qcover').setAttribute('aria-label', label);
+      }
       // the count at the top is always of albums; the foot says how far the list has gone
       const albums = s.queueAlbums != null ? s.queueAlbums : queue.length;
       setText(q('.q-count'), albums ? `${albums} album${albums === 1 ? '' : 's'}` : '');

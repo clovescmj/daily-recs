@@ -177,3 +177,5 @@
 #dr-player .queue .qlink { align-self: flex-start; display: flex; flex-direction: column; min-width: 0; max-width: 100%; color: inherit; text-decoration: none; } /* one link for both lines; only as wide as the text */
 #dr-player .queue a.qlink:hover b, #dr-player .queue a.qlink:hover span { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { #dr-player .queue .qplay { transition: none; } }
+#dr-player .queue .qcover:focus-visible { outline: 2px solid var(--dr-profile-blue); outline-offset: 1px; }
+#dr-player .queue .qcover:focus-visible .qplay { opacity: 1; } /* (from the keyboard: the play shows, as it does under the pointer) */

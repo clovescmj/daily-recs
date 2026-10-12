@@ -180,9 +180,6 @@ export async function albumSongs(id) {
 /** A track of the Liked list: its album, starting at that track (or at the same number if the track list changed). */
 export const playSavedTrack = (id, index) => playAlbum(id, index);
 
-/** The play mode that is on: 'album' (the default) or 'shuffle'. */
-export const playMode = () => player.mode;
-
 /** The song of an album in Shuffle: the one that is playing, or the last one that played of it; null while it has not played. */
 export function knownSongOf(id) {
   const { current } = player;
