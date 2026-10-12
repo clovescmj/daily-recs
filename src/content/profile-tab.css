@@ -1,11 +1,11 @@
 /* Styles for the "daily recs" tab and panel injected into the Bandcamp profile page. */
 .dr-hidden { display: none !important; }
 #grid-tabs li.dr-tab { cursor: pointer; }
-/* "35 new" next to the tab name, styled like Bandcamp's "NEW" tag on the playlists tab (colours approximated) */
+/* "35 new" before the tab name: Bandcamp's own rule for the "New" tag of the playlists tab (.grids ol.tabs .tab-title .tab-new-badge), with the same values */
 #grid-tabs li.dr-tab .dr-new-tag {
-  display: inline-block; margin-left: 8px; padding: 2px 6px; border-radius: var(--dr-radius); vertical-align: middle;
-  background: var(--dr-tag-bg); color: var(--dr-tag-text); font: var(--dr-weight-bold) var(--dr-font-xs)/1.4 var(--dr-font-family);
-  letter-spacing: .04em; text-transform: uppercase;
+  display: inline-flex; vertical-align: middle; margin-right: 4px; padding: 2px 5px; border-radius: 4px;
+  background: var(--dr-tag-bg); color: var(--dr-tag-text); font: 700 10px "Helvetica Neue", var(--dr-font-family);
+  letter-spacing: .4px; text-transform: uppercase;
 }
 #grid-tabs li.dr-tab .dr-new-tag:empty { display: none; }
 #dr-frame { display: block; max-width: 100%; height: 200px; border: 0; background: transparent; }

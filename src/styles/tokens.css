@@ -45,8 +45,8 @@
   --dr-success: var(--dr-green500);        /* a song of it is in Liked Songs */
   --dr-danger: var(--dr-red500);           /* don't show music like this */
   --dr-wish: var(--dr-orange500);          /* in the wishlist */
-  --dr-tag-bg: var(--dr-blue300);          /* the "new" tag of the tab */
-  --dr-tag-text: var(--dr-blue600);
+  --dr-tag-bg: var(--dr-blue300);          /* the "new" tag of the tab (Bandcamp's .tab-new-badge: #99DBEB) */
+  --dr-tag-text: var(--dr-gray-700);       /* #222 */
 
   /* buttons (the blue button of the profile, and the hover and pressed states of the plain ones) */
   --dr-profile-button: #309fc3;            /* the blue button of the fan profile ("Send message"), the page we live in: read from its pixels, not a design-system token */

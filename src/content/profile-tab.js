@@ -238,8 +238,8 @@
     title.className = 'tab-title';
     title.textContent = 'daily recs';
     const badge = document.createElement('span');
-    badge.className = 'dr-new-tag'; // same look as Bandcamp's "NEW" tag on the playlists tab
-    title.append(badge);
+    badge.className = 'dr-new-tag'; // same look and place as Bandcamp's "NEW" tag on the playlists tab: before the name
+    title.prepend(badge, ' '); // (the space after the badge is part of the gap, as in Bandcamp's own markup)
     tab.append(title);
     tabsContainer.appendChild(tab);
     state.tab = tab;

@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.1
+- The "new" tag of the daily recs tab has Bandcamp's own look and place, from its rule for the "New" tag of the playlists tab: it comes **before** the name of the tab (it used to come after),
+  with `#99DBEB` as the background, `#222` text in Helvetica Neue bold 10px, upper case, letter spacing .4px, padding 2px 5px, 4px corners and 4px (plus a space) to the name.
+
 ## 1.2.0
 - Full album: the queue lists **songs**, one after the other, like a streaming app. It shows what already played ("Played"), the song that plays ("Playing now") and, under "Up next",
   the rest of its album and all the songs of the **next three albums**; at the end, a note says that more songs load as you listen. The window moves as the music plays. The top
