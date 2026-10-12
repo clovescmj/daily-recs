@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.19
+- Queue and Liked Songs: tooltips on the rows. The row says "Play song" (the row that plays says "Pause", or "Play" when paused) and the song and the artist, which are one link to the
+  album, say "View album".
+
 ## 1.2.18
 - Queue: on the "Playing now" row, with the pointer on it, the bars of the equalizer give way to a pause while the song plays (a play when it is paused); the dark layer stays. A click on that
   row pauses or resumes the song.

@@ -37,7 +37,7 @@
   const rowText = (title, sub, url) => {
     const lines = `<b>${esc(title)}</b><span>${esc(sub)}</span>`;
     const link = typeof url === 'string' && url.startsWith('https://')
-      ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="qlink" data-open>${lines}</a>` : `<span class="qlink">${lines}</span>`;
+      ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="qlink" data-open title="View album">${lines}</a>` : `<span class="qlink">${lines}</span>`;
     return `<span class="qtext">${link}</span>`;
   };
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
@@ -217,7 +217,7 @@
           const current = bySection ? it.sec === 'now' : it.id === s.curId;
           const song = it.track === true;
           return heading(it, i)
-            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}">${rowCover(it.art, current)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
+            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}" title="${current ? (s.playing ? 'Pause' : 'Play') : 'Play song'}">${rowCover(it.art, current)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + (song
               ? action('save', it.saved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
@@ -226,6 +226,8 @@
             + '</span></li>';
         }).join('') + (s.queueMore ? '<li class="qmore">More songs load as you listen</li>' : '');
       }
+      const playingRow = q('.queue ol li.active');
+      if (playingRow) playingRow.title = s.playing ? 'Pause' : 'Play'; // (the song that plays: its click pauses or resumes it)
       // the count at the top is always of albums; the foot says how far the list has gone
       const albums = s.queueAlbums != null ? s.queueAlbums : queue.length;
       setText(q('.q-count'), albums ? `${albums} album${albums === 1 ? '' : 's'}` : '');
@@ -247,7 +249,7 @@
         }
         savedCount = s.savedList.length;
         q('.saved ol').innerHTML = s.savedList.length
-          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}">${rowCover(it.art, false)}${rowText(it.title, `${it.artist} · ${it.album}`, it.url)}<span class="qact">`
+          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}" title="Play song">${rowCover(it.art, false)}${rowText(it.title, `${it.artist} · ${it.album}`, it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + action('save', true, '', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
             + '</span></li>').join('')
