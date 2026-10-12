@@ -10,7 +10,6 @@
     checkCircle: 'M10.583 16l6.611 -6.583 -1.417 -1.417 -5.194 5.167 -2.361 -2.333 -1.417 1.417 3.778 3.75Zm1.417 6.667q-2.194 0 -4.139 -0.833t-3.403 -2.292Q3 18.083 2.167 16.139T1.333 12q0 -2.222 0.833 -4.153t2.292 -3.389Q5.917 3 7.861 2.167t4.139 -0.833q2.222 0 4.153 0.833t3.389 2.292Q21 5.917 21.833 7.847T22.667 12q0 2.194 -0.833 4.139t-2.292 3.403Q18.083 21 16.153 21.833T12 22.667Z',
     block: 'M7.861 21.833q-1.944 -0.833 -3.403 -2.292T2.167 16.139q-0.833 -1.944 -0.833 -4.139 0 -2.222 0.833 -4.153t2.292 -3.389Q5.917 3 7.861 2.167t4.153 -0.833q2.208 0 4.139 0.833t3.389 2.292Q21 5.917 21.833 7.847T22.667 12q0 2.194 -0.833 4.139t-2.292 3.403Q18.083 21 16.153 21.833t-4.139 0.833Q9.806 22.667 7.861 21.833Zm4.139 -1.167q1.528 0 2.889 -0.5t2.472 -1.389L5.222 6.639q-0.889 1.111 -1.389 2.472t-0.5 2.889q0 3.611 2.528 6.139t6.139 2.528Zm6.778 -3.306q0.889 -1.111 1.389 -2.472t0.5 -2.889q0 -3.611 -2.528 -6.139t-6.139 -2.528q-1.528 0 -2.889 0.5t-2.472 1.389l12.139 12.139ZM12 12Z',
     queue: 'M2.667 14.333v-2h8v2H2.667Zm0 -4.167v-2h12v2H2.667Zm0 -4.167v-2h12v2H2.667Zm13.333 14v-8.667l6.667 4.333 -6.667 4.333Z',
-    open: 'M4.667 21.333q-0.825 0 -1.412 -0.587Q2.667 20.158 2.667 19.333v-14.667q0 -0.825 0.587 -1.412Q3.842 2.667 4.667 2.667h7.333v2H4.667v14.667h14.667v-7.333h2v7.333q0 0.825 -0.587 1.412Q20.158 21.333 19.333 21.333H4.667Zm4.75 -5.333 -1.417 -1.417 9.917 -9.917H14.667v-2h6.667v6.667h-2v-3.25L9.417 16Z',
     close: 'M6.75 18.667l-1.417 -1.417 5.25 -5.25 -5.25 -5.25 1.417 -1.417 5.25 5.25 5.25 -5.25 1.417 1.417 -5.25 5.25 5.25 5.25 -1.417 1.417 -5.25 -5.25 -5.25 5.25Z',
     shuffle: 'M14.667 20v-2h1.917L13.417 14.833l1.417 -1.417 3.167 3.167v-1.917h2v5.333H14.667Zm-9.25 0 -1.417 -1.417 12.583 -12.583h-1.917v-2h5.333v5.333h-2v-1.917L5.417 20Zm3.75 -9.417L4 5.417l1.417 -1.417 5.167 5.167 -1.417 1.417Z',
     shuffleOn: 'M2 24q-0.825 0 -1.412 -0.587Q0 22.825 0 22v-20q0 -0.825 0.587 -1.412Q1.175 0 2 0h20q0.825 0 1.412 0.587Q24 1.175 24 2v20q0 0.825 -0.587 1.412Q22.825 24 22 24H2Zm12.667 -4h5.333v-5.333h-2v1.917L14.833 13.417l-1.417 1.417 3.167 3.167h-1.917v2Zm-9.25 0 12.583 -12.583v1.917h2v-5.333H14.667v2h1.917L4 18.583l1.417 1.417Zm3.75 -9.417 1.417 -1.417 -5.167 -5.167 -1.417 1.417 5.167 5.167Z',
@@ -28,8 +27,11 @@
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',');
   /** The cover of a row (the same box when there is none, so the rows keep their height). */
-  const rowCover = (art, playing) => `<span class="qcover">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}</span>`;
-  const rowText = (title, sub) => `<span class="qtext"><b>${esc(title)}</b><span>${esc(sub)}</span></span>`;
+  const rowCover = (art, playing) => `<span class="qcover">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}<span class="qplay"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg></span></span>`;
+  /** The song and the artist (or the album) of a row: a link to the album, in a new tab, underlined under the pointer. Without an address, plain text. */
+  const rowLink = (text, url) => (typeof url === 'string' && url.startsWith('https://')
+    ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="qlink" data-open>${esc(text)}</a>` : esc(text));
+  const rowText = (title, sub, url) => `<span class="qtext"><b>${rowLink(title, url)}</b><span>${rowLink(sub, url)}</span></span>`;
   const pct = (x) => `${Math.max(0, Math.min(1, x || 0)) * 100}%`;
 
   function create({ onCmd }) {
@@ -157,6 +159,7 @@
     q('.queue ol').addEventListener('click', (e) => {
       const li = e.target.closest('li[data-id]');
       if (!li) return;
+      if (e.target.closest('[data-open]')) return; // the link of the song and the artist opens the album in a new tab
       const act = e.target.closest('[data-act]');
       const i = li.dataset.i === undefined ? -1 : Number(li.dataset.i);
       const track = { id: li.dataset.id, i, title: li.dataset.title || '' };
@@ -205,7 +208,7 @@
           const current = bySection ? it.sec === 'now' : it.id === s.curId;
           const song = it.track === true;
           return heading(it, i)
-            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}">${rowCover(it.art, current)}${rowText(it.title, sub(it))}<span class="qact">`
+            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}">${rowCover(it.art, current)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + (song
               ? action('save', it.saved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
@@ -235,10 +238,7 @@
         }
         savedCount = s.savedList.length;
         q('.saved ol').innerHTML = s.savedList.length
-          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}">${rowCover(it.art, false)}${rowText(it.title, `${it.artist} · ${it.album}`)}<span class="qact">`
-            + (typeof it.url === 'string' && it.url.startsWith('https://')
-              ? `<a href="${esc(it.url)}" target="_blank" rel="noopener" class="dr-act dr-act--open" data-open title="Open album on Bandcamp" aria-label="Open album on Bandcamp">${svg(P.open, 'ci', '', 'Open album on Bandcamp')}</a>`
-              : '')
+          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}">${rowCover(it.art, false)}${rowText(it.title, `${it.artist} · ${it.album}`, it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + action('save', true, '', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
             + '</span></li>').join('')

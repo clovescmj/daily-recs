@@ -442,7 +442,7 @@ function queueItems() {
     if (!cache.has(id)) {
       const card = findCard(id);
       const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
-      cache.set(id, card ? { id, album: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '', wished: session.wished.has(id) } : null);
+      cache.set(id, card ? { id, album: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '', url: /^https:\/\//i.test(pooled.url || '') ? pooled.url : '', wished: session.wished.has(id) } : null);
     }
     return cache.get(id);
   };
