@@ -20,7 +20,7 @@ Step by step, for someone who is not a developer: [INSTALL.md](INSTALL.md). In s
 - **My tags:** explore new music by genre.
 - **Best matches:** perfect matches with your collection.
 - **Surprise me:** go beyond your collection.
-- A player bar in Bandcamp's style (a play mode with full albums or shuffle, queue, Liked Songs), and a random song from your collection while a list is being built.
+- A player bar in Bandcamp's style (a Shuffle button, queue, Liked Songs), and a random song from your collection while your first list is being built.
 
 ## Project layout
 ```

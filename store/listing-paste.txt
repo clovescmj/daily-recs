@@ -26,7 +26,7 @@ Daily Recs starts from what you own and what you've saved on Bandcamp, finds alb
 • "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
 • Three lists: "My tags" (explore new music by genre), "Best matches" (perfect matches with your collection) and "Surprise me" (go beyond your collection)
 • A built-in player in Bandcamp's own style, with a Shuffle button (one song from each album, in random order, never the same song twice), a queue, Liked Songs and media keys
-• While your list is being built, play a random song from your own collection
+• While your first list is being built, play a random song from your own collection
 • The albums you hide sync across your computers through your Google account
 
 Private by design: everything runs in your browser and only talks to Bandcamp (bandcamp.com and its media servers). No analytics, no ads, no accounts.
