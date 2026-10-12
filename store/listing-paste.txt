@@ -58,7 +58,7 @@ Keeps the library snapshot, the recommendations and the user's taste on this com
 alarms
 Checks once every few hours whether a new day has started, to prepare the day's list in the background, and schedules a retry when Bandcamp asks to slow down.
 
-offscreen (new permission in this version)
+offscreen
 Opens a hidden page that only checks whether the browser is in dark or light mode, so the toolbar icon can use the symbol that is visible on the user's toolbar (the service worker cannot check this itself). It reads and sends no other data.
 
 contextMenus

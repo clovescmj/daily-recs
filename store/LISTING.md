@@ -1,4 +1,4 @@
-# Chrome Web Store listing (draft)
+# Chrome Web Store listing
 
 Paste these into the developer dashboard. Not shipped inside the extension package.
 
@@ -61,14 +61,13 @@ Show a daily list of new album recommendations on the user's own Bandcamp profil
 **Remote code:** No, I am not using remote code.
 
 **Data usage (check what applies, and be accurate)**
-- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
+- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides and the user's Liked Songs. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
 - Certify: the data is not sold to third parties, not used for purposes unrelated to the single purpose, and not used for creditworthiness or lending.
 
 **Privacy policy URL:** https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md
-(This only works once the code is pushed to the repository.)
 
 ## Before submitting
-- [ ] Push the code to GitHub (so the privacy policy URL exists).
+- [x] The code is on GitHub (so the privacy policy URL exists).
 - [x] Screenshot 1 and the promo tiles are in `store/images/`; add more screenshots if you want.
 - [ ] Upload `dist/daily-recs-<version>.zip` (run `npm run package`; the version is the one in `manifest.json`).
 - [ ] Choose visibility: Public, or Unlisted (only people with the link).

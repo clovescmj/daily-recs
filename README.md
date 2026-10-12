@@ -49,6 +49,7 @@ src/
     shared/
   assets/                the logo of the About page (the player icons are inline SVG)
 test/                    node:test suites with an offline fake Bandcamp
+INSTALL.md               how to install from a release zip, for someone who is not a developer
 CHANGELOG.md, PRIVACY.md  history by version, and the privacy policy the store links to
 ```
 
