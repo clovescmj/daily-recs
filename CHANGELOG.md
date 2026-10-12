@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.24
+- The About page said "one song per album or full albums, even while your list is loading": it now describes the Shuffle button and says the song while waiting is for the first list.
+
 ## 1.1.23
 - Queue: all the buttons of a row are always visible (the block icon used to show only on hover).
 - Queue: the + of a row follows the play mode. With Shuffle off (Full album) it adds the whole album, as before. With Shuffle on it adds only the song of that album (the one that
