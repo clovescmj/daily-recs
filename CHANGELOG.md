@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.8
+- After a reload of the page, the bar shows the song that was playing, paused at the point where it stopped (the song and its position are kept in `chrome.storage.session`, for today, every
+  few seconds and at once on a pause). Chrome does not let a page start playing by itself, so you press play and it goes on from there. A song of the loading box is not kept.
+
 ## 1.2.7
 - The heart of an album that is in your wishlist is Bandcamp's own orange (`#F99F32`, a lighter and more yellow orange than the `#E65225` it had), on the cards, in the queue and in the player bar.
 

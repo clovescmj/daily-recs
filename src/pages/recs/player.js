@@ -38,6 +38,42 @@ function savePlayed() {
     try { chrome.storage.session.set({ [PLAYED_KEY]: { date: todayKey(), history: history.slice(-500) } }); } catch { /* storage unavailable */ }
   }, 300);
 }
+const NOW_KEY = 'nowPlaying';       // the song that plays and where it is, in chrome.storage.session too
+let lastNowSave = 0;
+/** Keeps the song and the position (every few seconds while it plays, at once on a pause or a new song). A song of the loading box is not kept. */
+function saveNowPlaying(force = false) {
+  const { current } = player;
+  if (player.waiting || !current.id || String(current.id).startsWith('w:') || !current.tracks[current.index]) return;
+  const now = Date.now();
+  if (!force && now - lastNowSave < 3000) return;
+  lastNowSave = now;
+  try { chrome.storage.session.set({ [NOW_KEY]: { date: todayKey(), id: current.id, index: current.index, time: audio.currentTime || 0 } }); } catch { /* storage unavailable */ }
+}
+
+/** After a reload: the bar shows the song that was playing, paused where it stopped (the browser does not let a page play by itself; play goes on from there). */
+async function restoreNowPlaying() {
+  try {
+    const saved = (await chrome.storage.session.get(NOW_KEY))[NOW_KEY];
+    if (!saved || saved.date !== todayKey() || player.current.id || audio.src || !Number.isInteger(saved.index)) return;
+    const album = await poolAlbum(String(saved.id));
+    if (!album) return;
+    const tracks = await fetchTracks(album);
+    if (!tracks[saved.index] || player.current.id || audio.src) return; // (the user started something meanwhile)
+    player.album = album;
+    player.current = { id: album.id, tracks, index: saved.index };
+    const time = Number(saved.time) || 0;
+    audio.preload = 'metadata';
+    audio.addEventListener('loadedmetadata', () => {
+      if (time > 0 && time < audio.duration - 1) audio.currentTime = time;
+      audio.preload = 'none';
+    }, { once: true });
+    audio.src = tracks[saved.index].src;
+    setMediaSession();
+    markPlaying();
+    emit(true);
+  } catch { /* storage unavailable, or the album cannot be read */ }
+}
+
 async function restorePlayed() {
   try {
     const saved = (await chrome.storage.session.get(PLAYED_KEY))[PLAYED_KEY];
@@ -100,6 +136,7 @@ function playTrack(index) {
   }
   audio.src = tracks[index].src;
   audio.play().catch(() => {});
+  saveNowPlaying(true);
   setMediaSession();
   markPlaying();
   emit(true);
@@ -550,12 +587,17 @@ export function initPlayer() {
     if (saved !== null && Number.isFinite(+saved)) audio.volume = Math.max(0, Math.min(1, +saved));
   } catch { /* storage unavailable */ }
   registerMediaSessionHandlers();
-  restorePlayed();
+  restorePlayed().then(restoreNowPlaying);
+  addEventListener('pagehide', () => saveNowPlaying(true));
   audio.addEventListener('ended', nextTrack); // (a song while waiting: another one, until the list is ready)
   audio.addEventListener('error', recoverFromAudioError);
   audio.addEventListener('play', markPlaying);
   audio.addEventListener('pause', markPlaying);
   for (const type of ['play', 'pause', 'timeupdate', 'loadedmetadata', 'volumechange', 'waiting', 'playing', 'canplay', 'progress']) {
-    audio.addEventListener(type, () => emit(type !== 'timeupdate' && type !== 'progress'));
+    audio.addEventListener(type, () => {
+      emit(type !== 'timeupdate' && type !== 'progress');
+      if (type === 'timeupdate') saveNowPlaying(false);
+      else if (type === 'pause') saveNowPlaying(true);
+    });
   }
 }
