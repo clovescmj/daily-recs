@@ -15,6 +15,15 @@ describe('the play plan', () => {
     assert.equal(plan.pick('a', 4, 2), -1);
   });
 
+  test('the track chosen for an album stays the same until it plays (the queue shows what will play)', () => {
+    const plan = createPlayPlan(seeded(9));
+    plan.mark('a', 0, 6);
+    const first = plan.pick('a', 6, 0);
+    for (let n = 0; n < 5; n += 1) assert.equal(plan.pick('a', 6, 0), first);
+    plan.mark('a', first, 6);
+    assert.notEqual(plan.pick('a', 6, 0), first, 'once it has played, another one');
+  });
+
   test("'one' follows the list, starts over at the end and skips albums with no song left", () => {
     const plan = createPlayPlan(seeded());
     const ids = ['a', 'b', 'c'];

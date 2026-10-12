@@ -335,29 +335,94 @@ export function markPlaying() {
 /** True when the album was added whole to Liked Songs (a single song of it does not count). */
 const hasSavedSong = (id) => session.savedAlbums.has(id);
 
+// ── The queue ───────────────────────────────────────────────────────────────────────────────────────────────
+
+const QUEUE_AHEAD = 3;               // Full album: the songs of the album that plays and of the next three albums
+const failedTracks = new Set();      // albums whose songs could not be read (not asked again)
+let queueTracksVersion = 0;          // goes up when the songs of an album arrive, so the queue is drawn again
+let loadingWindow = false;
+const tracksOf = (id) => { const cached = trackCache.get(id); return cached && cached.tracks.length ? cached.tracks : null; }; // (a list that expired still names the songs)
+
+/** Which albums the queue shows songs of: the one that plays and the next three; `more` when the list goes on after them. */
+function queueWindow(ids) {
+  const at = ids.indexOf(player.current.id);
+  const from = at >= 0 ? at + 1 : 0;
+  return { at, ahead: ids.slice(from, from + QUEUE_AHEAD), more: from + QUEUE_AHEAD < ids.length };
+}
+
+/** Reads, one at a time and in the background, the songs of the albums in the window that are not known yet. */
+async function ensureWindowTracks() {
+  if (loadingWindow || player.mode === 'shuffle') return;
+  const ids = visibleCardIds();
+  const { at, ahead } = queueWindow(ids);
+  const want = [...(at >= 0 ? [ids[at]] : []), ...ahead].filter((id) => !tracksOf(id) && !failedTracks.has(id));
+  if (!want.length) return;
+  loadingWindow = true;
+  try {
+    for (const id of want) {
+      const album = await poolAlbum(id);
+      if (!album) { failedTracks.add(id); continue; }
+      try { await fetchTracks(album); queueTracksVersion += 1; emit(true); } catch { failedTracks.add(id); }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  } finally { loadingWindow = false; }
+}
+
+/**
+ * The queue. Full album: a list of songs, one after the other, like a streaming app: what already played, the song that plays, and the rest
+ * of its album and the three albums after it (an album whose songs are not read yet is one line). Shuffle: one line per album, in the order of
+ * the round, with the song that will play from it.
+ */
 function queueItems() {
-  const ids = player.mode === 'shuffle' ? plan.order('shuffle', visibleCardIds()) : visibleCardIds(); // (in shuffle: the random order of the round)
-  // the heart of each item is part of the key, so the bar redraws when one of them changes
-  // the + of a row: the whole album in Full album; in Shuffle the song of that album (the one that played or is playing)
-  const rowSaved = (id) => {
-    if (player.mode !== 'shuffle') return hasSavedSong(id);
-    const song = knownSongOf(id) || featuredSongs.get(id);
-    return Boolean(song) && session.saved.has(`${song.id}:${song.i}`);
+  const shuffle = player.mode === 'shuffle';
+  const ids = visibleCardIds();
+  const order = shuffle ? plan.order('shuffle', ids) : ids;
+  const cur = player.current;
+  const cache = new Map();
+  const base = (id) => {
+    if (!cache.has(id)) {
+      const card = findCard(id);
+      const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
+      cache.set(id, card ? { id, album: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '', wished: session.wished.has(id) } : null);
+    }
+    return cache.get(id);
   };
-  const key = `${player.mode}|` + ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${rowSaved(id) ? 's' : ''}`).join(',');
-  if (key !== queueCache.key) {
-    queueCache = {
-      key,
-      items: ids.map((id) => {
-        const card = findCard(id);
-        const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
-        return {
-          id, title: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '',
-          wished: session.wished.has(id), saved: rowSaved(id),
-        };
-      }),
+  const items = [];
+  let queuePlayed = 0;
+  let more = false;
+  if (shuffle) {
+    // the + of a row: the song of that album (the one that played or is playing, or the one its artist highlights)
+    const rowSaved = (id) => {
+      const song = knownSongOf(id) || featuredSongs.get(id);
+      return Boolean(song) && session.saved.has(`${song.id}:${song.i}`);
     };
+    for (const id of order) {
+      const row = base(id);
+      if (row) items.push({ ...row, title: row.album, saved: rowSaved(id) });
+    }
+    queuePlayed = Math.max(0, order.indexOf(cur.id));
+  } else {
+    const win = queueWindow(order);
+    more = win.more;
+    queuePlayed = Math.max(0, win.at);
+    const songRow = (id, i, tracks, sec) => {
+      const row = base(id);
+      return row ? { ...row, i, title: tracks[i] ? tracks[i].title : `Track ${i + 1}`, track: true, sec, saved: session.saved.has(`${id}:${i}`) } : null;
+    };
+    const push = (row) => { if (row) items.push(row); };
+    // what already played, in the order it played (the song that plays now is not in it)
+    const played = new Map();
+    for (const h of history) { const k = `${h.id}:${h.index}`; played.delete(k); played.set(k, h); }
+    for (const h of played.values()) if (!(h.id === cur.id && h.index === cur.index)) push(songRow(h.id, h.index, tracksOf(h.id) || [], 'played'));
+    if (win.at >= 0) cur.tracks.forEach((track, i) => { if (i >= cur.index) push(songRow(cur.id, i, cur.tracks, i === cur.index ? 'now' : 'next')); });
+    for (const id of win.ahead) {
+      const tracks = tracksOf(id);
+      if (!tracks) { const row = base(id); if (row) items.push({ ...row, i: -1, title: row.album, placeholder: true, sec: 'next', saved: false }); continue; }
+      tracks.forEach((track, i) => push(songRow(id, i, tracks, 'next')));
+    }
   }
+  const key = `${player.mode}|${order.length}|${queuePlayed}|${more ? 'm' : ''}|${items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',')}`;
+  if (key !== queueCache.key) queueCache = { key, items, albums: order.length, more, played: queuePlayed };
   return queueCache;
 }
 
@@ -390,6 +455,7 @@ function snapshot() {
   const { current, album } = player;
   const track = current.tracks[current.index];
   const queue = queueItems();
+  ensureWindowTracks(); // (in the background: the songs of the albums the queue will show)
   const albumIndex = visibleCardIds().indexOf(current.id);
   const snap = {
     has: session.hasList, plain: player.waiting, // (the bar stays hidden while the list is built: the loading box has the button)
@@ -406,7 +472,8 @@ function snapshot() {
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     mode: player.mode,
     hasPrev: player.waiting ? false : player.mode !== 'album' ? history.length > 1 : current.index > 0,
-    hasNext: player.waiting ? true : player.mode !== 'album' ? plan.hasMore(visibleCardIds()) : current.index + 1 < current.tracks.length || albumIndex + 1 < queue.items.length,
+    hasNext: player.waiting ? true : player.mode !== 'album' ? plan.hasMore(visibleCardIds()) : current.index + 1 < current.tracks.length || albumIndex + 1 < visibleCardIds().length,
+    queueAlbums: queue.albums, queueMore: queue.more, queuePlayed: queue.played,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
   if (queue.key !== queueSentKey) snap.queue = queue.items;

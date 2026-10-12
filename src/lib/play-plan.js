@@ -6,6 +6,7 @@
 export function createPlayPlan(random = Math.random) {
   const played = new Map();   // album id -> Set of track numbers that have played
   const counts = new Map();   // album id -> how many tracks it has (known once it was opened)
+  const pending = new Map();  // album id -> the track chosen for its next turn (kept, so what the queue shows is what plays)
   let round = [];             // shuffle: the albums of the current round, in order
 
   const playedOf = (id) => played.get(id) || new Set();
@@ -25,15 +26,23 @@ export function createPlayPlan(random = Math.random) {
       if (!played.has(id)) played.set(id, new Set());
       played.get(id).add(index);
       counts.set(id, trackCount);
+      pending.delete(id);
     },
 
     /** The track an album plays now: `featured` the first time, a random unplayed one after that, or -1 when all have played. */
     pick(id, trackCount, featured) {
       const before = playedOf(id);
-      if (!before.size) return featured;
-      const left = [];
-      for (let i = 0; i < trackCount; i += 1) if (!before.has(i)) left.push(i);
-      return left.length ? left[Math.floor(random() * left.length)] : -1;
+      const kept = pending.get(id);
+      if (kept !== undefined && kept < trackCount && !before.has(kept)) return kept;   // the same one until it has played
+      let chosen = -1;
+      if (!before.size) chosen = featured;
+      else {
+        const left = [];
+        for (let i = 0; i < trackCount; i += 1) if (!before.has(i)) left.push(i);
+        if (left.length) chosen = left[Math.floor(random() * left.length)];
+      }
+      if (chosen >= 0) pending.set(id, chosen);
+      return chosen;
     },
 
     /** The albums in the order of the current round: the list itself, or (shuffle) a random order kept until the round is over. */
@@ -66,6 +75,6 @@ export function createPlayPlan(random = Math.random) {
     },
 
     /** Everything is new again (the user played the list once through and wants it again). */
-    reset() { played.clear(); round = []; },
+    reset() { played.clear(); pending.clear(); round = []; },
   };
 }

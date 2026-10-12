@@ -25,7 +25,7 @@
   const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', dislike: 'dislike' };
   /** One icon of a row of the queue or of the Liked list. */
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
-  const queueVersion = (items) => items.map((it) => `${it.id}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}`).join(',');
+  const queueVersion = (items) => items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',');
   /** The cover of a row (the same box when there is none, so the rows keep their height). */
   const rowCover = (art, playing) => `<span class="qcover">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}</span>`;
   const rowText = (title, sub) => `<span class="qtext"><b>${esc(title)}</b><span>${esc(sub)}</span></span>`;
@@ -157,7 +157,11 @@
       const li = e.target.closest('li[data-id]');
       if (!li) return;
       const act = e.target.closest('[data-act]');
-      if (act) { e.preventDefault(); onCmd(act.dataset.act, li.dataset.id); } else onCmd('playAlbum', li.dataset.id);
+      const i = li.dataset.i === undefined ? -1 : Number(li.dataset.i);
+      const track = { id: li.dataset.id, i, title: li.dataset.title || '' };
+      if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'save' ? track : li.dataset.id); } // (a song row: its own + )
+      else if (i >= 0) onCmd('playTrack', track); // a song of the queue: its album from that song
+      else onCmd('playAlbum', li.dataset.id);
     });
     q('.saved ol').addEventListener('click', (e) => { // each item is a track: { id, i, title }
       const li = e.target.closest('li[data-id]');
@@ -184,19 +188,34 @@
       q('.collect').style.visibility = s.artist && !s.plain ? '' : 'hidden'; // a song played while waiting is not on any list: nothing to wish, like or skip
       // queue: only redraw when the list or the current album change (`queue` omitted = unchanged)
       if (s.queue != null) { queue = s.queue; queueKey = queueVersion(queue); }
-      const sig = `${s.curId}|${queueKey}|${s.mode}`;
+      const sig = `${s.curId}|${queueKey}|${s.mode}|${s.queueMore ? 1 : 0}|${s.queuePlayed || 0}|${s.queueAlbums || 0}`;
       if (sig !== queueSig) {
         queueSig = sig;
+        const bySection = queue.some((it) => it.sec); // Full album: the queue says itself which songs played, play now and come next
         const at = queue.findIndex((it) => it.id === s.curId);
-        const heading = (i) => (i === 0 && at > 0 ? '<li class="qsec">Played</li>' : '') + (at < 0 ? (i === 0 ? '<li class="qsec">Up next</li>' : '') : i === at ? '<li class="qsec">Playing now</li>' : i === at + 1 ? '<li class="qsec">Up next</li>' : '');
-        q('.queue ol').innerHTML = queue.map((it, i) => heading(i)
-          + `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}">${rowCover(it.art, it.id === s.curId)}${rowText(it.title, it.artist)}<span class="qact">`
-          + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
-          + action('saveAlbum', it.saved, s.mode === 'shuffle' ? 'Add song to Liked Songs' : 'Add album to Liked Songs', s.mode === 'shuffle' ? 'Remove song from Liked Songs' : 'Remove album from Liked Songs', P.addCircle, P.checkCircle)
-          + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
-          + '</span></li>').join('');
-        q('.q-foot').textContent = queue.length ? `${Math.max(0, at)} of ${queue.length} played` : '';
+        const NAMES = { played: 'Played', now: 'Playing now', next: 'Up next' };
+        const heading = (it, i) => {
+          if (bySection) return i === 0 || queue[i - 1].sec !== it.sec ? `<li class="qsec">${NAMES[it.sec]}</li>` : '';
+          return (i === 0 && at > 0 ? '<li class="qsec">Played</li>' : '') + (at < 0 ? (i === 0 ? '<li class="qsec">Up next</li>' : '') : i === at ? '<li class="qsec">Playing now</li>' : i === at + 1 ? '<li class="qsec">Up next</li>' : '');
+        };
+        const sub = (it) => (it.track ? `${it.artist} · ${it.album}` : it.artist);
+        q('.queue ol').innerHTML = queue.map((it, i) => {
+          const current = bySection ? it.sec === 'now' : it.id === s.curId;
+          const song = it.track === true;
+          return heading(it, i)
+            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}">${rowCover(it.art, current)}${rowText(it.title, sub(it))}<span class="qact">`
+            + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
+            + (song
+              ? action('save', it.saved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
+              : action('saveAlbum', it.saved, s.mode === 'shuffle' ? 'Add song to Liked Songs' : 'Add album to Liked Songs', s.mode === 'shuffle' ? 'Remove song from Liked Songs' : 'Remove album from Liked Songs', P.addCircle, P.checkCircle))
+            + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
+            + '</span></li>';
+        }).join('') + (s.queueMore ? '<li class="qmore">More songs load as you listen</li>' : '');
       }
+      // the count at the top is always of albums; the foot says how far the list has gone
+      const albums = s.queueAlbums != null ? s.queueAlbums : queue.length;
+      setText(q('.q-count'), albums ? `${albums} album${albums === 1 ? '' : 's'}` : '');
+      setText(q('.q-foot'), albums ? `${s.queuePlayed || 0} of ${albums} albums played` : '');
       if (s.savedList !== undefined) {
         // a song was added: its cover appears above the Liked Songs icon and shrinks into it, and the icon jumps and wobbles as if it kept it
         if (savedCount !== null && s.savedList.length > savedCount) {
@@ -221,8 +240,6 @@
           : EMPTY_LIKED;
         q('.l-count').textContent = s.savedList.length ? `${s.savedList.length} ${s.savedList.length === 1 ? 'song' : 'songs'}` : '';
       }
-      // the count: albums in the list, in either play mode (the number of songs is not known before the albums are opened)
-      setText(q('.q-count'), queue.length ? `${queue.length} album${queue.length === 1 ? '' : 's'}` : '');
       q('.queue').classList.toggle('audible', !!s.playing);
       // wishlist heart and thumb down: each one has its own icon and label
       const paint = (selector, on, offLabel, onLabel, offPath, onPath) => {

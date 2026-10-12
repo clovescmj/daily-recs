@@ -3,6 +3,16 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.0
+- Full album: the queue lists **songs**, one after the other, like a streaming app. It shows what already played ("Played"), the song that plays ("Playing now") and, under "Up next",
+  the rest of its album and all the songs of the **next three albums**; at the end, a note says that more songs load as you listen. The window moves as the music plays. The top
+  still counts albums ("24 albums") and the foot says how far the list went ("3 of 24 albums played"). A click on a song plays its album from that song; each song row has its own +
+  (the heart and the block icon still act on the album).
+- The songs of the albums in the window are read in the background, one at a time, as soon as the list is on screen and each time the album that plays changes (3 to 4 pages, not the
+  whole list). An album whose songs are not read yet is one line until they arrive.
+- Shuffle: the queue is as it was (one line per album, in the order of the round); the song of each album is chosen once and kept until it plays, so the queue shows what will play.
+- The foot of the queue says "N of M albums played".
+
 ## 1.1.25
 - The "What's new" page: the entries of 1.0.1 to 1.1.24 are one entry, "1.1", with what a user notices (this file keeps every step).
 
