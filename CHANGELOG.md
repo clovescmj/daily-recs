@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.12
+- What played today and the song that was playing (with its position) are kept in `chrome.storage.local` instead of `chrome.storage.session`: the session storage is emptied when the
+  extension is reloaded or updated, so 1.2.6 and 1.2.8 lost them in that case. They still count only for the day they were kept. PRIVACY.md says it.
+
 ## 1.2.11
 - Queue and Liked Songs: the count ("27 albums", "5 songs") is under the title, and the close X is a button that lights up under the pointer.
 

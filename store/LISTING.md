@@ -61,7 +61,7 @@ Show a daily list of new album recommendations on the user's own Bandcamp profil
 **Remote code:** No, I am not using remote code.
 
 **Data usage (check what applies, and be accurate)**
-- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides and the user's Liked Songs. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
+- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides, the user's Liked Songs and what played today. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
 - Certify: the data is not sold to third parties, not used for purposes unrelated to the single purpose, and not used for creditworthiness or lending.
 
 **Privacy policy URL:** https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md

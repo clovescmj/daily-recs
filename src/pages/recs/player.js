@@ -29,16 +29,16 @@ const player = {
 const plan = createPlayPlan();   // which songs have played (shuffle never plays one twice)
 const history = [];              // the songs that played, in order: { id, index } (the previous button goes back along it)
 const MODES = ['album', 'shuffle'];
-const PLAYED_KEY = 'playedToday';   // chrome.storage.session: what played today, so a reload of the page does not forget it (it goes when the browser closes)
+const PLAYED_KEY = 'playedToday';   // chrome.storage.local: what played today, so a reload of the page or of the extension does not forget it (only today's counts)
 const todayKey = () => { const d = new Date(); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
 let saveTimer = null;
 function savePlayed() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    try { chrome.storage.session.set({ [PLAYED_KEY]: { date: todayKey(), history: history.slice(-500) } }); } catch { /* storage unavailable */ }
+    try { chrome.storage.local.set({ [PLAYED_KEY]: { date: todayKey(), history: history.slice(-500) } }); } catch { /* storage unavailable */ }
   }, 300);
 }
-const NOW_KEY = 'nowPlaying';       // the song that plays and where it is, in chrome.storage.session too
+const NOW_KEY = 'nowPlaying';       // the song that plays and where it is, in chrome.storage.local too
 let lastNowSave = 0;
 /** Keeps the song and the position (every few seconds while it plays, at once on a pause or a new song). A song of the loading box is not kept. */
 function saveNowPlaying(force = false) {
@@ -47,13 +47,13 @@ function saveNowPlaying(force = false) {
   const now = Date.now();
   if (!force && now - lastNowSave < 3000) return;
   lastNowSave = now;
-  try { chrome.storage.session.set({ [NOW_KEY]: { date: todayKey(), id: current.id, index: current.index, time: audio.currentTime || 0 } }); } catch { /* storage unavailable */ }
+  try { chrome.storage.local.set({ [NOW_KEY]: { date: todayKey(), id: current.id, index: current.index, time: audio.currentTime || 0 } }); } catch { /* storage unavailable */ }
 }
 
 /** After a reload: the bar shows the song that was playing, paused where it stopped (the browser does not let a page play by itself; play goes on from there). */
 async function restoreNowPlaying() {
   try {
-    const saved = (await chrome.storage.session.get(NOW_KEY))[NOW_KEY];
+    const saved = (await chrome.storage.local.get(NOW_KEY))[NOW_KEY];
     if (!saved || saved.date !== todayKey() || player.current.id || audio.src || !Number.isInteger(saved.index)) return;
     const album = await poolAlbum(String(saved.id));
     if (!album) return;
@@ -76,7 +76,7 @@ async function restoreNowPlaying() {
 
 async function restorePlayed() {
   try {
-    const saved = (await chrome.storage.session.get(PLAYED_KEY))[PLAYED_KEY];
+    const saved = (await chrome.storage.local.get(PLAYED_KEY))[PLAYED_KEY];
     if (!saved || saved.date !== todayKey() || !Array.isArray(saved.history) || history.length) return;
     const valid = saved.history.filter((h) => h && h.id !== undefined && Number.isInteger(h.index) && h.index >= 0 && h.index < 1000)
       .map((h) => ({ id: String(h.id), index: h.index, title: typeof h.title === 'string' ? h.title.slice(0, 200) : '' }));
