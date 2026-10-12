@@ -67,12 +67,12 @@
         </div>
       </div></div>
       <div class="queue" role="dialog" aria-label="Recommendations queue">
-        <div class="queue-header"><h2>Recommendations queue</h2><span class="q-count"></span><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
+        <div class="queue-header"><div class="queue-title"><h2>Recommendations queue</h2><span class="q-count"></span></div><span class="q-close" role="button" tabindex="0" aria-label="Close queue" title="Close queue">${svg(P.close, 'close-icon', '', 'Close queue')}</span></div>
         <ol></ol>
         <div class="queue-foot"><span class="q-foot"></span></div>
       </div>
       <div class="queue saved" role="dialog" aria-label="Liked Songs">
-        <div class="queue-header"><h2>Liked Songs</h2><span class="l-count"></span><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
+        <div class="queue-header"><div class="queue-title"><h2>Liked Songs</h2><span class="l-count"></span></div><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
         <ol>${EMPTY_LIKED}</ol>
         <div class="queue-foot"><span>Stored on this computer</span></div>
       </div>`;

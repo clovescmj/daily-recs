@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.11
+- Queue and Liked Songs: the count ("27 albums", "5 songs") is under the title, and the close X is a button that lights up under the pointer.
+
 ## 1.2.10
 - Queue and Liked Songs: the headings ("Played", "Playing now", "Up next"), the title, the foot and the note at the end are on the same left edge as the covers (12 px; the headings were at 16 px).
 

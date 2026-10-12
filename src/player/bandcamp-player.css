@@ -98,9 +98,16 @@
   border: 1px solid var(--dr-border-bar); border-bottom: 0; /* the bar's own line closes it at the bottom */ box-shadow: var(--dr-shadow-menu); border-radius: var(--dr-radius) var(--dr-radius) 0 0; } /* the shadow of the menus; it rises a little from the bar when it opens */
 #dr-player .queue.show { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity var(--dr-panel-fade) var(--dr-ease), transform var(--dr-panel-rise) var(--dr-ease-out), visibility 0s; }
 #dr-player .queue { display: flex; flex-direction: column; }
-#dr-player .queue-header { margin: 0; padding: 14px 12px 10px; display: flex; align-items: center; gap: 8px; }
-#dr-player .queue-header h2 { flex: 1; margin: 0; font-size: var(--dr-font-title); font-weight: var(--dr-weight-medium); }
-#dr-player .queue-header .q-count, #dr-player .queue-header .l-count { font-size: var(--dr-font-s); color: var(--dr-text-muted); }
+#dr-player .queue-header { margin: 0; padding: 14px 12px 10px; display: flex; align-items: flex-start; gap: 8px; }
+#dr-player .queue-title { flex: 1; min-width: 0; }
+#dr-player .queue-header h2 { margin: 0; font-size: var(--dr-font-title); font-weight: var(--dr-weight-medium); }
+#dr-player .queue-header .q-count, #dr-player .queue-header .l-count { display: block; margin-top: 2px; font-size: var(--dr-font-s); color: var(--dr-text-muted); }
+#dr-player .queue-header .q-count:empty, #dr-player .queue-header .l-count:empty { display: none; }
+/* the close button: a square that lights up under the pointer, like the other buttons of the bar */
+#dr-player .q-close, #dr-player .l-close { flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: -3px -4px 0 0; border-radius: var(--dr-radius); cursor: pointer; }
+#dr-player .q-close:hover, #dr-player .l-close:hover { background: var(--dr-button-plain-hover); }
+#dr-player .q-close:active, #dr-player .l-close:active { background: var(--dr-button-plain-active); }
+#dr-player .q-close:focus-visible, #dr-player .l-close:focus-visible { outline: 2px solid var(--dr-profile-blue); outline-offset: 1px; }
 #dr-player .close-icon { height: var(--dr-icon-size); width: var(--dr-icon-size); cursor: pointer; fill: var(--dr-glyph); display: block; }
 #dr-player .queue ol, #dr-player .queue li { list-style: none; padding: 0; margin: 0; }
 #dr-player .queue ol { flex: 1; min-height: 0; overflow-y: auto; }
