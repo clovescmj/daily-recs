@@ -4,7 +4,7 @@ import { MSG } from '../../lib/messages.js';
 import { runCommand } from './commands.js';
 import { loadState, loadStatus, pickedToday, savePicked, send, watchStorage } from './data.js';
 import { listenToHost } from './host-bridge.js';
-import { initPlayer, playAlbum, togglePlay } from './player.js';
+import { initPlayer, pause, playAlbum, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
@@ -107,5 +107,24 @@ async function init() {
   document.documentElement.classList.remove('is-booting');
   if (picked) await chooseView(picked.view, picked.tags);   // already chose today: show that list (build it if it's missing)
 }
+
+/**
+ * The extension was reloaded or updated while this page was open: the page stays on screen (and its music keeps playing), but every call to
+ * the extension fails with "Extension context invalidated". It stops the music and asks for a reload of the tab, instead of failing in silence.
+ */
+let contextLost = false;
+function handleLostContext() {
+  if (contextLost) return;
+  contextLost = true;
+  try { pause(); } catch { /* the player may be gone as well */ }
+  document.title = 'Daily Recs';
+  const grid = $('album-grid');
+  if (grid) grid.innerHTML = '<div class="empty-state">Daily Recs was updated. Reload this page to keep using it.</div>';
+  const status = $('status');
+  if (status) status.hidden = true;
+}
+const isLostContext = (reason) => /Extension context invalidated/i.test(String((reason && reason.message) || reason || ''));
+addEventListener('unhandledrejection', (event) => { if (isLostContext(event.reason)) { event.preventDefault(); handleLostContext(); } });
+addEventListener('error', (event) => { if (isLostContext(event.error || event.message)) { event.preventDefault(); handleLostContext(); } });
 
 init();

@@ -175,6 +175,14 @@
     }
   }
   window.addEventListener('message', handleFrameMessage);
+  // The extension was reloaded or updated while the Bandcamp tab was open: this copy of the script is cut off from it. It takes the player bar away
+  // and stays quiet (a reload of the tab brings the new version).
+  window.addEventListener('unhandledrejection', (event) => {
+    if (!/Extension context invalidated/i.test(String((event.reason && event.reason.message) || event.reason || ''))) return;
+    event.preventDefault();
+    document.getElementById('dr-player')?.remove();
+    document.body.classList.remove('dr-player-on');
+  });
 
   // ── Player bar ────────────────────────────────────────────────────────────────────────────────────────────────
 

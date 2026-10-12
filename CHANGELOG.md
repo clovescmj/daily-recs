@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.9
+- When the extension is reloaded or updated while a Bandcamp tab is open, the old page no longer fills the errors of the extension with "Extension context invalidated": the page stops the
+  music and says "Daily Recs was updated. Reload this page to keep using it.", and the old script takes its player bar away. (A reload of the tab brings the new version.)
+
 ## 1.2.8
 - After a reload of the page, the bar shows the song that was playing, paused at the point where it stopped (the song and its position are kept in `chrome.storage.session`, for today, every
   few seconds and at once on a pause). Chrome does not let a page start playing by itself, so you press play and it goes on from there. A song of the loading box is not kept.
