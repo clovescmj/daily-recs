@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.25
+- The "What's new" page: the entries of 1.0.1 to 1.1.24 are one entry, "1.1", with what a user notices (this file keeps every step).
+
 ## 1.1.24
 - The About page said "one song per album or full albums, even while your list is loading": it now describes the Shuffle button and says the song while waiting is for the first list.
 
