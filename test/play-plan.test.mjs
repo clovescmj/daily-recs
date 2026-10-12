@@ -15,6 +15,28 @@ describe('the play plan', () => {
     assert.equal(plan.pick('a', 4, 2), -1);
   });
 
+  test('the round and the chosen songs come back as they were after a reload', () => {
+    const ids = ['a', 'b', 'c', 'd', 'e'];
+    const first = createPlayPlan(seeded(11));
+    const order = [...first.order('shuffle', ids)];
+    const choice = first.pick('c', 6, 2);
+    const copy = createPlayPlan(seeded(99));          // another random sequence: nothing may come from it
+    copy.restore([], JSON.parse(JSON.stringify(first.snapshot())));
+    assert.deepEqual([...copy.order('shuffle', ids)], order);
+    assert.equal(copy.pick('c', 6, 2), choice);
+  });
+
+  test('asking for the order before the list is drawn does not lose the restored round', () => {
+    const ids = ['a', 'b', 'c', 'd'];
+    const first = createPlayPlan(seeded(21));
+    const order = [...first.order('shuffle', ids)];
+    const copy = createPlayPlan(seeded(77));
+    copy.restore([], JSON.parse(JSON.stringify(first.snapshot())));
+    assert.deepEqual(copy.order('shuffle', []), []);   // the page asks before it has any card
+    assert.deepEqual(copy.snapshot().round, order, 'the round is still there');
+    assert.deepEqual([...copy.order('shuffle', ids)], order);
+  });
+
   test('songs restored after a reload do not play again', () => {
     const plan = createPlayPlan(seeded(5));
     plan.restore([{ id: 'a', index: 0 }, { id: 'a', index: 2 }]);

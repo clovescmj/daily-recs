@@ -32,11 +32,12 @@ const MODES = ['album', 'shuffle'];
 const PLAYED_KEY = 'playedToday';   // chrome.storage.local: what played today, so a reload of the page or of the extension does not forget it (only today's counts)
 const todayKey = () => { const d = new Date(); const pad = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
 let saveTimer = null;
+function writePlayed() {
+  try { chrome.storage.local.set({ [PLAYED_KEY]: { date: todayKey(), history: history.slice(-500), plan: plan.snapshot() } }); } catch { /* storage unavailable */ }
+}
 function savePlayed() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try { chrome.storage.local.set({ [PLAYED_KEY]: { date: todayKey(), history: history.slice(-500) } }); } catch { /* storage unavailable */ }
-  }, 300);
+  saveTimer = setTimeout(writePlayed, 300);
 }
 const NOW_KEY = 'nowPlaying';       // the song that plays and where it is, in chrome.storage.local too
 let lastNowSave = 0;
@@ -81,7 +82,7 @@ async function restorePlayed() {
     const valid = saved.history.filter((h) => h && h.id !== undefined && Number.isInteger(h.index) && h.index >= 0 && h.index < 1000)
       .map((h) => ({ id: String(h.id), index: h.index, title: typeof h.title === 'string' ? h.title.slice(0, 200) : '' }));
     history.push(...valid);
-    plan.restore(valid);
+    plan.restore(valid, saved.plan);
     emit(true);
   } catch { /* storage unavailable */ }
 }
@@ -480,7 +481,10 @@ function queueItems() {
     }
   }
   const key = `${player.mode}|${order.length}|${queuePlayed}|${more ? 'm' : ''}|${items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',')}`;
-  if (key !== queueCache.key) queueCache = { key, items, albums: order.length, more, played: queuePlayed };
+  if (key !== queueCache.key) {
+    queueCache = { key, items, albums: order.length, more, played: queuePlayed };
+    if (shuffle) savePlayed(); // (the round and the songs chosen for the albums may be new)
+  }
   return queueCache;
 }
 
@@ -588,7 +592,7 @@ export function initPlayer() {
   } catch { /* storage unavailable */ }
   registerMediaSessionHandlers();
   restorePlayed().then(restoreNowPlaying);
-  addEventListener('pagehide', () => saveNowPlaying(true));
+  addEventListener('pagehide', () => { saveNowPlaying(true); writePlayed(); }); // (what is waiting in the 300 ms delay goes out as the page closes)
   audio.addEventListener('ended', nextTrack); // (a song while waiting: another one, until the list is ready)
   audio.addEventListener('error', recoverFromAudioError);
   audio.addEventListener('play', markPlaying);

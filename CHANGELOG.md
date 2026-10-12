@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.13
+- The sequence of the queue no longer changes after a reload: in Shuffle the order of the round and the song chosen for each album are kept with what played (they were drawn again at each
+  reload), and what was waiting in the short delay before the history is written goes out when the page closes. (A first version of this lost the kept round at the start, because the
+  queue asked for the order before the list was drawn and the round was emptied; now an empty list leaves the round alone.)
+
 ## 1.2.12
 - What played today and the song that was playing (with its position) are kept in `chrome.storage.local` instead of `chrome.storage.session`: the session storage is emptied when the
   extension is reloaded or updated, so 1.2.6 and 1.2.8 lost them in that case. They still count only for the day they were kept. PRIVACY.md says it.

@@ -48,6 +48,7 @@ export function createPlayPlan(random = Math.random) {
     /** The albums in the order of the current round: the list itself, or (shuffle) a random order kept until the round is over. */
     order(mode, ids) {
       if (mode !== 'shuffle') return ids;
+      if (!ids.length) return [];   // (the list is not drawn yet: the round that was kept stays as it is)
       const known = new Set(ids);
       round = round.filter((id) => known.has(id));
       if (!round.length) round = shuffled(ids.filter((id) => !done(id)));
@@ -77,11 +78,25 @@ export function createPlayPlan(random = Math.random) {
     /** Everything is new again (the user played the list once through and wants it again). */
     reset() { played.clear(); pending.clear(); round = []; },
 
-    /** The songs that had played before the page was reloaded: they do not play again. (How many tracks an album has is learnt when it is opened.) */
-    restore(entries) {
+    /** What the plan has decided besides what played: the order of the round and the song chosen for each album (to keep the queue the same after a reload). */
+    snapshot() {
+      return { round: [...round], pending: [...pending] };
+    },
+
+    /**
+     * What had played before the page was reloaded: those songs do not play again. `extra` is a `snapshot()`: the round and the chosen songs come back as they
+     * were, so the sequence does not change. (How many tracks an album has is learnt when it is opened.)
+     */
+    restore(entries, extra = null) {
       for (const { id, index } of entries) {
         if (!played.has(id)) played.set(id, new Set());
         played.get(id).add(index);
+      }
+      if (extra && Array.isArray(extra.round)) round = extra.round.filter((id) => typeof id === 'string' || typeof id === 'number').map(String);
+      if (extra && Array.isArray(extra.pending)) {
+        for (const pair of extra.pending) {
+          if (Array.isArray(pair) && pair.length === 2 && Number.isInteger(pair[1]) && pair[1] >= 0 && pair[1] < 1000) pending.set(String(pair[0]), pair[1]);
+        }
       }
     },
   };
