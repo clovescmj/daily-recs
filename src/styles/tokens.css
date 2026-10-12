@@ -44,7 +44,7 @@
   --dr-accent-dark: var(--dr-blue500);
   --dr-success: var(--dr-green500);        /* a song of it is in Liked Songs */
   --dr-danger: var(--dr-red500);           /* don't show music like this */
-  --dr-wish: var(--dr-orange500);          /* in the wishlist */
+  --dr-wish: #f99f32;                      /* the heart of an album that is in the wishlist: the orange of Bandcamp's own heart */
   --dr-tag-bg: var(--dr-blue300);          /* the "new" tag of the tab (Bandcamp's .tab-new-badge: #99DBEB) */
   --dr-tag-text: var(--dr-gray-700);       /* #222 */
 
