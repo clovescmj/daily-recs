@@ -162,8 +162,13 @@
         if (state.bar) state.bar.closeMenus();
         break;
       case 'now':
-        // Updates are partial: the queue is only included when it changed, so keep the last one.
-        state.lastNow = { ...message, queue: message.queue !== undefined ? message.queue : state.lastNow ? state.lastNow.queue : undefined };
+        // Updates are partial: the queue and the Liked list are only included when they changed, so keep the last ones. (The Liked list only until the
+        // bar has drawn it: the bar counts the songs from there on, and it must have seen the list before the first song is added, to animate it.)
+        state.lastNow = {
+          ...message,
+          queue: message.queue !== undefined ? message.queue : state.lastNow ? state.lastNow.queue : undefined,
+          savedList: message.savedList !== undefined ? message.savedList : state.lastNow && !state.bar ? state.lastNow.savedList : undefined,
+        };
         renderBar();
         break;
       default:

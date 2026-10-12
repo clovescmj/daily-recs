@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.4
+- The animation of the Liked Songs icon (the cover that flies into it) also plays for the **first** song you add. The bar never knew that the list was empty (an empty list was not sent, and
+  the page that carries the messages kept only the last update, which has no list), so the first song arrived with nothing to compare it to. Now the first message carries the list, even
+  empty, and the host keeps it until the bar has drawn it.
+
 ## 1.2.3
 - The "new" tag of the tab goes after the name again (1.2.1 had moved it before the name, like Bandcamp's playlists tab). It keeps Bandcamp's colours, type, size and 19 px height.
 

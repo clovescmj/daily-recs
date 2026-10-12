@@ -33,9 +33,9 @@ const MODE_NOTICE = { album: 'Shuffle off', shuffle: 'Shuffle on' }; // the noti
 const trackCache = new Map();    // album id -> { tracks, at }
 let lastEmit = 0;
 let queueCache = { key: '', items: [] };
-let queueSentKey = '';
+let queueSentKey = null;         // (null: nothing was sent yet, so even an empty queue goes out the first time)
 let savedCache = { key: '', items: [] };
-let savedSentKey = '';
+let savedSentKey = null;         // (null: the first message carries the Liked list, even when it is empty: the bar needs to know it had none)
 let recoveredAt = null;          // guards the one-shot recovery from an expired stream URL
 
 export const currentId = () => player.current.id;
