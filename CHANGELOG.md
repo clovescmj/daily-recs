@@ -3,6 +3,12 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.24
+- Shuffle queue: each row names the song, then the artist and the album, like the Full album queue (song · artist · album). Rows of albums whose songs are not read yet show the album
+  until they are; the songs of the albums that come next load in the background.
+- Queue: the song that plays shows a pause on its cover (a play when it is paused) instead of the bars of the equalizer.
+- The rules of which rows the queue shows are now in `src/lib/queue-rows.js`, with tests; the behavior of Full album is unchanged.
+
 ## 1.2.23
 - Keyboard: the close buttons of the queue and of Liked Songs answer Enter and Space, and the cover of each row is a button that can be focused (Tab) and plays the song with Enter or
   Space (the play shows on it, as it does under the pointer).

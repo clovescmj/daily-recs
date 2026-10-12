@@ -1,5 +1,5 @@
 // What plays next in Shuffle (one song of each album, in a random order). The same walk in the order of the list is mode 'one', which the player does not offer
-// (Full album does not use this plan to move on). The queue reads the round and the chosen songs from here, so what it shows is what plays.
+// (Full album does not use this plan to move on). The queue reads the round and the chosen songs from `snapshot()`, so the song a Shuffle row shows is the one that plays.
 // A song plays once: it is marked when it starts, and an album with no unplayed song left is skipped. The list is walked in rounds, one song
 // per album in each round; when a round ends the next one starts over, until every song of every album has played.
 

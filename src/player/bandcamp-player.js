@@ -30,7 +30,7 @@
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',');
   /** The cover of a row (the same box when there is none, so the rows keep their height). */
-  const rowCover = (art, playing) => `<span class="qcover" role="button" tabindex="0" aria-label="Play song">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}${playing ? '<span class="qeq"><i></i><i></i><i></i></span>' : ''}<span class="qplay"><svg class="qp-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg><svg class="qp-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.pause}"/></svg></span></span>`;
+  const rowCover = (art) => `<span class="qcover" role="button" tabindex="0" aria-label="Play song">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}<span class="qplay"><svg class="qp-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg><svg class="qp-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.pause}"/></svg></span></span>`;
   /**
    * The song and the artist (or the album) of a row: one link to the album, in a new tab, that wraps both lines and is underlined under the pointer.
    * Without an address, the same two lines as plain text.
@@ -231,12 +231,12 @@
           if (!bySection) return shuffleHeading(i);
           return i === 0 || queue[i - 1].sec !== it.sec ? sectionLi(NAMES[it.sec]) : '';
         };
-        const sub = (it) => (it.track ? `${it.artist} · ${it.album}` : it.artist);
+        const sub = (it) => (it.track || it.named ? `${it.artist} · ${it.album}` : it.artist); // (a row named by its album has no song to say)
         q('.queue ol').innerHTML = queue.map((it, i) => {
           const current = bySection ? it.sec === 'now' : it.id === s.curId;
           const song = it.track === true;
           return heading(it, i)
-            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}" title="${current ? (s.playing ? 'Pause' : 'Play') : 'Play song'}">${rowCover(it.art, current)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
+            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}" title="${current ? (s.playing ? 'Pause' : 'Play') : 'Play song'}">${rowCover(it.art)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + (song
               ? action('save', it.saved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
@@ -272,7 +272,7 @@
         }
         savedCount = s.savedList.length;
         q('.saved ol').innerHTML = s.savedList.length
-          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}" title="Play song">${rowCover(it.art, false)}${rowText(it.title, `${it.artist} · ${it.album}`, it.url)}<span class="qact">`
+          ? s.savedList.map((it) => `<li data-id="${esc(it.id)}" data-i="${esc(it.i)}" data-title="${esc(it.title || '')}" title="Play song">${rowCover(it.art)}${rowText(it.title, `${it.artist} · ${it.album}`, it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + action('save', true, '', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
             + '</span></li>').join('')

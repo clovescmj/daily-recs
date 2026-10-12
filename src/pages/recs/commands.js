@@ -37,7 +37,7 @@ const COMMANDS = {
 };
 
 async function saveRowSong(id) {
-  const song = player.knownSongOf(id) || await player.featuredSongOf(id).catch(() => null);
+  const song = player.queuedSongOf(id) || await player.featuredSongOf(id).catch(() => null);
   if (!song) { toast("Couldn't read this album's songs. Try again."); return; }
   await setSave(song, !session.saved.has(`${song.id}:${song.i}`));
 }
