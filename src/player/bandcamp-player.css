@@ -168,7 +168,7 @@
 #dr-player .queue .qplay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .5); opacity: 0; transition: opacity var(--dr-menu-dur) var(--dr-ease); pointer-events: none; }
 #dr-player .queue .qplay svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-white); display: block; }
 #dr-player .queue li:hover .qplay { opacity: 1; }
-#dr-player .queue li:hover .qeq { display: none; } /* (the play replaces the bars of the song that plays, while the pointer is on its row) */
-#dr-player .queue .qlink { color: inherit; text-decoration: none; }
-#dr-player .queue .qlink:hover { text-decoration: underline; }
+#dr-player .queue li.active .qplay { display: none; } /* the song that plays already has its dark layer and its bars: no play on top of them */
+#dr-player .queue .qlink { align-self: flex-start; display: flex; flex-direction: column; min-width: 0; max-width: 100%; color: inherit; text-decoration: none; } /* one link for both lines; only as wide as the text */
+#dr-player .queue a.qlink:hover b, #dr-player .queue a.qlink:hover span { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { #dr-player .queue .qplay { transition: none; } }

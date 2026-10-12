@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.17
+- Queue and Liked Songs: the song and the artist of a row are **one** link to the album (it wrapped each line in its own link in 1.2.16): both lines are underlined together under the pointer.
+- The play over the cover, under the pointer, shows now (in 1.2.16 its icon was empty). It is not applied to the "Playing now" row, which already has a dark layer with the bars.
+
 ## 1.2.16
 - Queue and Liked Songs: with the pointer on a row, the cover gets a dark layer with a play on it. The song and the artist (or the album) of a row are a link to the album, in a new tab,
   underlined under the pointer; a click on it does not start the song. The button to open the album, added to Liked Songs in 1.2.14, is gone (the link took its place).
