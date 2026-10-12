@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.18
+- Queue: on the "Playing now" row, with the pointer on it, the bars of the equalizer give way to a pause while the song plays (a play when it is paused); the dark layer stays. A click on that
+  row pauses or resumes the song.
+
 ## 1.2.17
 - Queue and Liked Songs: the song and the artist of a row are **one** link to the album (it wrapped each line in its own link in 1.2.16): both lines are underlined together under the pointer.
 - The play over the cover, under the pointer, shows now (in 1.2.16 its icon was empty). It is not applied to the "Playing now" row, which already has a dark layer with the bars.

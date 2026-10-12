@@ -168,7 +168,12 @@
 #dr-player .queue .qplay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .5); opacity: 0; transition: opacity var(--dr-menu-dur) var(--dr-ease); pointer-events: none; }
 #dr-player .queue .qplay svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-white); display: block; }
 #dr-player .queue li:hover .qplay { opacity: 1; }
-#dr-player .queue li.active .qplay { display: none; } /* the song that plays already has its dark layer and its bars: no play on top of them */
+/* the song that plays already has its dark layer: under the pointer its bars give way to a pause (a play when it is paused), the layer stays */
+#dr-player .queue li.active .qplay { background: transparent; }
+#dr-player .queue li.active:hover .qeq i { visibility: hidden; }
+#dr-player .queue .qplay .qp-pause { display: none; }
+#dr-player .queue.audible li.active .qplay .qp-play { display: none; }
+#dr-player .queue.audible li.active .qplay .qp-pause { display: block; }
 #dr-player .queue .qlink { align-self: flex-start; display: flex; flex-direction: column; min-width: 0; max-width: 100%; color: inherit; text-decoration: none; } /* one link for both lines; only as wide as the text */
 #dr-player .queue a.qlink:hover b, #dr-player .queue a.qlink:hover span { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { #dr-player .queue .qplay { transition: none; } }
