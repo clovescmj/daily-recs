@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.10
+- Queue and Liked Songs: the headings ("Played", "Playing now", "Up next"), the title, the foot and the note at the end are on the same left edge as the covers (12 px; the headings were at 16 px).
+
 ## 1.2.9
 - When the extension is reloaded or updated while a Bandcamp tab is open, the old page no longer fills the errors of the extension with "Extension context invalidated": the page stops the
   music and says "Daily Recs was updated. Reload this page to keep using it.", and the old script takes its player bar away. (A reload of the tab brings the new version.)
