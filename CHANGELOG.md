@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.15
+- Queue and Liked Songs: a grey line under the header, the same as the one over the foot, to set it apart from the list.
+
 ## 1.2.14
 - Liked Songs: each row has a button, before the heart, that opens the album on Bandcamp in a new tab (Material's `open_in_new`). A click on it does not start the song.
 
