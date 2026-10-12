@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.2
+- The "new" tag of the tab is 19 px tall, like Bandcamp's (it was 16 px: the line height of the tag was not set, and the tab gave it a smaller one). Now `line-height: 1.5`.
+
 ## 1.2.1
 - The "new" tag of the daily recs tab has Bandcamp's own look and place, from its rule for the "New" tag of the playlists tab: it comes **before** the name of the tab (it used to come after),
   with `#99DBEB` as the background, `#222` text in Helvetica Neue bold 10px, upper case, letter spacing .4px, padding 2px 5px, 4px corners and 4px (plus a space) to the name.
