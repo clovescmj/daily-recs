@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.3
+- The "new" tag of the tab goes after the name again (1.2.1 had moved it before the name, like Bandcamp's playlists tab). It keeps Bandcamp's colours, type, size and 19 px height.
+
 ## 1.2.2
 - The "new" tag of the tab is 19 px tall, like Bandcamp's (it was 16 px: the line height of the tag was not set, and the tab gave it a smaller one). Now `line-height: 1.5`.
 
