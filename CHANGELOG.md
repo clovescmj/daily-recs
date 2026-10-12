@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.25
+- About, privacy policy and store listing say what really syncs through the Google account (the albums you wishlist and hide, and a score per source) and that Liked Songs stay in this browser.
+- What's new: the Shuffle line says the rule (one song per album, never the same twice), and a line about the page remembering the queue and the song after a reload.
+
 ## 1.2.24
 - Shuffle queue: each row names the song, then the artist and the album, like the Full album queue (song · artist · album). Rows of albums whose songs are not read yet show the album
   until they are; the songs of the albums that come next load in the background.

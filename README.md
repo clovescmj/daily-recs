@@ -34,7 +34,7 @@ src/
     bandcamp.js          Bandcamp requests and HTML parsing (retry, rate limits, pagination)
     ranking.js           scoring, one-per-artist picking, surprise mode
     recommender.js       refresh / feedback use cases (store + fetch injected)
-    taste-sync.js        hidden albums <-> chrome.storage.sync (chunked, last-write-wins)
+    taste-sync.js        taste (wishlisted + hidden albums, source scores) <-> chrome.storage.sync (chunked, last-write-wins)
     taste-profile.js     genres of the user's albums and which ones are offered (genres.js: known genres, places.js: places that are never genres)
     state.js, messages.js, storage-keys.js, config.js
   background/            service worker (registers every listener synchronously at top level)
@@ -64,5 +64,5 @@ After changing `manifest.json`, reload the extension in `chrome://extensions`.
 ## Design notes
 - **Service worker:** listeners are registered synchronously at top level; long work is queued and never relies on in-memory state. Run progress lives in `chrome.storage.session`, so a worker killed mid-run can't leave the page "loading" forever.
 - **Messages:** every message is parsed strictly and the sender is checked: only the content script (on bandcamp.com) may ask for a wishlist change; everything else must come from the extension's own pages.
-- **Storage:** big state in `storage.local` (written twice per run); the Liked Songs under their own key, `likedSongs`, written by the page at once and never by a run (see `src/lib/liked.js`); hidden albums in `storage.sync`, chunked to stay inside the quota.
+- **Storage:** big state in `storage.local` (written twice per run); the Liked Songs under their own key, `likedSongs`, written by the page at once and never by a run (see `src/lib/liked.js`); taste (wishlisted and hidden albums, source scores) in `storage.sync`, chunked to stay inside the quota.
 - **Privacy:** see [PRIVACY.md](PRIVACY.md).

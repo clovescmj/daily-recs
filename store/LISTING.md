@@ -25,7 +25,7 @@ New music every day, built from your own taste. Never shows what you already own
 > • Three lists: "My tags" (explore new music by genre), "Best matches" (perfect matches with your collection) and "Surprise me" (go beyond your collection)
 > • A built-in player in Bandcamp's own style, with a Shuffle button, a queue, Liked Songs and media keys
 > • While your first list is being built, play a random song from your own collection
-> • The albums you hide sync across your computers through your Google account
+> • Your taste (wishlisted and hidden albums) syncs across your computers through your Google account; Liked Songs stay in your browser
 >
 > Private by design: everything runs in your browser and only talks to Bandcamp (bandcamp.com and its media servers). No analytics, no ads, no accounts.
 >
@@ -50,7 +50,7 @@ New music every day, built from your own taste. Never shows what you already own
 Show a daily list of new album recommendations on the user's own Bandcamp profile, based on their collection and wishlist.
 
 **Permission justifications**
-- `storage`: keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs hidden albums through the user's Google account.
+- `storage`: keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs the user's taste (the albums wishlisted with the heart and the albums hidden, with a score per source) through the user's Google account.
 - `alarms`: checks once every few hours whether a new day has started, to prepare the day's list in the background, and schedules a retry when Bandcamp asks to slow down.
 - `offscreen`: opens a hidden page that only checks whether the browser is in dark or light mode, so the toolbar icon can use the symbol that is visible on the user's toolbar (the service worker cannot check this itself). It reads and sends no other data.
 - `contextMenus`: adds the right-click menu on the toolbar icon (Open Daily Recs, Feedback, Report a bug, About).
@@ -61,7 +61,7 @@ Show a daily list of new album recommendations on the user's own Bandcamp profil
 **Remote code:** No, I am not using remote code.
 
 **Data usage (check what applies, and be accurate)**
-- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides, the user's Liked Songs and what played today. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
+- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user wishlists and hides, the user's Liked Songs and what played today. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
 - Certify: the data is not sold to third parties, not used for purposes unrelated to the single purpose, and not used for creditworthiness or lending.
 
 **Privacy policy URL:** https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md
