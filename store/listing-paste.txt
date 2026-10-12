@@ -25,7 +25,7 @@ Daily Recs starts from what you own and what you've saved on Bandcamp, finds alb
 • The heart adds an album to your Bandcamp wishlist, and the + saves songs to your own Liked Songs list
 • "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
 • Three lists: "My tags" (explore new music by genre), "Best matches" (perfect matches with your collection) and "Surprise me" (go beyond your collection)
-• A built-in player in Bandcamp's own style, with a Shuffle button (one song from each album, in random order, never the same song twice), a queue, Liked Songs and media keys
+• A built-in player in Bandcamp's own style, with a Shuffle button, a queue, Liked Songs and media keys
 • While your first list is being built, play a random song from your own collection
 • The albums you hide sync across your computers through your Google account
 
@@ -86,7 +86,7 @@ https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md
 === CHANGELOG / WHAT'S NEW (the dashboard has no field for this; it can go at the end of the description if you want it) ===
 
 Version 1.1
-• A new Shuffle button: one song from each album, in random order, and a song never plays twice
+• A Shuffle button that plays random songs from your recommendations
 • A queue with covers and sections, and Liked Songs with covers; the queue opens on what is playing
 • A fresh set of icons, and a player bar that follows Bandcamp's own style
 • The button to play a song from your collection shows while your first list loads
