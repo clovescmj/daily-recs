@@ -52,6 +52,9 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .page-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
 .page-subtitle { margin: 0; font-size: var(--bc-font-size-200); line-height: var(--bc-line-height-200); color: var(--muted); }
 .page-actions { display: flex; }
+/* The buttons sit in the middle between the line under the tabs and the line that ends the header (they were 10px lower: 37px from the one and 17px from the other).
+   `top` and not a margin, so the height of the header does not change. Only while the header is on one row (the buttons wrap under the title on a narrow window). */
+@media (min-width: 760px) { .page-actions { position: relative; top: -10px; } }
 
 /* ── Controls ───────────────────────────────────────────────────────────────────────────────────────────────────── */
 .button {

@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.20
+- The list buttons (My tags, Best matches, Surprise me) are in the middle between the line under the tabs and the line that ends the header: they were 10 px lower, 37 px from one line and
+  17 px from the other.
+
 ## 1.2.19
 - Queue and Liked Songs: tooltips on the rows. The row says "Play song" (the row that plays says "Pause", or "Play" when paused) and the song and the artist, which are one link to the
   album, say "View album".
