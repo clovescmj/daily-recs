@@ -209,9 +209,19 @@
         const bySection = queue.some((it) => it.sec); // Full album: the queue says itself which songs played, play now and come next
         const at = queue.findIndex((it) => it.id === s.curId);
         const NAMES = { played: 'Played', now: 'Playing now', next: 'Up next' };
+        const sectionLi = (name) => `<li class="qsec">${name}</li>`;
+        // Shuffle rows carry no section: what is before the song that plays played, the rest comes next
+        const shuffleHeading = (i) => {
+          let html = '';
+          if (i === 0 && at > 0) html += sectionLi('Played');
+          if (at < 0) return i === 0 ? html + sectionLi('Up next') : html;
+          if (i === at) html += sectionLi('Playing now');
+          else if (i === at + 1) html += sectionLi('Up next');
+          return html;
+        };
         const heading = (it, i) => {
-          if (bySection) return i === 0 || queue[i - 1].sec !== it.sec ? `<li class="qsec">${NAMES[it.sec]}</li>` : '';
-          return (i === 0 && at > 0 ? '<li class="qsec">Played</li>' : '') + (at < 0 ? (i === 0 ? '<li class="qsec">Up next</li>' : '') : i === at ? '<li class="qsec">Playing now</li>' : i === at + 1 ? '<li class="qsec">Up next</li>' : '');
+          if (!bySection) return shuffleHeading(i);
+          return i === 0 || queue[i - 1].sec !== it.sec ? sectionLi(NAMES[it.sec]) : '';
         };
         const sub = (it) => (it.track ? `${it.artist} · ${it.album}` : it.artist);
         q('.queue ol').innerHTML = queue.map((it, i) => {

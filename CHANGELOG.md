@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.22
+- Simpler code, same behaviour: the queue is built by two small functions (one for Full album, one for Shuffle) instead of one long one; the previous and next buttons and the headings
+  of the queue use `if` chains instead of nested ternaries; the check of an `https` address is written once. The queue gives the same rows in the three situations that were compared
+  before and after (Full album with nothing playing, Full album with a song and a history, Shuffle).
+
 ## 1.2.21
 - Comments brought up to date after the changes of 1.1 and 1.2 (the play mode, the queue of songs, the icons, the tag of the tab), and a rule of the stylesheet that nothing used any more
   (`.dr-menu--up`, from the old Playback menu) removed. The size of the tag of the tab is read from its token (`--dr-font-xs`, 10px, the same value). No change in behaviour.

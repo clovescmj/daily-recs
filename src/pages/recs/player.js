@@ -427,62 +427,100 @@ async function ensureWindowTracks() {
   } finally { loadingWindow = false; }
 }
 
+const httpsOrEmpty = (url) => (/^https:\/\//i.test(url || '') ? url : '');
+
+/** What a row of the queue says about an album, read once per album for one drawing (null when the album has no card on the page). */
+function rowBaseReader() {
+  const cache = new Map();
+  return (id) => {
+    if (!cache.has(id)) {
+      const card = findCard(id);
+      const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
+      cache.set(id, card ? {
+        id,
+        album: card.querySelector('.album-title').textContent,
+        artist: card.querySelector('.album-artist').textContent,
+        art: pooled.art || '',
+        url: httpsOrEmpty(pooled.url),
+        wished: session.wished.has(id),
+      } : null);
+    }
+    return cache.get(id);
+  };
+}
+
+/** Shuffle: one row per album, in the order of the round, with the song that will play from it. */
+function shuffleRows(order, base) {
+  // the + of a row: the song of that album (the one that played or is playing, or the one its artist highlights)
+  const rowSaved = (id) => {
+    const song = knownSongOf(id) || featuredSongs.get(id);
+    return Boolean(song) && session.saved.has(`${song.id}:${song.i}`);
+  };
+  const items = [];
+  for (const id of order) {
+    const row = base(id);
+    if (row) items.push({ ...row, title: row.album, saved: rowSaved(id) });
+  }
+  return { items, more: false, played: Math.max(0, order.indexOf(player.current.id)) };
+}
+
 /**
- * The queue. Full album: a list of songs, one after the other, like a streaming app: what already played, the song that plays, and the rest
- * of its album and the three albums after it (an album whose songs are not read yet is one line). Shuffle: one line per album, in the order of
- * the round, with the song that will play from it.
+ * Full album: a list of songs, one after the other, like a streaming app: what already played, the song that plays, and the rest of its album
+ * and the three albums after it (an album whose songs are not read yet is one line).
  */
+function albumRows(order, base) {
+  const cur = player.current;
+  const win = queueWindow(order);
+  const items = [];
+  const songRow = (id, i, tracks, sec, fallback = '') => {
+    const row = base(id);
+    if (!row) return;
+    items.push({ ...row, i, title: tracks[i] ? tracks[i].title : (fallback || `Track ${i + 1}`), track: true, sec, saved: session.saved.has(`${id}:${i}`) });
+  };
+
+  // what already played, in the order it played (the song that plays now is not in it)
+  const playedSongs = new Map();
+  for (const h of history) {
+    const key = `${h.id}:${h.index}`;
+    playedSongs.delete(key);
+    playedSongs.set(key, h);
+  }
+  for (const h of playedSongs.values()) {
+    if (h.id === cur.id && h.index === cur.index) continue;
+    songRow(h.id, h.index, tracksOf(h.id) || [], 'played', h.title);
+  }
+
+  // the song that plays and the rest of its album
+  if (win.at >= 0) {
+    cur.tracks.forEach((track, i) => {
+      if (i >= cur.index) songRow(cur.id, i, cur.tracks, i === cur.index ? 'now' : 'next');
+    });
+  }
+
+  // the next albums: their songs, or one line while the songs are not read
+  for (const id of win.ahead) {
+    const tracks = tracksOf(id);
+    if (tracks) {
+      tracks.forEach((track, i) => songRow(id, i, tracks, 'next'));
+      continue;
+    }
+    const row = base(id);
+    if (row) items.push({ ...row, i: -1, title: row.album, placeholder: true, sec: 'next', saved: false });
+  }
+  return { items, more: win.more, played: Math.max(0, win.at) };
+}
+
+/** The queue for the bar, rebuilt only when what it shows changes. */
 function queueItems() {
   const shuffle = player.mode === 'shuffle';
   const ids = visibleCardIds();
   const order = shuffle ? plan.order('shuffle', ids) : ids;
-  const cur = player.current;
-  const cache = new Map();
-  const base = (id) => {
-    if (!cache.has(id)) {
-      const card = findCard(id);
-      const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
-      cache.set(id, card ? { id, album: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '', url: /^https:\/\//i.test(pooled.url || '') ? pooled.url : '', wished: session.wished.has(id) } : null);
-    }
-    return cache.get(id);
-  };
-  const items = [];
-  let queuePlayed = 0;
-  let more = false;
-  if (shuffle) {
-    // the + of a row: the song of that album (the one that played or is playing, or the one its artist highlights)
-    const rowSaved = (id) => {
-      const song = knownSongOf(id) || featuredSongs.get(id);
-      return Boolean(song) && session.saved.has(`${song.id}:${song.i}`);
-    };
-    for (const id of order) {
-      const row = base(id);
-      if (row) items.push({ ...row, title: row.album, saved: rowSaved(id) });
-    }
-    queuePlayed = Math.max(0, order.indexOf(cur.id));
-  } else {
-    const win = queueWindow(order);
-    more = win.more;
-    queuePlayed = Math.max(0, win.at);
-    const songRow = (id, i, tracks, sec, fallback = '') => {
-      const row = base(id);
-      return row ? { ...row, i, title: tracks[i] ? tracks[i].title : (fallback || `Track ${i + 1}`), track: true, sec, saved: session.saved.has(`${id}:${i}`) } : null;
-    };
-    const push = (row) => { if (row) items.push(row); };
-    // what already played, in the order it played (the song that plays now is not in it)
-    const played = new Map();
-    for (const h of history) { const k = `${h.id}:${h.index}`; played.delete(k); played.set(k, h); }
-    for (const h of played.values()) if (!(h.id === cur.id && h.index === cur.index)) push(songRow(h.id, h.index, tracksOf(h.id) || [], 'played', h.title));
-    if (win.at >= 0) cur.tracks.forEach((track, i) => { if (i >= cur.index) push(songRow(cur.id, i, cur.tracks, i === cur.index ? 'now' : 'next')); });
-    for (const id of win.ahead) {
-      const tracks = tracksOf(id);
-      if (!tracks) { const row = base(id); if (row) items.push({ ...row, i: -1, title: row.album, placeholder: true, sec: 'next', saved: false }); continue; }
-      tracks.forEach((track, i) => push(songRow(id, i, tracks, 'next')));
-    }
-  }
-  const key = `${player.mode}|${order.length}|${queuePlayed}|${more ? 'm' : ''}|${items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',')}`;
+  const base = rowBaseReader();
+  const { items, more, played } = shuffle ? shuffleRows(order, base) : albumRows(order, base);
+  const rowKey = (it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`;
+  const key = `${player.mode}|${order.length}|${played}|${more ? 'm' : ''}|${items.map(rowKey).join(',')}`;
   if (key !== queueCache.key) {
-    queueCache = { key, items, albums: order.length, more, played: queuePlayed };
+    queueCache = { key, items, albums: order.length, more, played };
     if (shuffle) savePlayed(); // (the round and the songs chosen for the albums may be new)
   }
   return queueCache;
@@ -497,7 +535,7 @@ function savedItems() {
     savedCache = {
       key,
       items: entries.map((entry) => ({
-        id: entry.id, i: entry.i, title: entry.title || `Track ${entry.i + 1}`, art: state.pool[entry.id].art || '', artist: state.pool[entry.id].artist, album: state.pool[entry.id].title || '', url: /^https:\/\//i.test(state.pool[entry.id].url || '') ? state.pool[entry.id].url : '', wished: session.wished.has(entry.id),
+        id: entry.id, i: entry.i, title: entry.title || `Track ${entry.i + 1}`, art: state.pool[entry.id].art || '', artist: state.pool[entry.id].artist, album: state.pool[entry.id].title || '', url: httpsOrEmpty(state.pool[entry.id].url), wished: session.wished.has(entry.id),
       })),
     };
   }
@@ -511,6 +549,21 @@ function trackUrl(album, track) {
     const url = new URL((track && track.link) || '', album.url);
     return /^https?:$/.test(url.protocol) && track && track.link ? url.href : album.url;
   } catch { return album.url; }
+}
+
+/** The previous button: the song that played before (Shuffle), or an earlier song of this album. Nothing to go back to for the song of the loading box. */
+function canGoBack() {
+  if (player.waiting) return false;
+  if (player.mode !== 'album') return history.length > 1;
+  return player.current.index > 0;
+}
+
+/** The next button: more songs to play (Shuffle), or another song in this album, or another album after it. The loading box's song always has a next. */
+function canGoForward(albumIndex) {
+  const { current } = player;
+  if (player.waiting) return true;
+  if (player.mode !== 'album') return plan.hasMore(visibleCardIds());
+  return current.index + 1 < current.tracks.length || albumIndex + 1 < visibleCardIds().length;
 }
 
 function snapshot() {
@@ -533,8 +586,8 @@ function snapshot() {
     isSaved: Boolean(album && track) && session.saved.has(`${album.id}:${current.index}`),
     disliked: Boolean(album) && session.dislikedThisVisit.has(album.id),
     mode: player.mode,
-    hasPrev: player.waiting ? false : player.mode !== 'album' ? history.length > 1 : current.index > 0,
-    hasNext: player.waiting ? true : player.mode !== 'album' ? plan.hasMore(visibleCardIds()) : current.index + 1 < current.tracks.length || albumIndex + 1 < visibleCardIds().length,
+    hasPrev: canGoBack(),
+    hasNext: canGoForward(albumIndex),
     queueAlbums: queue.albums, queueMore: queue.more, queuePlayed: queue.played,
   };
   // The queue is large and rarely changes: it is only sent (to the other frame) when it did.
