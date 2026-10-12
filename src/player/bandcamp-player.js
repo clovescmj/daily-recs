@@ -184,7 +184,7 @@
       q('.collect').style.visibility = s.artist && !s.plain ? '' : 'hidden'; // a song played while waiting is not on any list: nothing to wish, like or skip
       // queue: only redraw when the list or the current album change (`queue` omitted = unchanged)
       if (s.queue != null) { queue = s.queue; queueKey = queueVersion(queue); }
-      const sig = `${s.curId}|${queueKey}`;
+      const sig = `${s.curId}|${queueKey}|${s.mode}`;
       if (sig !== queueSig) {
         queueSig = sig;
         const at = queue.findIndex((it) => it.id === s.curId);
@@ -192,7 +192,7 @@
         q('.queue ol').innerHTML = queue.map((it, i) => heading(i)
           + `<li data-id="${esc(it.id)}" class="${it.id === s.curId ? 'active' : ''}">${rowCover(it.art, it.id === s.curId)}${rowText(it.title, it.artist)}<span class="qact">`
           + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
-          + action('saveAlbum', it.saved, 'Add album to Liked Songs', 'Remove album from Liked Songs', P.addCircle, P.checkCircle)
+          + action('saveAlbum', it.saved, s.mode === 'shuffle' ? 'Add song to Liked Songs' : 'Add album to Liked Songs', s.mode === 'shuffle' ? 'Remove song from Liked Songs' : 'Remove album from Liked Songs', P.addCircle, P.checkCircle)
           + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
           + '</span></li>').join('');
         q('.q-foot').textContent = queue.length ? `${Math.max(0, at)} of ${queue.length} played` : '';

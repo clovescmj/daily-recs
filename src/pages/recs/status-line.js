@@ -47,7 +47,7 @@ function paintWait(info = waiting.info()) {
   const box = $('status');
   const wait = box && box.querySelector('.loading-wait');
   if (!wait) return;
-  wait.hidden = !waiting.can();
+  wait.hidden = !waiting.can() || !session.fresh; // the song while waiting is for the first load only (no list has been drawn yet), not when switching lists
   const label = wait.querySelector('.wait-label');
   const textEl = label.firstElementChild;
   const text = info.playing ? `${info.artist ? `${info.artist} - ` : ''}${info.song}` : WAIT_IDLE;

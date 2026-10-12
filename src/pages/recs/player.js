@@ -121,6 +121,36 @@ export async function albumSongs(id) {
 /** A track of the Liked list: its album, starting at that track (or at the same number if the track list changed). */
 export const playSavedTrack = (id, index) => playAlbum(id, index);
 
+/** The play mode that is on: 'album' (the default) or 'shuffle'. */
+export const playMode = () => player.mode;
+
+/** The song of an album in Shuffle: the one that is playing, or the last one that played of it; null while it has not played. */
+export function knownSongOf(id) {
+  const { current } = player;
+  if (current.id === id && current.tracks[current.index]) return { id, i: current.index, title: current.tracks[current.index].title };
+  for (let k = history.length - 1; k >= 0; k -= 1) {
+    if (history[k].id !== id) continue;
+    const cached = trackCache.get(id);
+    const track = cached && cached.tracks[history[k].index];
+    return { id, i: history[k].index, title: track ? track.title : '' };
+  }
+  return null;
+}
+
+const featuredSongs = new Map();   // album id -> the song of it that a + in Shuffle added (so its row can show it)
+
+/** The song Shuffle plays first from an album: the one its artist highlights (or the first). */
+export async function featuredSongOf(id) {
+  const album = await poolAlbum(id);
+  if (!album) return null;
+  const tracks = await fetchTracks(album);
+  if (!tracks.length) return null;
+  const i = startingTrack(tracks);
+  const song = { id, i, title: tracks[i].title };
+  featuredSongs.set(id, song);
+  return song;
+}
+
 /** The track that is playing, as the Liked list keeps it. */
 export function currentTrack() {
   const { current, album } = player;
@@ -308,7 +338,13 @@ const hasSavedSong = (id) => session.savedAlbums.has(id);
 function queueItems() {
   const ids = player.mode === 'shuffle' ? plan.order('shuffle', visibleCardIds()) : visibleCardIds(); // (in shuffle: the random order of the round)
   // the heart of each item is part of the key, so the bar redraws when one of them changes
-  const key = ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${hasSavedSong(id) ? 's' : ''}`).join(',');
+  // the + of a row: the whole album in Full album; in Shuffle the song of that album (the one that played or is playing)
+  const rowSaved = (id) => {
+    if (player.mode !== 'shuffle') return hasSavedSong(id);
+    const song = knownSongOf(id) || featuredSongs.get(id);
+    return Boolean(song) && session.saved.has(`${song.id}:${song.i}`);
+  };
+  const key = `${player.mode}|` + ids.map((id) => `${id}${session.wished.has(id) ? 'w' : ''}${rowSaved(id) ? 's' : ''}`).join(',');
   if (key !== queueCache.key) {
     queueCache = {
       key,
@@ -317,7 +353,7 @@ function queueItems() {
         const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
         return {
           id, title: card.querySelector('.album-title').textContent, artist: card.querySelector('.album-artist').textContent, art: pooled.art || '',
-          wished: session.wished.has(id), saved: hasSavedSong(id),
+          wished: session.wished.has(id), saved: rowSaved(id),
         };
       }),
     };

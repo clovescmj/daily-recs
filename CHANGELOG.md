@@ -3,6 +3,14 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.1.23
+- Queue: all the buttons of a row are always visible (the block icon used to show only on hover).
+- Queue: the + of a row follows the play mode. With Shuffle off (Full album) it adds the whole album, as before. With Shuffle on it adds only the song of that album (the one that
+  is playing or last played of it; for an album that has not played yet, the song its artist highlights), and its tooltip says "Add song to Liked Songs". Pressing it again takes
+  the song out. The + of the cards still adds the whole album.
+- The button of the loading box (a song from your collection while waiting) shows only in the first load, while no list has been drawn. Switching between My tags, Best matches and
+  Surprise me no longer offers it.
+
 ## 1.1.22
 - Play mode is a single **Shuffle** button, like in any player, instead of the pair of Full album and Shuffle buttons: Full album (the albums in order, every song) is simply what
   plays when Shuffle is off. The button is an icon on its own (Material's `shuffle`); when it is on it shows `shuffle_on`, in the blue of the other active icons. Tooltip:

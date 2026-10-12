@@ -118,8 +118,6 @@
 #dr-player .queue .qtext b { font-weight: var(--dr-weight-medium); overflow: hidden; text-overflow: ellipsis; }
 #dr-player .queue .qtext span { font-size: var(--dr-font-s); color: var(--dr-text-muted); overflow: hidden; text-overflow: ellipsis; }
 #dr-player .queue .qact { flex: none; display: inline-flex; align-items: center; gap: var(--dr-icon-gap); }
-#dr-player .queue .qact .q-dislike { visibility: hidden; }
-#dr-player .queue li:hover .qact .q-dislike { visibility: visible; }
 #dr-player .queue li.active, #dr-player .queue li:hover { background: var(--dr-hover); }
 #dr-player .queue-foot { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; border-top: 1px solid var(--dr-border-bar); font-size: var(--dr-font-s); color: var(--dr-text-muted); }
 #dr-player .now-playing img:not([src]) { visibility: hidden; }
