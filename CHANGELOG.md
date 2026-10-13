@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.28
+- The texts about sync use the names of the interface: "albums in your wishlist" and "hidden albums" (the About page said "likes" and "dislikes"), in About, the store listing and the README.
+
 ## 1.2.27
 - About: a "Clear saved data" button removes everything the extension keeps in the browser and in the Google account (the Bandcamp account is not touched).
 - Covers and audio only load from Bandcamp's own hosts (bcbits.com, bandcamp.com); the song link on the bar and the profile address are only taken when they are https and Bandcamp's.

@@ -14,7 +14,7 @@ async function showSyncSummary() {
     const s = await summary(chrome.storage.sync);
     if (!s) { el.textContent = 'Nothing saved to your account yet.'; return; }
     const when = s.updatedAt ? ` Last update: ${new Date(s.updatedAt).toLocaleString()}.` : '';
-    el.textContent = `Saved to your account: ${plural(s.likes, 'like')}, ${plural(s.dislikes, 'dislike')}.${when}`;
+    el.textContent = `Saved to your account: ${plural(s.likes, 'album')} in your wishlist, ${plural(s.dislikes, 'hidden album')}.${when}`;
   } catch {
     el.textContent = "Couldn't read your synced data.";
   }
