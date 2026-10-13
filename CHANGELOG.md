@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.34
+- About: the logo has a transparent background (it was white), so it sits on the page whatever its colour.
+
 ## 1.2.33
 - New logo: the wordmark reads "for Bandcamp" in lower case. Updated in the About page, the app and toolbar icons (light and dark), the favicon and the store images (promo tile, marquee).
 
