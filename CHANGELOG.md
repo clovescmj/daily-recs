@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.33
+- New logo: the wordmark reads "for Bandcamp" in lower case. Updated in the About page, the app and toolbar icons (light and dark), the favicon and the store images (promo tile, marquee).
+
 ## 1.2.32
 - The wishlist record follows the real wishlist: each time the library is read, an album that Bandcamp has in the wishlist counts as wishlisted (an add that Bandcamp took but did not confirm in time), and one that is no longer there does not.
 - About, privacy policy and store listing say that the wishlist lives in the Bandcamp account and that the extension keeps only a record of what was added from here.
