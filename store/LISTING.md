@@ -15,21 +15,18 @@ New music every day, built from your own taste. Never shows what you already own
 
 **Description:**
 
-> Find new music every day, without losing the evening.
+> Daily Recs adds a "daily recs" tab to your own Bandcamp profile with a new list of 50 albums every day. It starts from the albums you own and have in your wishlist, follows what other fans of those albums also own, and shows only albums you don't have, from artists you don't have, with no repeats.
 >
-> Daily Recs starts from what you own and what you've saved on Bandcamp, finds albums that fans of those records love, and keeps the ones that fit your taste. Every list is made of albums you don't own, from artists you don't have, and nothing repeats.
+> • Best matches: the albums that the most fans of your albums also own.
+> • My tags: albums with the genres you pick.
+> • Surprise me: albums from deeper in the same ranking, further from what you own. It never repeats Best matches.
+> • The heart adds an album to your Bandcamp wishlist. The + adds songs to Liked Songs, a list that stays in your browser. The ⊘ hides an album, its artist and the albums Bandcamp pairs with it.
+> • A player in Bandcamp's style, with a queue, Liked Songs and media keys. Shuffle plays one song from each album, in random order, never the same song twice. While your first list loads, you can play a random song from your own collection.
+> • The albums you hide sync between your computers through your Google account. Liked Songs stay in your browser, and the wishlist stays in your Bandcamp account.
 >
-> • A fresh list of 50 albums every day, right inside your Bandcamp profile, in a new "daily recs" tab
-> • The heart adds an album to your Bandcamp wishlist, and the + saves songs to your own Liked Songs list
-> • "Don't show music like this": that album, its artist and what Bandcamp pairs with it stop coming
-> • Three lists: "My tags" (explore new music by genre), "Best matches" (perfect matches with your collection) and "Surprise me" (go beyond your collection)
-> • A built-in player in Bandcamp's own style, with a Shuffle button, a queue, Liked Songs and media keys
-> • While your first list is being built, play a random song from your own collection
-> • The albums you hide sync across your computers through your Google account; Liked Songs stay in your browser, and the wishlist is in your Bandcamp account
+> It runs in your browser and only talks to Bandcamp (bandcamp.com and the servers of its audio and covers). It uses the session you already have open and never sees your password. There are no analytics, no ads and no accounts. The About page (right-click the toolbar icon) has a button that clears everything it saved.
 >
-> Private by design: everything runs in your browser and only talks to Bandcamp (bandcamp.com and its media servers). No analytics, no ads, no accounts.
->
-> You need to be signed in to Bandcamp. This is an independent project. It is not made, endorsed or supported by Bandcamp.
+> You need to be signed in to Bandcamp. This is an independent project, not made, endorsed or supported by Bandcamp.
 
 **Support URL:** https://github.com/clovescmj/daily-recs/issues  (or leave the store's own Support tab on)
 **Homepage URL:** https://github.com/clovescmj/daily-recs
