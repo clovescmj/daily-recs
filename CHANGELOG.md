@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.26
+- The extension no longer loads on Bandcamp's sign-in, account settings, cart and checkout, and purchases pages (it only ever acted on your own profile).
+- Privacy policy and store listing describe the background scan of your albums' genre tags (a few pages about every half hour) and the pages where the extension does not run.
+
 ## 1.2.25
 - About, privacy policy and store listing say what really syncs through the Google account (the albums you wishlist and hide, and a score per source) and that Liked Songs stay in this browser.
 - What's new: the Shuffle line says the rule (one song per album, never the same twice), and a line about the page remembering the queue and the song after a reload.

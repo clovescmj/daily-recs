@@ -51,12 +51,12 @@ Show a daily list of new album recommendations on the user's own Bandcamp profil
 
 **Permission justifications**
 - `storage`: keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs the user's taste (the albums wishlisted with the heart and the albums hidden, with a score per source) through the user's Google account.
-- `alarms`: checks once every few hours whether a new day has started, to prepare the day's list in the background, and schedules a retry when Bandcamp asks to slow down.
+- `alarms`: about every 30 minutes, reads a handful of the pages of the user's own albums in the background, only to learn their genre tags (it pauses when Bandcamp asks to slow down), and schedules a retry after such a request.
 - `offscreen`: opens a hidden page that only checks whether the browser is in dark or light mode, so the toolbar icon can use the symbol that is visible on the user's toolbar (the service worker cannot check this itself). It reads and sends no other data.
 - `contextMenus`: adds the right-click menu on the toolbar icon (Open Daily Recs, Feedback, Report a bug, About).
 - `scripting`: when the user clicks the heart, runs Bandcamp's own "add to wishlist" function in the user's Bandcamp tab, so the wishlist changes exactly as if they had clicked Bandcamp's button.
 - Host access `https://*.bandcamp.com/*`: reads the user's collection and wishlist, and the "you may also like" section, tags and songs of album pages (these live on artists' subdomains). Nothing else is accessed. The audio and covers it plays come from Bandcamp's own media servers (`bcbits.com`), loaded by the page as any image or audio; no access is needed for that.
-- Content script on `https://bandcamp.com/*`: adds the "daily recs" tab and the player bar to the user's own profile page.
+- Content script on `https://bandcamp.com/*`: adds the "daily recs" tab and the player bar to the user's own profile page. It is not loaded on the sign-in, account settings, cart and checkout, or purchases pages.
 
 **Remote code:** No, I am not using remote code.
 

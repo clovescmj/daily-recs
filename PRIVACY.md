@@ -11,6 +11,7 @@ Daily Recs for Bandcamp is an independent extension. It is not made, endorsed or
 - It keeps, **on your computer** (`chrome.storage.local`), what played today (the songs, their names and the position of the song that was playing), so the player can show it again after a reload. It only counts for the day it was kept, and it is replaced by the next day's.
 - It stores your **taste** in `chrome.storage.sync`, which Chrome syncs through your own Google account, so it follows you to your other computers: the albums you add to your wishlist with the heart, the albums you hide, and a score for each source of recommendations. This is controlled by your Chrome sync settings. Liked Songs are not part of it.
 - To play music it loads the audio and the cover images straight from Bandcamp's own servers (`bandcamp.com` and `bcbits.com`, the network Bandcamp uses for its media), the same way Bandcamp's own pages do. The "song while waiting" is a random song of your own collection, read from the page of one of your albums, and only starts when you press play.
+- While the browser is open, it reads a few pages of your own albums in the background (a handful about every half hour) only to learn their genre tags, using your Bandcamp session like any visit. It pauses by itself when Bandcamp asks to slow down.
 - It adds or removes an album from your Bandcamp wishlist **only when you click** the heart. Hiding an album never changes your Bandcamp account.
 
 ## What it does not do
@@ -18,6 +19,7 @@ Daily Recs for Bandcamp is an independent extension. It is not made, endorsed or
 - It does not use analytics, advertising or trackers.
 - It does not sell or share data with anyone.
 - It does not load or run remote code.
+- It does not run on Bandcamp's sign-in, account settings, cart and checkout, or purchases pages, nor on artist subdomains (`artist.bandcamp.com`), where it only fetches album pages in the background.
 
 ## Links
 The "Feedback" and "Report a bug" links open the Chrome Web Store and GitHub in a new tab, only when you click them. The bug report link pre-fills the extension version and your browser's name, which you can edit or delete before sending.
