@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.31
+- About: the listening text no longer names a "Full album" option (the player has only the Shuffle button): it says what happens with Shuffle off and with Shuffle on.
+
 ## 1.2.30
 - About: the Google account's sync status is in its own box under "Sync" (the count of hidden albums and the last update).
 - About and What's new rewritten with concrete wording: what each list contains, what the three buttons do, what the extension reads, keeps and syncs.
