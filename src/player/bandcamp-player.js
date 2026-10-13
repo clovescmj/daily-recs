@@ -22,6 +22,7 @@
   const LIKED_ICON = `<svg class="x-icon" viewBox="0 0 24 24" role="img" aria-label="Liked Songs"><title>Liked Songs</title><path d="M12.66 15.333Q13.778 15.333 14.556 14.56q0.778 -0.773 0.778 -1.893v-5.333h3.333v-2.667H14v5.694q-0.306 -0.167 -0.625 -0.264T12.667 10q-1.12 0 -1.893 0.771 -0.773 0.772 -0.773 1.889Q10 13.778 10.771 14.556q0.772 0.778 1.889 0.778ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z"/></svg>`;
   const LIKED_PATH = 'M12.66 15.333Q13.778 15.333 14.556 14.56q0.778 -0.773 0.778 -1.893v-5.333h3.333v-2.667H14v5.694q-0.306 -0.167 -0.625 -0.264T12.667 10q-1.12 0 -1.893 0.771 -0.773 0.772 -0.773 1.889Q10 13.778 10.771 14.556q0.772 0.778 1.889 0.778ZM7.333 18.667q-0.825 0 -1.412 -0.587Q5.333 17.492 5.333 16.667v-13.333q0 -0.825 0.587 -1.412Q6.508 1.333 7.333 1.333h13.333q0.825 0 1.412 0.587Q22.667 2.508 22.667 3.333v13.333q0 0.825 -0.587 1.412Q21.492 18.667 20.667 18.667H7.333ZM3.333 22.667q-0.825 0 -1.412 -0.587Q1.333 21.492 1.333 20.667v-15.333h2v15.333h15.333v2H3.333Z';
   const EMPTY_LIKED = `<li class="empty"><svg class="empty-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${LIKED_PATH}"/></svg><strong>No liked songs yet</strong><span>Click the ${svg(P.addCircle, 'ci', '', 'Add to Liked Songs')} on an album or in the player to save songs here.</span></li>`;
+  const isImageUrl = (u) => typeof u === 'string' && /^(https:|data:image)/.test(u);
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let savedCount = null;
@@ -30,7 +31,7 @@
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',');
   /** The cover of a row (the same box when there is none, so the rows keep their height). */
-  const rowCover = (art) => `<span class="qcover" role="button" tabindex="0" aria-label="Play song">${typeof art === 'string' && /^(https:|data:image)/.test(art) ? `<img src="${esc(art)}" alt="">` : ''}<span class="qplay"><svg class="qp-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg><svg class="qp-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.pause}"/></svg></span></span>`;
+  const rowCover = (art) => `<span class="qcover" role="button" tabindex="0" aria-label="Play song">${isImageUrl(art) ? `<img src="${esc(art)}" alt="">` : ''}<span class="qplay"><svg class="qp-play" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.play}"/></svg><svg class="qp-pause" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${P.pause}"/></svg></span></span>`;
   /**
    * The song and the artist (or the album) of a row: one link to the album, in a new tab, that wraps both lines and is underlined under the pointer.
    * Without an address, the same two lines as plain text.
@@ -202,8 +203,8 @@
       if (s.has && el.hidden) { el.hidden = false; void el.offsetWidth; }
       el.classList.toggle('is-offscreen', !s.has);
       const img = q('.np-art img');
-      if (s.art) { if (img.getAttribute('src') !== s.art) img.src = s.art; } else img.removeAttribute('src');
-      q('.np-art').href = q('.np-link').href = s.url || '#';
+      if (isImageUrl(s.art)) { if (img.getAttribute('src') !== s.art) img.src = s.art; } else img.removeAttribute('src');
+      q('.np-art').href = q('.np-link').href = typeof s.url === 'string' && s.url.startsWith('https://') ? s.url : '#'; // (only https: this page is bandcamp.com)
       img.alt = s.albumTitle ? `Cover of ${s.albumTitle}${s.artist ? ` by ${s.artist}` : ''}` : 'No album playing';
       setText(q('.now-playing .title'), s.songTitle || s.albumTitle || ''); // the song, with the artist under it
       setText(q('.now-playing .artist span'), s.artist || '');

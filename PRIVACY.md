@@ -14,6 +14,8 @@ Daily Recs for Bandcamp is an independent extension. It is not made, endorsed or
 - While the browser is open, it reads a few pages of your own albums in the background (a handful about every half hour) only to learn their genre tags, using your Bandcamp session like any visit. It pauses by itself when Bandcamp asks to slow down.
 - It adds or removes an album from your Bandcamp wishlist **only when you click** the heart. Hiding an album never changes your Bandcamp account.
 
+- You can remove everything it saved from **About → Clear saved data** (the data in your Google account too), or by uninstalling the extension.
+
 ## What it does not do
 - It does not send your data to the developer or to any server other than Bandcamp's (`bandcamp.com` and its media servers).
 - It does not use analytics, advertising or trackers.

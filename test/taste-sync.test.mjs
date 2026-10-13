@@ -61,11 +61,27 @@ describe('sync between devices', () => {
 
   test('an undone dislike spreads and clears the old dislike on another device', async () => {
     const cloud = createSyncArea();
-    const a = emptyState(); migrateTaste(a); setVote(a, 'a', VOTE.UNDISLIKE, NOW + 10); rebuildVoteLists(a);
+    const a = emptyState(); migrateTaste(a); setVote(a, '5', VOTE.UNDISLIKE, NOW + 10); rebuildVoteLists(a);
     await syncState(cloud, a);
-    const other = emptyState(); setVote(other, 'a', VOTE.DISLIKE, NOW - 5000); rebuildVoteLists(other);
+    const other = emptyState(); setVote(other, '5', VOTE.DISLIKE, NOW - 5000); rebuildVoteLists(other);
     await syncState(cloud, other);
-    assert.ok(!other.dismissed.includes('a'));
+    assert.ok(!other.dismissed.includes('5'));
+  });
+
+  test('a remote document with entries of a shape we never write is ignored', async () => {
+    const state = emptyState(); migrateTaste(state);
+    const remote = { v: 1, m: { '9': 'l.zzzz', evil: 'l.1', '8': 'x.1', '7': { a: 1 }, '6': 'l.' }, ls: { k: 5, huge: 1e12, neg: -1, text: 'x' }, ds: 'nope' };
+    mergeRemote(state, remote);
+    assert.deepEqual(Object.keys(state.votes), ['9']);
+    assert.deepEqual(state.sourceLikes, { k: 5 });
+    assert.equal(mergeRemote(state, { v: 1, m: 'abc' }), false);
+  });
+
+  test('nothing is written to the cloud for an empty state', async () => {
+    const cloud = createSyncArea();
+    const empty = emptyState(); migrateTaste(empty);
+    const result = await syncState(cloud, empty);
+    assert.equal(result.pushed, null);
   });
 
   test('conflicting votes: the most recent one wins on both devices', async () => {

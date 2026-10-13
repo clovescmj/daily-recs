@@ -2,11 +2,15 @@
 body.info .page { max-width: 680px; }
 body.info h1 { font-size: var(--dr-font-xl); margin: 4px 0 6px; font-weight: var(--dr-weight-regular); }
 body.info h2 { font-size: var(--dr-font-l); margin: 24px 0 6px; }
+body.info h3 { font-size: var(--dr-font-m); margin: 14px 0 4px; font-weight: var(--dr-weight-bold, 700); }
 body.info p, body.info li { font-size: var(--dr-font-m); line-height: 1.55; }
 body.info ul { padding-left: 20px; }
 .meta { color: var(--muted); margin: 0 0 14px; }
 .links { margin-top: 28px; }
 .disclaimer { margin-top: 28px; color: var(--muted); }
+.clear-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.clear-row [hidden] { display: none; }
+.link-button { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 
 /* The logo (symbol, name and "For Bandcamp") at the top of the About page, aligned to the left. */
 .about-logo { display: block; height: 56px; width: auto; margin: 4px 0 26px; }

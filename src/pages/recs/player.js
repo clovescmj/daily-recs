@@ -1,6 +1,6 @@
 // Audio playback. This page (an iframe inside the Bandcamp profile) owns the <audio> element; the Bandcamp-style bar
 // (src/player, drawn by the content script in the Bandcamp page) only shows state and sends commands back.
-import { embeddedPlayerUrl, isBandcampUrl, parseEmbeddedTracks, parseTracks, toHttpsUrl } from '../../lib/bandcamp.js';
+import { embeddedPlayerUrl, isBandcampUrl, parseEmbeddedTracks, parseTracks, toMediaUrl } from '../../lib/bandcamp.js';
 import { findCard, visibleCardIds } from './cards.js';
 import { loadState, send } from './data.js';
 import { session } from './session.js';
@@ -111,7 +111,7 @@ async function fetchTracks(album, { fresh = false } = {}) {
   const html = await response.text();
   const tracks = (onBandcamp ? parseTracks : parseEmbeddedTracks)(html);
   const cover = html.match(/<meta property="og:image" content="([^"]+)"/);
-  trackCache.set(album.id, { tracks, at: Date.now(), art: cover ? toHttpsUrl(cover[1]) : '' });
+  trackCache.set(album.id, { tracks, at: Date.now(), art: cover ? toMediaUrl(cover[1]) : '' });
   return tracks;
 }
 
@@ -478,7 +478,7 @@ function trackUrl(album, track) {
   if (!album) return '';
   try {
     const url = new URL((track && track.link) || '', album.url);
-    return /^https?:$/.test(url.protocol) && track && track.link ? url.href : album.url;
+    return url.protocol === 'https:' && track && track.link ? url.href : album.url;
   } catch { return album.url; }
 }
 

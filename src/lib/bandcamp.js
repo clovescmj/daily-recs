@@ -26,14 +26,17 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Sanitising. Everything parsed from remote HTML is untrusted: ids must be numeric and URLs must be https.
 // ---------------------------------------------------------------------------------------------------------------------
 
+/** A character from its number; '' when the number is not one (String.fromCodePoint would throw and drop the whole page). */
+const fromCodePoint = (n) => (Number.isInteger(n) && n >= 0 && n <= 0x10ffff ? String.fromCodePoint(n) : '');
+
 export function decodeHtmlEntities(text = '') {
   return text
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&#x27;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
-    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&#(\d+);/g, (_, n) => fromCodePoint(+n))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => fromCodePoint(parseInt(n, 16)))
     .replace(/&amp;/g, '&');
 }
 
@@ -47,6 +50,15 @@ export function toHttpsUrl(value) {
   } catch {
     return '';
   }
+}
+
+const MEDIA_HOST = /^([a-z0-9-]+\.)*(bcbits|bandcamp)\.com$/i;
+
+/** Covers and audio only load from Bandcamp's own hosts (bcbits.com, bandcamp.com), so no other server learns that this page was opened. */
+export function toMediaUrl(value) {
+  const url = toHttpsUrl(value);
+  if (!url) return '';
+  try { return MEDIA_HOST.test(new URL(url).hostname) ? url : ''; } catch { return ''; }
 }
 
 /** Bandcamp ids are plain digits. Anything else is rejected. */
@@ -95,8 +107,9 @@ export async function getFan(fetchFn) {
   const json = await response.json().catch(() => null);
   if (!json || json.error) throw new NotLoggedInError();
   const summary = json.collection_summary || {};
-  const profileUrl = toHttpsUrl(summary.url || (summary.username ? `${BANDCAMP_ORIGIN}/${summary.username}` : ''));
+  const profileUrl = toHttpsUrl(summary.url || (summary.username ? `${BANDCAMP_ORIGIN}/${encodeURIComponent(summary.username)}` : ''));
   if (!profileUrl) throw new NotLoggedInError();
+  if (!isBandcampUrl(profileUrl)) throw new Error('Unexpected profile address.'); // it is opened in a tab: only Bandcamp's own
   return { fanId: toNumericId(json.fan_id || summary.fan_id), profileUrl };
 }
 
@@ -202,7 +215,7 @@ export function parseRecommendations(html) {
       artist: toLabel(attribute('data-artist')),
       artistId: toNumericId(attribute('data-artistid')),
       url,
-      art: toHttpsUrl(decodeHtmlEntities(art)),
+      art: toMediaUrl(decodeHtmlEntities(art)),
       fans: supporters ? +supporters[1] : 0,
       ownedTitle: supporters ? toLabel(decodeHtmlEntities(supporters[2])) : '',
     });
@@ -268,7 +281,7 @@ export function parseEmbeddedTracks(html) {
     .map((track) => ({
       title: toLabel(track.title),
       link: typeof track.title_link === 'string' ? track.title_link : '', // the song's own page (relative to the album's site)
-      src: toHttpsUrl(track.file && track.file['mp3-128']),
+      src: toMediaUrl(track.file && track.file['mp3-128']),
       duration: track.duration,
       featured: Boolean(data.featured_track_id) && String(track.id) === String(data.featured_track_id),
     }))
@@ -287,7 +300,7 @@ export function parseTracks(html) {
     .map((track) => ({
       title: toLabel(track.title),
       link: typeof track.title_link === 'string' ? track.title_link : '', // the song's own page (relative to the album's site)
-      src: toHttpsUrl(track.file && track.file['mp3-128']),
+      src: toMediaUrl(track.file && track.file['mp3-128']),
       duration: track.duration,
       featured: Boolean(tralbum.featured_track_id) && String(track.track_id ?? track.id) === String(tralbum.featured_track_id),
     }))

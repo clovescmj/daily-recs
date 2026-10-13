@@ -2,7 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   HttpError, NotLoggedInError, RateLimitedError, fetchText, getFan, loadLibrary, parseRecommendations, parseTracks,
-  toHttpsUrl, toNumericId, decodeHtmlEntities,
+  toHttpsUrl, toMediaUrl, toNumericId, decodeHtmlEntities,
 } from '../src/lib/bandcamp.js';
 import { createFakeBandcamp } from './helpers/fake-bandcamp.js';
 
@@ -220,4 +220,30 @@ test('parseTags splits a list of hashtags into tags and drops the names of place
 test('parseTags also splits tags written with commas, semicolons and slashes', () => {
   const tag = (text) => `<a class="tag" href="https://bandcamp.com/discover/x">${text}</a>`;
   assert.deepEqual(parseTagsFromPage(tag('rock, punk') + tag('hip-hop/rap') + tag('synthpop; darkwave') + tag('Los Angeles, California')), ['rock', 'punk', 'hiphop', 'rap', 'synthpop', 'darkwave']);
+});
+
+describe('hardening', () => {
+  test('covers and audio only come from Bandcamp hosts', () => {
+    assert.equal(toMediaUrl('https://f4.bcbits.com/img/a1.jpg'), 'https://f4.bcbits.com/img/a1.jpg');
+    assert.equal(toMediaUrl('https://popplers5.bandcamp.com/download/track?x=1'), 'https://popplers5.bandcamp.com/download/track?x=1');
+    assert.equal(toMediaUrl('https://evil.example/img.jpg'), '');
+    assert.equal(toMediaUrl('https://bcbits.com.evil.example/x.jpg'), '');
+    assert.equal(toMediaUrl('https://evilbcbits.com/x.jpg'), '');
+    assert.equal(toMediaUrl('http://f4.bcbits.com/x.jpg'), '');
+  });
+
+  test('a track with audio from another host is dropped', () => {
+    const blob = JSON.stringify({ trackinfo: [{ title: 'a', file: { 'mp3-128': 'https://evil.example/a.mp3' } }, { title: 'b', file: { 'mp3-128': 'https://t4.bcbits.com/stream/b' } }] }).replace(/"/g, '&quot;');
+    assert.deepEqual(parseTracks(`<div data-tralbum="${blob}">`).map((t) => t.title), ['b']);
+  });
+
+  test('a character reference out of range does not throw', () => {
+    assert.equal(decodeHtmlEntities('a&#99999999;b&#x110000;c&#65;'), 'abcA');
+  });
+
+  test('getFan refuses a profile address that is not Bandcamp\'s', async () => {
+    const answer = (url) => async () => ({ json: async () => ({ fan_id: 1, collection_summary: { url } }) });
+    await assert.rejects(getFan(answer('https://evil.example/me')), /Unexpected profile address/);
+    assert.equal((await getFan(answer('https://bandcamp.com/me'))).profileUrl, 'https://bandcamp.com/me');
+  });
 });

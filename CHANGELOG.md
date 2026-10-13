@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.27
+- About: a "Clear saved data" button removes everything the extension keeps in the browser and in the Google account (the Bandcamp account is not touched).
+- Covers and audio only load from Bandcamp's own hosts (bcbits.com, bandcamp.com); the song link on the bar and the profile address are only taken when they are https and Bandcamp's.
+- Taste sync ignores entries of a shape the extension never writes (bad ids, votes or scores) and writes nothing to the cloud for an empty state.
+- A character reference out of range in a page no longer makes the whole page unreadable.
+- About: the privacy section says plainly what the extension reads, what it keeps and where (this computer, the Google account), and what it changes on Bandcamp.
+
 ## 1.2.26
 - The extension no longer loads on Bandcamp's sign-in, account settings, cart and checkout, and purchases pages (it only ever acted on your own profile).
 - Privacy policy and store listing describe the background scan of your albums' genre tags (a few pages about every half hour) and the pages where the extension does not run.

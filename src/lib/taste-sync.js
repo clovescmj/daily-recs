@@ -126,18 +126,25 @@ export function buildDoc(state) {
   return doc;
 }
 
-/** Merges a remote document into local state. Returns true if anything changed locally. */
+const ALBUM_ID = /^\d{1,20}$/;
+const VOTE_VALUE = /^[ludn]\.[0-9a-z]{1,10}$/;
+const MAX_SCORE = 1_000_000;
+const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+/** Merges a remote document into local state. Returns true if anything changed locally. Entries of a shape we never write are ignored. */
 export function mergeRemote(state, remote) {
-  if (!remote || remote.v !== DOC_VERSION) return false;
+  if (!isPlainObject(remote) || remote.v !== DOC_VERSION) return false;
   migrateTaste(state);
   let changed = false;
-  for (const [id, value] of Object.entries(remote.m || {})) {
+  for (const [id, value] of Object.entries(isPlainObject(remote.m) ? remote.m : {})) {
+    if (!ALBUM_ID.test(id) || typeof value !== 'string' || !VOTE_VALUE.test(value)) continue;
     const local = state.votes[id];
     if (!local || parseVote(value).time > parseVote(local).time) { state.votes[id] = value; changed = true; }
   }
   for (const [remoteKey, localKey] of [['ls', 'sourceLikes'], ['ds', 'sourceDislikes']]) {
     state[localKey] ||= {};
-    for (const [key, score] of Object.entries(remote[remoteKey] || {})) {
+    for (const [key, score] of Object.entries(isPlainObject(remote[remoteKey]) ? remote[remoteKey] : {})) {
+      if (key.length > 200 || typeof score !== 'number' || !Number.isFinite(score) || score < 0 || score > MAX_SCORE) continue;
       if ((state[localKey][key] || 0) < score) { state[localKey][key] = score; changed = true; }
     }
   }
@@ -173,8 +180,10 @@ export async function syncState(area, state) {
   migrateTaste(state);
   const remote = await pull(area);
   const changed = mergeRemote(state, remote);
-  const upToDate = remote && JSON.stringify(remote) === JSON.stringify(buildDoc(state));
-  const pushed = upToDate ? null : await push(area, state);
+  const doc = buildDoc(state);
+  const upToDate = remote && JSON.stringify(remote) === JSON.stringify(doc);
+  const nothingToShare = !remote && !Object.keys(doc.m).length && !Object.keys(doc.ls).length && !Object.keys(doc.ds).length;
+  const pushed = upToDate || nothingToShare ? null : await push(area, state); // (an empty document is not worth writing)
   return { changed, pushed };
 }
 
@@ -183,7 +192,7 @@ export async function summary(area) {
   const meta = (await area.get(`${PREFIX}meta`))[`${PREFIX}meta`];
   const doc = await pull(area);
   if (!doc) return null;
-  const votes = Object.values(doc.m).map((value) => parseVote(value).vote);
+  const votes = Object.values(isPlainObject(doc.m) ? doc.m : {}).map((value) => parseVote(value).vote);
   return {
     likes: votes.filter((vote) => vote === VOTE.LIKE).length,
     dislikes: votes.filter((vote) => vote === VOTE.DISLIKE).length,
