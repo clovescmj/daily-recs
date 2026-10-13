@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.30
+- About: the Google account's sync status is in its own box under "Sync" (the count of hidden albums and the last update).
+- About and What's new rewritten with concrete wording: what each list contains, what the three buttons do, what the extension reads, keeps and syncs.
+
 ## 1.2.29
 - About: the goal line says that the wishlist and Liked Songs also shape the next lists, not only the albums you hide.
 - Corrects the texts of 1.2.25 to 1.2.28: what syncs through the Google account is the albums you hide and a score per source; the wishlist hearts and Liked Songs stay on this computer.

@@ -14,3 +14,9 @@ body.info ul { padding-left: 20px; }
 
 /* The logo (symbol, name and "For Bandcamp") at the top of the About page, aligned to the left. */
 .about-logo { display: block; height: 56px; width: auto; margin: 4px 0 26px; }
+
+/* What the Google account holds (under "Sync"): the one fact of the page that changes, so it gets its own box. */
+.sync-status { display: flex; flex-direction: column; gap: 2px; margin: 8px 0 14px; padding: 12px 16px; border: 1px solid var(--dr-border); border-radius: var(--dr-radius); background: var(--dr-surface-soft); }
+.sync-label { font-size: var(--dr-font-m); color: var(--muted); }
+.sync-status strong { font-size: var(--dr-font-l); font-weight: var(--dr-weight-bold); }
+.sync-when { font-size: var(--dr-font-m); color: var(--muted); }
