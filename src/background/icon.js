@@ -31,7 +31,7 @@ async function iconWithDot(dark) {
     const context = canvas.getContext('2d');
     context.drawImage(bitmap, 0, 0);
     const radius = size / 6.5;
-    const x = size - radius - 0.5;
+    const x = size - radius;   // against the right edge of the icon
     const y = radius + 0.5;
     context.globalCompositeOperation = 'destination-out';   // a thin gap around the dot, so it does not blur into the symbol
     context.beginPath();
