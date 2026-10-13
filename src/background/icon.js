@@ -4,7 +4,14 @@
 import { WHATS_NEW_KEY } from '../lib/storage-keys.js';
 
 const SCHEME_KEY = 'colorScheme';   // true when the browser reported dark mode
-const DOT_COLOR = '#f99f32';
+const DOT_COLOR = '#FF7300';
+const BOX_WIDTH = 198;
+const BOX_HEIGHT = 206;
+const DOT_X = 168;
+const DOT_Y = 60;
+const DOT_RADIUS = 23;              // the orange part; the ring around it is 5 units wide
+const DOT_RING = 5;
+const SYMBOL_PATH = 'M150.213 112.949C121.858 107.61 116.324 100.103 111.188 68C105.645 102.641 99.6406 108.645 65 114.188C96.6401 119.25 104.388 124.698 109.717 152H16L68.8428 54H182L150.213 112.949ZM129.157 152H112.658C117.463 127.379 124.236 120.531 148.724 115.711L129.157 152Z';
 const DOT_MAX_DAYS = 7;             // the dot goes away by itself
 const OFFSCREEN_PAGE = 'src/background/offscreen/color-scheme.html';
 
@@ -21,27 +28,30 @@ export async function pendingWhatsNew() {
   return stored;
 }
 
-/** The icon of the toolbar with a small dot in its top right corner (drawn here: Chrome has no way to put a dot on an icon). */
-async function iconWithDot(dark) {
+/**
+ * The icon with news: the symbol a little smaller and an orange dot over its top right corner, in a box of 198 x 206 units (as designed).
+ * It is drawn from the paths of the icon files, because Chrome has no way to put a dot on an icon. The ring around the dot is cut out, so
+ * it takes the colour of the toolbar, light or dark.
+ */
+function iconWithDot(dark) {
   const imageData = {};
   for (const size of [16, 32]) {
-    const response = await fetch(chrome.runtime.getURL(iconPaths(dark)[size]));
-    const bitmap = await createImageBitmap(await response.blob());
     const canvas = new OffscreenCanvas(size, size);
     const context = canvas.getContext('2d');
-    context.drawImage(bitmap, 0, 0);
-    const radius = size / 6.5;
-    const x = size - radius;   // against the right edge of the icon
-    const y = radius + 0.5;
-    context.globalCompositeOperation = 'destination-out';   // a thin gap around the dot, so it does not blur into the symbol
+    const scale = size / BOX_HEIGHT;
+    context.setTransform(scale, 0, 0, scale, (size - BOX_WIDTH * scale) / 2, 0);
+    context.fillStyle = dark ? '#ffffff' : '#111111';
+    context.fill(new Path2D(SYMBOL_PATH));
+    context.globalCompositeOperation = 'destination-out';
     context.beginPath();
-    context.arc(x, y, radius + size / 16, 0, Math.PI * 2);
+    context.arc(DOT_X, DOT_Y, DOT_RADIUS + DOT_RING, 0, Math.PI * 2);
     context.fill();
     context.globalCompositeOperation = 'source-over';
     context.beginPath();
-    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.arc(DOT_X, DOT_Y, DOT_RADIUS, 0, Math.PI * 2);
     context.fillStyle = DOT_COLOR;
     context.fill();
+    context.setTransform(1, 0, 0, 1, 0, 0);
     imageData[size] = context.getImageData(0, 0, size, size);
   }
   return imageData;
@@ -55,7 +65,7 @@ export async function refreshToolbarIcon() {
   const dark = stored === undefined ? true : stored;   // (the manifest default is the white symbol)
   try {
     if (news) {
-      try { await chrome.action.setIcon({ imageData: await iconWithDot(dark) }); return; } catch { /* no canvas here: the plain icon */ }
+      try { await chrome.action.setIcon({ imageData: iconWithDot(dark) }); return; } catch { /* no canvas here: the plain icon */ }
     }
     await chrome.action.setIcon({ path: iconPaths(dark) });
   } catch { /* the toolbar may not be ready: the next call will do it */ }
