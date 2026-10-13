@@ -8,6 +8,7 @@ export const STATE_KEY = 'state';
 export const STATUS_KEY = 'status';
 export const OPENED_KEY = 'opened';
 export const LIKED_KEY = 'likedSongs';
+export const WHATS_NEW_KEY = 'whatsNew';   // { version, at }: a major update was installed and its news were not opened yet (a dot on the toolbar icon)
 export const PICKED_KEY = 'pickedDate';   // the day the user last chose what to hear (the opening screen shows once a day)
 
 /** A run that has not reported progress for this long is considered dead (e.g. the service worker was terminated). */

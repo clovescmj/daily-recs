@@ -7,9 +7,10 @@
 import { registerMenu } from './menu.js';
 import { registerMessageHandler } from './messages.js';
 import { RETRY_ALARM, enqueue, retryAfterRateLimit, runScan, syncNow, updateBadge } from './jobs.js';
-import { restoreToolbarIcon, startColorSchemeWatcher } from './icon.js';
+import { refreshToolbarIcon, restoreToolbarIcon, startColorSchemeWatcher } from './icon.js';
 import { continueAfterLogin, forgetLoginTab, openMainPage } from './navigation.js';
-import { PICKED_KEY } from '../lib/storage-keys.js';
+import { PICKED_KEY, WHATS_NEW_KEY } from '../lib/storage-keys.js';
+import { isMajorUpdate } from '../lib/versions.js';
 import { clearStaleStatus } from './storage.js';
 
 const DAILY_ALARM = 'daily';
@@ -28,7 +29,15 @@ startColorSchemeWatcher();
 chrome.alarms.get(SCAN_ALARM).then((alarm) => { if (!alarm) chrome.alarms.create(SCAN_ALARM, { delayInMinutes: 5, periodInMinutes: SCAN_PERIOD_MINUTES }); });
 
 // Nothing is built in the background: a list is made only when the user asks for it (the opening screen, or the toggle).
-chrome.runtime.onInstalled.addListener(() => chrome.alarms.clear(DAILY_ALARM)); // older versions built a list every few hours
+chrome.runtime.onInstalled.addListener(async (details) => {
+  chrome.alarms.clear(DAILY_ALARM); // older versions built a list every few hours
+  // A major update leaves a dot on the toolbar icon until its news are opened (or a week passes).
+  const current = chrome.runtime.getManifest().version;
+  if (details.reason === 'update' && isMajorUpdate(details.previousVersion, current)) {
+    await chrome.storage.local.set({ [WHATS_NEW_KEY]: { version: current, at: Date.now() } });
+    refreshToolbarIcon();
+  }
+});
 chrome.runtime.onStartup.addListener(() => { enqueue(syncNow); });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === RETRY_ALARM) retryAfterRateLimit();
@@ -44,4 +53,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes['taste:meta']) enqueue(syncNow);
   // The user picked another list: the numbers on the icon follow it.
   if (area === 'local' && changes[PICKED_KEY]) enqueue(updateBadge);
+  // The news were opened (or the dot expired): the icon and its tooltip lose the dot.
+  if (area === 'local' && changes[WHATS_NEW_KEY]) { refreshToolbarIcon(); enqueue(updateBadge); }
 });

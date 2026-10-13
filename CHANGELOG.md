@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.3.0
+- A small orange dot on the toolbar icon when a major update is installed (a new minor or major number: 1.2.x to 1.3.0, not 1.2.34 to 1.2.35). It goes away when "What's new" is opened (right-click menu of the icon, or the About page), or after a week. The tooltip of the icon says which version brought news.
+- The right-click menu of the icon has a "What's new" item.
+- What's new has a 1.3 entry that gathers the changes since 1.2 (About and privacy texts, Clear saved data, the pages where it does not load, the wishlist record, the new logo).
+
 ## 1.2.34
 - About: the logo has a transparent background (it was white), so it sits on the page whatever its colour.
 

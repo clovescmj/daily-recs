@@ -6,6 +6,7 @@ import { scanSources } from '../lib/scanner.js';
 import { dequeueWishlistOp, emptyState, queueWishlistOp } from '../lib/state.js';
 import { syncState } from '../lib/taste-sync.js';
 import { loadStatus, markOpened, store, todaySummary } from './storage.js';
+import { pendingWhatsNew } from './icon.js';
 
 let chain = Promise.resolve();
 
@@ -32,7 +33,8 @@ export async function updateBadge() {
   const summary = await todaySummary();
   const label = describeCount(summary);
   await chrome.action.setBadgeText({ text: summary.unopened ? String(summary.unopened) : '' });
-  await chrome.action.setTitle({ title: `Daily Recs\n${label}` });
+  const news = await pendingWhatsNew();
+  await chrome.action.setTitle({ title: `Daily Recs\n${label}${news ? `\nNew in ${news.version}: right-click the icon, What's new` : ''}` });
   try {
     await chrome.contextMenus.update(COUNT_MENU_ID, { title: label });
   } catch { /* the menu isn't created yet (first start): it is created with the right text on install */ }

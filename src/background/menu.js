@@ -5,6 +5,7 @@ import { openExtensionPage, openMainPage } from './navigation.js';
 
 const PAGES = Object.freeze({
   about: 'src/pages/about/about.html',
+  whatsnew: 'src/pages/about/whats-new.html',
 });
 
 /** Menu items are created on install/update; clicks are handled on every worker start (listeners must be top-level). */
@@ -18,6 +19,7 @@ export function registerMenu() {
       item('open', 'Open Daily Recs');
       item('feedback', 'Feedback');
       item('bug', 'Report a bug');
+      item('whatsnew', "What's new");
       item('about', `About · v${version}`);
       updateBadge(); // fills in the number text (created after the items, so the update finds it)
     });
