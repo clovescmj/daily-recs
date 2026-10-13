@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.29
+- About: the goal line says that the wishlist and Liked Songs also shape the next lists, not only the albums you hide.
+- Corrects the texts of 1.2.25 to 1.2.28: what syncs through the Google account is the albums you hide and a score per source; the wishlist hearts and Liked Songs stay on this computer.
+
 ## 1.2.28
 - The texts about sync use the names of the interface: "albums in your wishlist" and "hidden albums" (the About page said "likes" and "dislikes"), in About, the store listing and the README.
 
