@@ -87,7 +87,7 @@
       <div class="queue saved" role="dialog" aria-label="Liked Songs">
         <div class="queue-header"><div class="queue-title"><h2>Liked Songs</h2><span class="l-count"></span></div><span class="l-close" role="button" tabindex="0" aria-label="Close Liked Songs" title="Close Liked Songs">${svg(P.close, 'close-icon', '', 'Close Liked Songs')}</span></div>
         <ol>${EMPTY_LIKED}</ol>
-        <div class="queue-foot"><span>Stored on this computer</span></div>
+        <div class="queue-foot"><span>Saved in this browser · not synced</span><button type="button" class="l-export" title="Download your Liked Songs as a CSV file" hidden>Export liked songs</button></div>
       </div>`;
     const q = (s) => el.querySelector(s);
     /** The cover of a song just added: it shows above the icon and shrinks into it (see .liked-fly). It lives in the bar, not in the button, so it does not get the button's fade. */
@@ -166,6 +166,7 @@
     closePanels = () => { setQueue(false); setSaved(false); };
     q('.q-close').addEventListener('click', () => setQueue(false));
     q('.l-close').addEventListener('click', () => setSaved(false));
+    q('.l-export').addEventListener('click', () => onCmd('exportLiked'));
     // the elements with role="button" that are not links or buttons answer Enter and Space like a click
     el.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -278,6 +279,7 @@
             + action('save', true, '', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
             + '</span></li>').join('')
           : EMPTY_LIKED;
+        q('.l-export').hidden = !s.savedList.length;
         q('.l-count').textContent = s.savedList.length ? `${s.savedList.length} ${s.savedList.length === 1 ? 'song' : 'songs'}` : '';
       }
       q('.queue').classList.toggle('audible', !!s.playing);

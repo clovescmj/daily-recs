@@ -2,6 +2,7 @@
 import { session } from './session.js';
 import { toast } from './toast.js';
 import * as player from './player.js';
+import { exportLikedSongs } from './export.js';
 import { dislikeAlbum, saveAlbumSong, setSave, setWish, undoDislike } from './wishlist-actions.js';
 
 const isFraction = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -28,6 +29,7 @@ const COMMANDS = {
   // the + of a queue item that stands for an album: the whole album, like on the cards
   saveAlbum: (v) => isAlbumId(v) && saveAlbumSong(String(v)),
   saveSong: (v) => isAlbumId(v) && saveRowSong(String(v)), // the + of a Shuffle row: the song of that album, not the whole album
+  exportLiked: () => exportLikedSongs(),
   playTrack: (v) => isTrack(v) && player.playSavedTrack(String(v.id), v.i),
   dislike: (v) => {
     const id = targetId(v);
