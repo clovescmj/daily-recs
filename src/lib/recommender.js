@@ -12,7 +12,7 @@ import {
 } from './bandcamp.js';
 import { GENERIC_GENRES, addTasteTags, createSourceWeigher, recordSourceRead, savedAlbumIds, tagsOfAlbum } from './taste-profile.js';
 import { hashSource, recordVote, rebuildVoteLists, VOTE } from './taste-sync.js';
-import { DAILY_COUNT, emptyState, idsOfTodaysLists, migrateState, rollShownOver, tagListKey, todayKey } from './state.js';
+import { DAILY_COUNT, emptyState, idsOfTodaysLists, migrateState, reconcileWishlist, rollShownOver, tagListKey, todayKey } from './state.js';
 import { markShown, pickBest, pickFocused, pickSources, pickSurprise, rankedCandidates } from './ranking.js';
 import { scanSources } from './scanner.js';
 
@@ -213,6 +213,7 @@ export async function refresh({ fetch: fetchFn, store, force = false, mode = 'be
     state.pool = Object.fromEntries([...keep].filter((id) => state.pool[id]).map((id) => [id, state.pool[id]]));
     await report({ phase: PHASE.LIBRARY });
     state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing), state.owned, now.getTime());
+    reconcileWishlist(state); // (the record of what was wishlisted from here follows the real wishlist)
     state.fanId = fan.fanId;
     state.profileUrl = fan.profileUrl;
 
@@ -328,6 +329,7 @@ export async function refreshTags({ fetch: fetchFn, store, tags, force = false, 
       const fan = await getFan(fetchFn);
       await report({ phase: PHASE.LIBRARY });
       state.owned = await loadLibrary(fetchFn, fan.profileUrl, httpOptions(pacing));
+      reconcileWishlist(state);
       state.fanId = fan.fanId;
       state.profileUrl = fan.profileUrl;
     }

@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.2.32
+- The wishlist record follows the real wishlist: each time the library is read, an album that Bandcamp has in the wishlist counts as wishlisted (an add that Bandcamp took but did not confirm in time), and one that is no longer there does not.
+- About, privacy policy and store listing say that the wishlist lives in the Bandcamp account and that the extension keeps only a record of what was added from here.
+
 ## 1.2.31
 - About: the listening text no longer names a "Full album" option (the player has only the Shuffle button): it says what happens with Shuffle off and with Shuffle on.
 

@@ -25,7 +25,7 @@ New music every day, built from your own taste. Never shows what you already own
 > • Three lists: "My tags" (explore new music by genre), "Best matches" (perfect matches with your collection) and "Surprise me" (go beyond your collection)
 > • A built-in player in Bandcamp's own style, with a Shuffle button, a queue, Liked Songs and media keys
 > • While your first list is being built, play a random song from your own collection
-> • The albums you hide sync across your computers through your Google account; your wishlist hearts and Liked Songs stay in your browser
+> • The albums you hide sync across your computers through your Google account; Liked Songs stay in your browser, and the wishlist is in your Bandcamp account
 >
 > Private by design: everything runs in your browser and only talks to Bandcamp (bandcamp.com and its media servers). No analytics, no ads, no accounts.
 >

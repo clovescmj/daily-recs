@@ -42,7 +42,7 @@
     <strong id="sync">Checking…</strong>
     <span id="sync-when" class="sync-when"></span>
   </div>
-  <p>The albums you hide, and a score for each source of recommendations, are saved in your Google account through Chrome sync, so your other computers get them. Chrome sync has to be on. Your wishlist hearts and your Liked Songs are not synced: they stay on this computer.</p>
+  <p>The albums you hide, and a score for each source of recommendations, are saved in your Google account through Chrome sync, so your other computers get them. Chrome sync has to be on. Liked Songs are not synced: they stay on this computer. Your wishlist is not part of it either, because it lives in your Bandcamp account.</p>
   <h2>Privacy and the data it uses</h2>
   <p>Daily Recs runs in your browser and talks only to Bandcamp (bandcamp.com and the servers that serve its audio and covers). It uses the Bandcamp session you already have open, so it never sees your password. Nothing goes to the developer or to any other server. There are no analytics and no ads.</p>
   <h3>What it reads</h3>
@@ -52,17 +52,17 @@
   </ul>
   <h3>What it keeps, and where</h3>
   <ul>
-    <li><strong>On this computer:</strong> a copy of your library (titles, artists, links), the day's lists, your genre profile, the albums you added to your wishlist from here, your Liked Songs, and what played today with the position of the song, so the player picks up where it was after a reload.</li>
+    <li><strong>On this computer:</strong> a copy of your library (titles, artists, links), the day's lists, your genre profile, a record of the albums you added to your wishlist from here, your Liked Songs, and what played today with the position of the song, so the player picks up where it was after a reload.</li>
     <li><strong>In your Google account:</strong> the albums you hide and the score of each source, as ids and codes. No titles and no links. Chrome's sync settings control it.</li>
   </ul>
   <h3>What it changes on Bandcamp</h3>
   <ul>
-    <li>Your wishlist, and only when you click the heart.</li>
+    <li>Your wishlist, and only when you click the heart. The heart writes to your Bandcamp account, and the album counts as added only after Bandcamp confirms it. Each time the extension reads your library, it checks its record against your real wishlist.</li>
     <li>It doesn't load on Bandcamp's sign-in, settings, cart, checkout and purchases pages.</li>
   </ul>
   <p>The full text is in the <a href="https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md" target="_blank" rel="noopener">privacy policy</a>.</p>
   <h2>Your data</h2>
-  <p>Clear saved data removes everything listed above from this browser: the library copy, the lists, Liked Songs, the wishlist hearts and the hidden albums kept in your Google account. Your Bandcamp account and wishlist stay as they are. If you use Daily Recs on other computers, clear it there too, or they will send the hidden albums back to your Google account.</p>
+  <p>Clear saved data removes everything listed above from this browser: the library copy, the lists, Liked Songs, the record of what you added to your wishlist from here, and the hidden albums kept in your Google account. Your Bandcamp account and your wishlist there stay as they are. If you use Daily Recs on other computers, clear it there too, or they will send the hidden albums back to your Google account.</p>
   <p class="clear-row"><button type="button" class="button" id="clear-data">Clear saved data</button>
     <span id="clear-confirm" hidden>This can't be undone. <button type="button" class="button" id="clear-yes">Yes, clear it</button> <button type="button" class="link-button" id="clear-no">Cancel</button></span>
     <span id="clear-done" role="status"></span></p>

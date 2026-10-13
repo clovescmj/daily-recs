@@ -65,6 +65,30 @@ export function migrateState(state) {
   return state;
 }
 
+// ---- The wishlist the extension remembers ----
+
+/**
+ * Brings the record of the albums wishlisted from here in line with the real wishlist on Bandcamp, once the library has been read:
+ *  - an album of the pool that is in the Bandcamp wishlist counts as wishlisted (Bandcamp took the add, but did not confirm it in time);
+ *  - an album that is no longer in the wishlist (or in the library) does not.
+ * Albums the pool does not know are left alone. Returns true when the record changed.
+ */
+export function reconcileWishlist(state) {
+  const owned = state && state.owned;
+  if (!owned || !Array.isArray(owned.sources)) return false;
+  const stripQuery = (url) => String(url || '').split('?')[0];
+  const inWishlist = new Set(owned.sources.filter((source) => source.kind === 'wishlist').map((source) => source.url));
+  const inLibrary = new Set((owned.ids || []).map(String));
+  const pool = state.pool || {};
+  const before = state.wishlisted || [];
+  const kept = before.filter((id) => !pool[id] || inLibrary.has(String(id)) || inWishlist.has(stripQuery(pool[id].url)));
+  const added = Object.keys(pool).filter((id) => !kept.includes(id) && inWishlist.has(stripQuery(pool[id].url)));
+  const next = [...kept, ...added];
+  const changed = next.length !== before.length || next.some((id, i) => id !== before[i]);
+  if (changed) state.wishlisted = next;
+  return changed;
+}
+
 // ---- Wishlist operations that couldn't run right away (e.g. a failed removal) ----
 
 /** Queues an operation. Opposite operations on the same album cancel each other out. */

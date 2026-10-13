@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { SCHEMA_VERSION, dequeueWishlistOp, emptyState, hiddenIn, migrateState, queueWishlistOp, todayKey } from '../src/lib/state.js';
+import { SCHEMA_VERSION, dequeueWishlistOp, emptyState, hiddenIn, migrateState, queueWishlistOp, reconcileWishlist, todayKey } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { wishlistOpInPage } from '../src/background/wishlist-in-page.js';
 
@@ -145,5 +145,36 @@ describe('hiddenIn', () => {
     assert.ok(hiddenIn(state, '2', { tags: ['industrial'] }));
     assert.ok(!hiddenIn(state, '2', { tags: ['metal'] }));
     assert.ok(!hiddenIn(state, '2', {}), 'not in the daily lists');
+  });
+});
+
+describe('reconcileWishlist', () => {
+  const stateWith = ({ wishlisted = [], pool = {}, sources = [], ids = [] }) => ({ ...emptyState(), wishlisted, pool, owned: { sources, ids } });
+  const album = (id) => ({ id, url: `https://a.bandcamp.com/album/${id}` });
+  const wished = (id) => ({ url: `https://a.bandcamp.com/album/${id}`, kind: 'wishlist' });
+
+  test('an album that Bandcamp has in the wishlist counts, even if the confirmation did not arrive in time', () => {
+    const state = stateWith({ pool: { 1: album('1') }, sources: [wished('1')] });
+    assert.equal(reconcileWishlist(state), true);
+    assert.deepEqual(state.wishlisted, ['1']);
+  });
+
+  test('an album taken out of the wishlist on Bandcamp is not remembered as wishlisted', () => {
+    const state = stateWith({ wishlisted: ['1', '2'], pool: { 1: album('1'), 2: album('2') }, sources: [wished('2')], ids: ['2'] });
+    reconcileWishlist(state);
+    assert.deepEqual(state.wishlisted, ['2']);
+  });
+
+  test('an album the pool does not know is left alone, and nothing changes when the record is right', () => {
+    const state = stateWith({ wishlisted: ['9', '2'], pool: { 2: album('2') }, sources: [wished('2')], ids: ['2'] });
+    assert.equal(reconcileWishlist(state), false);
+    assert.deepEqual(state.wishlisted, ['9', '2']);
+    assert.equal(reconcileWishlist({ ...emptyState(), owned: null }), false);
+  });
+
+  test('an album of the collection is not taken for a wishlist entry', () => {
+    const state = stateWith({ pool: { 3: album('3') }, sources: [{ url: 'https://a.bandcamp.com/album/3', kind: 'collection' }], ids: ['3'] });
+    reconcileWishlist(state);
+    assert.deepEqual(state.wishlisted, []);
   });
 });
