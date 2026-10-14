@@ -1,6 +1,10 @@
 # How to install Daily Recs for Bandcamp
 
-The extension is waiting for the Chrome Web Store review, so for now it is installed by hand. It takes about two minutes.
+## The easy way: the Chrome Web Store
+Install it from the [Chrome Web Store](https://chromewebstore.google.com/detail/fefclbgoafhlnelkmbhcjbafoimgnako) and click **Add to Chrome**. Chrome keeps it up to date by itself.
+
+## The manual way
+If you prefer to install it from a file, or want a version that is not in the store yet, it takes about two minutes. Extensions installed by hand do not update by themselves, and they do not share data with the store version (the Liked Songs of one are not in the other).
 
 **You need:** Google Chrome (or another Chromium browser, such as Edge or Brave) and a Bandcamp account, preferably with some albums in your collection or wishlist.
 
