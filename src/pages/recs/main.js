@@ -8,6 +8,7 @@ import { initPlayer, pause, playAlbum, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
+import { initNewDay } from './new-day.js';
 import { $ } from './dom.js';
 import { initViewSwitch } from './views.js';
 import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-actions.js';
@@ -93,6 +94,7 @@ async function init() {
 
   initViewSwitch(chooseView);
   initLanding(startFromLanding);
+  initNewDay(chooseView);
   $('play-all').addEventListener('click', () => togglePlay());
   $('album-grid').addEventListener('click', onGridClick);
 

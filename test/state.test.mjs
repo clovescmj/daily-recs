@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { SCHEMA_VERSION, dequeueWishlistOp, emptyState, hiddenIn, migrateState, queueWishlistOp, reconcileWishlist, todayKey } from '../src/lib/state.js';
+import { SCHEMA_VERSION, dequeueWishlistOp, emptyState, hiddenIn, migrateState, msUntilTomorrow, queueWishlistOp, reconcileWishlist, todayKey } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { wishlistOpInPage } from '../src/background/wishlist-in-page.js';
 
@@ -176,5 +176,13 @@ describe('reconcileWishlist', () => {
     const state = stateWith({ pool: { 3: album('3') }, sources: [{ url: 'https://a.bandcamp.com/album/3', kind: 'collection' }], ids: ['3'] });
     reconcileWishlist(state);
     assert.deepEqual(state.wishlisted, []);
+  });
+});
+
+describe('msUntilTomorrow', () => {
+  test('the time left until the next local midnight', () => {
+    assert.equal(msUntilTomorrow(new Date(2026, 9, 13, 23, 0, 0)), 3_600_000);
+    assert.equal(msUntilTomorrow(new Date(2026, 9, 13, 0, 0, 0)), 86_400_000);
+    assert.equal(msUntilTomorrow(new Date(2026, 11, 31, 12, 0, 0)), 12 * 3_600_000);
   });
 });

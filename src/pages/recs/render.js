@@ -36,14 +36,18 @@ function setEmpty(message) {
 const isFromToday = (list) => Boolean(list && list.date === todayKey());
 
 /** Today's list for a view ('best', 'surprise', or 'tags' with its genres), or null when it hasn't been built. */
-export function listFor(state, view, keys = []) {
+export function listFor(state, view, keys = [], { anyDay = false } = {}) {
   if (!state) return null;
   const list = view === 'surprise' ? state.surprise : view === 'tags' ? (state.tagLists || {})[tagListKey(keys)] : state.today;
-  return isFromToday(list) ? list : null;
+  return list && (anyDay || isFromToday(list)) ? list : null;
 }
 
 /** The list on screen. */
-export const currentList = (state) => listFor(state, session.view, session.tagKeys) || (session.view === 'best' || session.fresh ? null : listFor(state, 'best'));
+// (after midnight the list on screen stays until the user asks for the new ones: nothing is taken away from under the music)
+export const currentList = (state) => {
+  const anyDay = session.newDay;
+  return listFor(state, session.view, session.tagKeys, { anyDay }) || (session.view === 'best' || session.fresh ? null : listFor(state, 'best', [], { anyDay }));
+};
 
 /** Albums of the current list that should be on the page: not hidden (unless hidden during this visit). */
 function visibleAlbumIds(state, list) {

@@ -27,4 +27,8 @@ export const session = {
   fresh: true,
   /** True while a run is building a list: the loading box offers a song to listen to meanwhile. */
   running: false,
+  /** The day (todayKey) the lists on screen belong to. */
+  loadedDay: '',
+  /** True from the moment the day changes until the user asks for the new recommendations: the list on screen stays as it is, and the banner is showing. */
+  newDay: false,
 };

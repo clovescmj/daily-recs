@@ -5,6 +5,9 @@ import { normalizeTasteTags, splitMergedTags } from './taste-profile.js';
 export const SCHEMA_VERSION = 3;
 export const DAILY_COUNT = 50;
 
+/** Milliseconds until the next local midnight (when "today" becomes another day). */
+export const msUntilTomorrow = (now = new Date()) => new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+
 export const todayKey = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
