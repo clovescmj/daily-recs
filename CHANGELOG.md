@@ -4,7 +4,7 @@ Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a ne
 a small adjustment raises the patch number.
 
 ## Unreleased
-- A tab left open past midnight: a banner says "A new day has started. Reload to get today's recommendations." with a "Reload recommendations" button. Nothing changes on screen until it is clicked (the music and the list stay), and the click asks for today's list of the same kind the user was in (Best matches, Surprise me or the same genres). The banner is checked when the tab becomes visible or focused, and at midnight.
+- A tab left open past midnight: a banner says "A new day has started. Get today's recommendations." (with a smaller line saying that the list below will be replaced, and that the music keeps playing) and has a "Get new recs" button. Nothing changes on screen until it is clicked (the music and the list stay), and the click asks for today's list of the same kind the user was in (Best matches, Surprise me or the same genres). The banner is checked when the tab becomes visible or focused, and at midnight.
 - Liked Songs: "Export liked songs" at the bottom of the list saves a CSV file (artist, song, album, album link, album ID, track number). The footer now says "Saved in this browser · not synced". The file is built in the extension's page and saved by the browser; text that a spreadsheet would run as a formula is kept as text.
 - The dot of the toolbar icon follows the final design: a smaller symbol and an orange dot with a thick ring over its top right corner.
 
