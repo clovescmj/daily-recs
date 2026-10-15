@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import { MAX_DECISIONS, addDecision, decisionEntry, withReason } from '../src/lib/decisions.js';
+import { MAX_DECISIONS, addDecision, decisionEntry } from '../src/lib/decisions.js';
 
 const candidate = { srcs: { a: 3, b: 12 }, tags: ['postpunk', 'darkwave', 'ebm', 'synthpop'], hop: true };
 
@@ -22,14 +22,10 @@ describe('the record of decisions', () => {
     assert.equal(list[0].at, 5);
   });
 
-  test('the reason goes to the latest hide of that album, and only a known reason is accepted', () => {
-    let list = addDecision([], decisionEntry({ id: 7, kind: 'dislike', now: 1 }));
-    list = addDecision(list, decisionEntry({ id: 8, kind: 'dislike', now: 2 }));
-    list = addDecision(list, decisionEntry({ id: 7, kind: 'dislike', now: 3 }));
-    const marked = withReason(list, 7, 'genre');
-    assert.equal(marked[2].reason, 'genre');
-    assert.equal(marked[0].reason, undefined);
-    assert.equal(withReason(list, 7, 'because'), list);
-    assert.equal(withReason(list, 99, 'genre'), list);
+  test('the reason picked when hiding goes with the hide, and only a known reason on a hide is kept', () => {
+    assert.equal(decisionEntry({ id: 7, kind: 'dislike', reason: 'genre', now: 1 }).reason, 'genre');
+    assert.equal(decisionEntry({ id: 7, kind: 'dislike', reason: 'because', now: 1 }).reason, undefined);
+    assert.equal(decisionEntry({ id: 7, kind: 'dislike', now: 1 }).reason, undefined);
+    assert.equal(decisionEntry({ id: 7, kind: 'wish', reason: 'genre', now: 1 }).reason, undefined);
   });
 });

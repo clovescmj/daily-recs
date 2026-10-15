@@ -2,6 +2,8 @@
 // album, the reason they gave. It says which kind of album gets hidden, so the lists can be tuned. It is never sent anywhere.
 
 export const HIDE_REASONS = Object.freeze(['genre', 'sound', 'obscure', 'known']);
+/** What the menu of the hide button says for each reason, in the order it lists them. (The bar of the player repeats these: keep them in step.) */
+export const HIDE_REASON_LABELS = Object.freeze({ genre: 'Wrong genre', sound: 'Not my sound', obscure: 'Too obscure', known: 'Already know it' });
 export const MAX_DECISIONS = 1000;
 const KINDS = Object.freeze({ dislike: 'hide', undislike: 'unhide', wish: 'wish', unwish: 'unwish', save: 'save' });
 
@@ -20,27 +22,16 @@ export function describeCandidate(candidate, fit = null) {
 }
 
 /** One entry for the record, or null for a kind that is not recorded. */
-export function decisionEntry({ id, kind, view = 'best', candidate = null, fit = null, now = Date.now() }) {
+export function decisionEntry({ id, kind, view = 'best', candidate = null, fit = null, reason = '', now = Date.now() }) {
   const action = KINDS[kind];
   if (!action || !id) return null;
-  return { at: now, id: String(id), action, view, ...describeCandidate(candidate, fit) };
+  const entry = { at: now, id: String(id), action, view, ...describeCandidate(candidate, fit) };
+  if (action === 'hide' && HIDE_REASONS.includes(reason)) entry.reason = reason;   // (the reason picked in the menu of the hide button)
+  return entry;
 }
 
 /** The record with `entry` added, keeping the latest MAX_DECISIONS. */
 export function addDecision(list, entry) {
   if (!entry) return list || [];
   return [...(list || []), entry].slice(-MAX_DECISIONS);
-}
-
-/** The reason for the latest hide of `id`. Returns the new list, or the same list when there is no such hide (or the reason is not one of ours). */
-export function withReason(list, id, reason) {
-  if (!HIDE_REASONS.includes(reason)) return list || [];
-  const items = [...(list || [])];
-  for (let i = items.length - 1; i >= 0; i -= 1) {
-    if (items[i].id === String(id) && items[i].action === 'hide') {
-      items[i] = { ...items[i], reason };
-      return items;
-    }
-  }
-  return list || [];
 }

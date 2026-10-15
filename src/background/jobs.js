@@ -3,7 +3,7 @@
 // the queue and the in-flight map are just coordination for the current worker instance.
 import { applyFeedback, extendList, extendListMany, refresh, refreshTags } from '../lib/recommender.js';
 import { scanSources } from '../lib/scanner.js';
-import { addDecision, decisionEntry, withReason } from '../lib/decisions.js';
+import { addDecision, decisionEntry } from '../lib/decisions.js';
 import { dequeueWishlistOp, emptyState, queueWishlistOp } from '../lib/state.js';
 import { DECISIONS_KEY } from '../lib/storage-keys.js';
 import { tagFit } from '../lib/taste-profile.js';
@@ -129,29 +129,24 @@ export const runExtend = ({ view, tags, count = 1 }) => enqueue(async () => {
   return id ? [id] : [];
 });
 
-export const runFeedback = ({ id, kind, tags, index, track }) => enqueue(async () => {
+export const runFeedback = ({ id, kind, tags, index, track, reason }) => enqueue(async () => {
   const state = await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track });
-  await recordDecision(state, { id, kind, tags });
+  await recordDecision(state, { id, kind, tags, reason });
   await syncNow();
 });
 
 /** Remembers, on this computer, what was done with the album and what the album looked like (see lib/decisions.js). */
-async function recordDecision(state, { id, kind, tags = [] }) {
+async function recordDecision(state, { id, kind, tags = [], reason = '' }) {
   try {
     const candidate = state && state.pool && state.pool[id];
     const entry = decisionEntry({
-      id, kind, view: tags.length ? 'tags' : 'best', candidate, fit: candidate ? tagFit(state, candidate.tags) : null,
+      id, kind, view: tags.length ? 'tags' : 'best', candidate, fit: candidate ? tagFit(state, candidate.tags) : null, reason,
     });
     if (!entry) return;
     const stored = (await chrome.storage.local.get(DECISIONS_KEY))[DECISIONS_KEY];
     await chrome.storage.local.set({ [DECISIONS_KEY]: addDecision(stored, entry) });
   } catch { /* the record is a help for tuning: it never gets in the way */ }
 }
-
-export const runHideReason = ({ id, reason }) => enqueue(async () => {
-  const stored = (await chrome.storage.local.get(DECISIONS_KEY))[DECISIONS_KEY];
-  await chrome.storage.local.set({ [DECISIONS_KEY]: withReason(stored, id, reason) });
-});
 
 export const runWishlistQueue = (op) => enqueue(async () => {
   const state = await store.load();

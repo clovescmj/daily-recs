@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.1
+- The hide button (⊘) opens a list of reasons instead of hiding at once and showing chips afterwards: Wrong genre, Not my sound, Too obscure, Already know it, and Just hide it. It works on the cards, in the player bar and in the rows of the queue; taking an album back (when it is already hidden) is still one click. The reason goes with the hide in the local record of decisions.
+
 ## 1.4.0
 - Shuffle is a radio: one song from each album, and an album does not come back the same day (before: rounds that came back to albums with songs left). More albums are asked for in the background: 50 as soon as a list is loaded, and 50 more when 10 or fewer are left to play, up to 300 in a day. At the end of what is loaded the next button asks for more albums, or says there are none.
 - Skipping a song does not hide the album or teach the taste anything (as before; now it is a rule).

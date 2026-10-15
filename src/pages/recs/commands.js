@@ -2,6 +2,7 @@
 import { session } from './session.js';
 import { toast } from './toast.js';
 import * as player from './player.js';
+import { HIDE_REASONS } from '../../lib/decisions.js';
 import { exportLikedSongs } from './export.js';
 import { dislikeAlbum, saveAlbumSong, setSave, setWish, undoDislike } from './wishlist-actions.js';
 
@@ -9,7 +10,10 @@ const isFraction = (v) => typeof v === 'number' && Number.isFinite(v);
 const isAlbumId = (v) => (typeof v === 'string' || typeof v === 'number') && /^\d+$/.test(String(v));
 
 const isTrack = (v) => Boolean(v) && typeof v === 'object' && isAlbumId(v.id) && Number.isInteger(v.i) && v.i >= 0 && v.i < 1000;
-const targetId = (v) => (isAlbumId(v) ? String(v) : (player.currentAlbum() || {}).id);
+// (the heart and the hide button name an album by its id, or as { id, reason } from the menu of the hide button; nothing named: the one that plays)
+const albumOf = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v.id : v);
+const targetId = (v) => (isAlbumId(albumOf(v)) ? String(albumOf(v)) : (player.currentAlbum() || {}).id);
+const reasonOf = (v) => (v && typeof v === 'object' && HIDE_REASONS.includes(v.reason) ? v.reason : '');
 
 const COMMANDS = {
   toggle: () => player.togglePlay(),
@@ -34,7 +38,7 @@ const COMMANDS = {
   dislike: (v) => {
     const id = targetId(v);
     if (!id) return undefined;
-    return session.dislikedThisVisit.has(id) ? undoDislike(id) : dislikeAlbum(id);
+    return session.dislikedThisVisit.has(id) ? undoDislike(id) : dislikeAlbum(id, reasonOf(v));
   },
 };
 

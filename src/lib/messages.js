@@ -13,7 +13,6 @@ export const MSG = Object.freeze({
   EXTEND_LIST: 'extend-list',        // more albums at the end of a list: one when the user hides one, 50 at a time for the radio
   COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
-  HIDE_REASON: 'hide-reason',        // { id, reason }: why an album was hidden
 });
 
 export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish', 'save', 'unsave']);
@@ -38,8 +37,6 @@ export function parseMessage(raw) {
       };
     case MSG.COLOR_SCHEME:
       return { type: raw.type, dark: raw.dark === true };
-    case MSG.HIDE_REASON:
-      return id && HIDE_REASONS.includes(raw.reason) ? { type: raw.type, id, reason: raw.reason } : null;
     case MSG.OPEN_MAIN:
       return { type: raw.type };
     case MSG.FEEDBACK:
@@ -52,7 +49,9 @@ export function parseMessage(raw) {
         const track = typeof raw.track === 'string' ? raw.track.replace(/[\u0000-\u001f]/g, ' ').slice(0, 200) : '';
         return index < 0 ? null : { type: raw.type, id, kind: raw.kind, index, track };
       }
-      return tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
+      const message = tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
+      if (raw.kind === 'dislike' && HIDE_REASONS.includes(raw.reason)) message.reason = raw.reason;   // why it was hidden (the menu of the hide button)
+      return message;
     }
     case MSG.WISHLIST_OP:
     case MSG.WISHLIST_QUEUE: {

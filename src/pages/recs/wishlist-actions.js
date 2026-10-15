@@ -67,7 +67,7 @@ export async function saveAlbumSong(id) {
   await setSongs(songs.map((song) => ({ ...song, all: true })), true, 'Added album to Liked Songs');
 }
 
-export async function dislikeAlbum(id) {
+export async function dislikeAlbum(id, reason = '') {
   const ids = visibleCardIds();
   const nextId = ids[ids.indexOf(id) + 1];
   const wasPlaying = currentId() === id;
@@ -78,7 +78,7 @@ export async function dislikeAlbum(id) {
   // would only answer when it is done, and the music has to skip right now. The requests keep their order.
   // "Don't show music like this": the album, its artist and what is closely tied to it stop coming. Inside a genre list that holds only for lists
   // of those genres (the genres go along); anywhere else it holds everywhere. The wishlist is not touched: only the heart changes it.
-  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) }).catch(() => undefined);
+  const feedback = send({ type: MSG.FEEDBACK, id, kind: 'dislike', ...(reason ? { reason } : {}), ...(session.view === 'tags' ? { tags: session.tagKeys } : {}) }).catch(() => undefined);
   const replacement = requestReplacement();
   if (wasPlaying) {
     continueAfterRemoval(nextId);

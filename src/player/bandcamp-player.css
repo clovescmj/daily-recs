@@ -122,6 +122,10 @@
 #dr-player .queue .qact { flex: none; display: inline-flex; align-items: center; gap: var(--dr-icon-gap); }
 #dr-player .queue li.active, #dr-player .queue li:hover { background: var(--dr-hover); }
 #dr-player .queue-foot { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-top: 1px solid var(--dr-border-bar); font-size: var(--dr-font-s); color: var(--dr-text-muted); }
+/* the menu of the hide button: opens above the button, over the bar */
+#dr-player .dr-hide-menu { position: absolute; z-index: 120; min-width: 190px; } /* (over the queue and the Liked Songs panels: 111) */
+#dr-player .dr-hide-menu .dr-menu-row { width: 100%; background: none; border: 0; text-align: left; font: inherit; font-size: var(--dr-font-s); cursor: pointer; }
+#dr-player .dr-hide-menu .dr-hide-plain { border-top: 1px solid var(--dr-divider); color: var(--dr-text-muted); }
 #dr-player .l-export { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 #dr-player .l-export:hover { color: var(--dr-text); }
 #dr-player .l-export[hidden] { display: none; }
