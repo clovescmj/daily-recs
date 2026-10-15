@@ -21,6 +21,13 @@ export function cardHtml(album, { wished = false, saved = false, disliked }) {
       <a class="album-title" href="${url}" target="_blank" rel="noopener" data-open>${title}</a>
       <a class="album-artist" href="${url}" target="_blank" rel="noopener" data-open>${esc(album.artist)}</a>
       <div class="album-reason">${reason}${fans}</div>
+      <div class="hide-reasons" role="group" aria-label="Why did you hide it?">
+        <span class="hide-reasons-label">Why?</span>
+        <button type="button" data-reason="genre">Wrong genre</button>
+        <button type="button" data-reason="sound">Not my sound</button>
+        <button type="button" data-reason="obscure">Too obscure</button>
+        <button type="button" data-reason="known">Already know it</button>
+      </div>
       <div class="album-actions">
         <a href="#" class="dr-act dr-act--wish action-wishlist${wished ? ' is-on' : ''}" data-wish title="${wishlistText}" aria-label="${wishlistText}: ${title}">${labelledIcon(wished ? HEART_FILLED : HEART, wishlistText)}</a>
         <a href="#" class="dr-act dr-act--save action-save${saved ? ' is-on' : ''}" data-save title="${saveText}" aria-label="${saveText}: ${title}">${labelledIcon(saved ? CHECK_CIRCLE : ADD_CIRCLE, saveText)}</a>

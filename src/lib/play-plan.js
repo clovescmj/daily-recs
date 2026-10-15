@@ -4,14 +4,15 @@
 // per album in each round; when a round ends the next one starts over, until every song of every album has played.
 
 /** The first time an album plays it starts with the track the artist highlights; later ones are drawn from the songs that have not played. */
-export function createPlayPlan(random = Math.random) {
+export function createPlayPlan(random = Math.random, { songsPerAlbum = Infinity } = {}) {
   const played = new Map();   // album id -> Set of track numbers that have played
   const counts = new Map();   // album id -> how many tracks it has (known once it was opened)
   const pending = new Map();  // album id -> the track chosen for its next turn (kept, so what the queue shows is what plays)
   let round = [];             // shuffle: the albums of the current round, in order
 
   const playedOf = (id) => played.get(id) || new Set();
-  const done = (id) => counts.has(id) && playedOf(id).size >= counts.get(id);
+  // an album is done when all its songs played, or when `songsPerAlbum` of them did (radio: one song of each album, and it never comes back)
+  const done = (id) => playedOf(id).size >= Math.min(songsPerAlbum, counts.has(id) ? counts.get(id) : Infinity);
   const shuffled = (ids) => {
     const list = [...ids];
     for (let i = list.length - 1; i > 0; i -= 1) {
@@ -60,6 +61,9 @@ export function createPlayPlan(random = Math.random) {
 
     /** True while some song of the list has not played. */
     hasMore: (ids) => ids.some((id) => !done(id)),
+
+    /** How many albums of the list are not done yet. */
+    remaining: (ids) => ids.filter((id) => !done(id)).length,
 
     /** The album after `currentId` (starting a new round at the end of one), or null when every song has played. */
     next(mode, ids, currentId) {

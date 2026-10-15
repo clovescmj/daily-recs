@@ -92,3 +92,39 @@ describe('the play plan', () => {
     assert.deepEqual([...order].sort(), ['a', 'c', 'd']);
   });
 });
+
+describe('the radio: one song of each album', () => {
+  const seeded = (seed = 7) => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+  test('an album is done after one song, and it never comes back in a later round', () => {
+    const plan = createPlayPlan(seeded(), { songsPerAlbum: 1 });
+    const ids = ['a', 'b', 'c'];
+    const played = [];
+    let current = plan.next('shuffle', ids, null);
+    while (current) {
+      played.push(current);
+      plan.mark(current, plan.pick(current, 5, 2), 5);
+      current = plan.next('shuffle', ids, current);
+    }
+    assert.deepEqual([...played].sort(), ['a', 'b', 'c']);
+    assert.equal(plan.hasMore(ids), false);
+    assert.equal(plan.remaining(ids), 0);
+  });
+
+  test('albums that arrive later are played after the ones that were there', () => {
+    const plan = createPlayPlan(seeded(), { songsPerAlbum: 1 });
+    plan.mark('a', 0, 4);
+    plan.mark('b', 1, 4);
+    assert.equal(plan.remaining(['a', 'b']), 0);
+    assert.equal(plan.remaining(['a', 'b', 'c', 'd']), 2);
+    assert.ok(['c', 'd'].includes(plan.next('shuffle', ['a', 'b', 'c', 'd'], 'b')));
+  });
+
+  test('without the limit an album is done only when all its songs played (the plan of Full album is unchanged)', () => {
+    const plan = createPlayPlan(seeded());
+    plan.mark('a', 0, 2);
+    assert.equal(plan.remaining(['a']), 1);
+    plan.mark('a', 1, 2);
+    assert.equal(plan.remaining(['a']), 0);
+  });
+});

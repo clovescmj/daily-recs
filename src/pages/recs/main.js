@@ -73,9 +73,20 @@ function onGridClick(event) {
   } else if (event.target.closest('[data-dislike]')) {
     event.preventDefault();
     if (session.dislikedThisVisit.has(id)) undoDislike(id); else dislikeAlbum(id);
+  } else if (event.target.closest('[data-reason]')) {
+    pickHideReason(card, id, event.target.closest('[data-reason]').dataset.reason);
   } else if (event.target.closest('[data-open]')) {
     send({ type: MSG.MARK_OPENED, id });
   }
+}
+
+/** The reason for hiding an album: one click on a chip, sent to be kept with the record of what was hidden. */
+function pickHideReason(card, id, reason) {
+  card.querySelectorAll('[data-reason]').forEach((chip) => {
+    chip.classList.toggle('is-picked', chip.dataset.reason === reason);
+    chip.disabled = true;
+  });
+  send({ type: MSG.HIDE_REASON, id, reason }).catch(() => undefined);
 }
 
 /** This page only works inside the Bandcamp profile (the player bar and wishlist live there): if it was opened on its own, go there. */

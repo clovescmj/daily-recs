@@ -11,8 +11,11 @@ describe('parseMessage', () => {
     assert.deepEqual(parseMessage({ type: MSG.REFRESH, force: true, mode: 'surprise', junk: 1 }), { type: 'refresh', force: true, mode: 'surprise', tags: [] });
     assert.deepEqual(parseMessage({ type: MSG.REFRESH, mode: 'whatever' }), { type: 'refresh', force: false, mode: 'best', tags: [] });
     assert.deepEqual(parseMessage({ type: MSG.REFRESH, mode: 'tags', tags: ['metal', 'post punk!', 42, 'noise'] }), { type: 'refresh', force: false, mode: 'tags', tags: ['metal', 'noise'] });
-    assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'tags', tags: ['metal'] }), { type: 'extend-list', view: 'tags', tags: ['metal'] });
-    assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'x' }), { type: 'extend-list', view: 'best', tags: [] });
+    assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'tags', tags: ['metal'] }), { type: 'extend-list', view: 'tags', count: 1, tags: ['metal'] });
+    assert.equal(parseMessage({ type: MSG.EXTEND_LIST, count: 50 }).count, 50);
+    assert.equal(parseMessage({ type: MSG.EXTEND_LIST, count: 500 }).count, 1);
+    assert.equal(parseMessage({ type: MSG.EXTEND_LIST, count: 'x' }).count, 1);
+    assert.deepEqual(parseMessage({ type: MSG.EXTEND_LIST, view: 'x' }), { type: 'extend-list', view: 'best', count: 1, tags: [] });
     assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '123', kind: 'dislike' }), { type: 'feedback', id: '123', kind: 'dislike' });
     assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'save', index: 2, track: 'Song\nname' }), { type: 'feedback', id: '9', kind: 'save', index: 2, track: 'Song name' });
     assert.equal(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'save', index: -1, track: 'x' }), null, 'a track needs its number');

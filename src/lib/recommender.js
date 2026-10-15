@@ -449,6 +449,54 @@ export async function extendList({ fetch: fetchFn, store, view = 'best', tags = 
   }
 }
 
+const MANY_ROUNDS = 3;        // extendListMany: how many times it reads more albums before it gives up
+const MANY_TAG_CHECK = 160;   // how many leftovers get their genres checked in one round
+
+/**
+ * The radio: up to `count` new albums at the end of today's list for `view`, chosen by the same rules as the list itself (an album
+ * must fit the taste, a genre does not take over, one album per artist). The genres of the leftovers of the run are checked first; if
+ * that is not enough, more of the user's albums are read and the genres of what they recommend are checked, up to MANY_ROUNDS times.
+ * Returns the ids it added (fewer than `count`, or none, when there is nothing more that fits).
+ */
+export async function extendListMany({ fetch: fetchFn, store, view = 'best', tags = [], count = 50, now = new Date(), tuning }) {
+  const pacing = withDefaults(tuning);
+  const state = migrateState((await store.load()) || emptyState());
+  const today = todayKey(now);
+  const keys = [...new Set((tags || []).map(normalizeTag).filter(Boolean))].sort();
+  const list = view === 'surprise' ? state.surprise : view === 'tags' ? state.tagLists[tagListKey(keys)] : state.today;
+  if (!list || list.date !== today || !state.owned) return [];
+  const added = [];
+  const exclude = () => {
+    const ids = [...list.ids, ...added];
+    return { ids, artists: ids.map((id) => state.pool[id] && state.pool[id].artistId).filter(Boolean) };
+  };
+  const pick = (n) => (view === 'surprise' ? pickSurprise : view === 'tags' ? (s, c, e) => pickFocused(s, c, keys, e, { allowUnknown: false }) : pickBest)(state, n, exclude());
+
+  try {
+    for (let round = 0; round < MANY_ROUNDS && added.length < count; round++) {
+      await readCandidateTags(fetchFn, state, view === 'tags' ? EXTEND_TAG_CHECK : MANY_TAG_CHECK, () => {}, pacing);
+      for (const id of pick(count - added.length)) if (!added.includes(id) && !list.ids.includes(id)) added.push(id);
+      if (added.length >= count) break;
+      const unreadSeeds = () => seedsFor(state, keys).filter((source) => !state.sampled[source.url]).slice(0, EXTEND_READS);
+      let sources = view === 'tags' ? unreadSeeds() : pickSources(state, EXTEND_READS);
+      if (view === 'tags' && !sources.length) {
+        await scanSources({ fetch: fetchFn, state, count: EXTEND_SCAN, tuning: pacing, now: now.getTime() });
+        sources = unreadSeeds();
+      }
+      if (!sources.length) break;
+      await readWithProgress(fetchFn, state, sources, quiet, {}, pacing);
+    }
+    if (added.length) {
+      list.ids.push(...added);
+      markShown(state, added);
+    }
+    await store.save(state);
+    return added;
+  } catch {
+    return [];
+  }
+}
+
 async function rememberProfileUrl(fetchFn, state, store) {
   try {
     state.profileUrl = (await getFan(fetchFn)).profileUrl;

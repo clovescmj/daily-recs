@@ -2,7 +2,7 @@
 import { hiddenIn, tagListKey, todayKey } from '../../lib/state.js';
 import { cardHtml, findCard, paintDislike, paintSave, paintWish } from './cards.js';
 import { $ } from './dom.js';
-import { emit, markPlaying } from './player.js';
+import { emit, maintainRadio, markPlaying } from './player.js';
 import { session } from './session.js';
 import { renderStatus } from './status-line.js';
 import { renderViewSwitch } from './views.js';
@@ -93,5 +93,6 @@ export function render(state, status) {
   renderGrid(state, status);
   $('play-all').hidden = !session.hasList;
   emit(true);
+  maintainRadio();
   if (state && state.wishQueue && state.wishQueue.length) flushWishlistQueue();
 }

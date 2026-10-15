@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.0
+- Shuffle is a radio: one song from each album, and an album does not come back the same day (before: rounds that came back to albums with songs left). More albums are asked for in the background: 50 as soon as a list is loaded, and 50 more when 10 or fewer are left to play, up to 300 in a day. At the end of what is loaded the next button asks for more albums, or says there are none.
+- Skipping a song does not hide the album or teach the taste anything (as before; now it is a rule).
+- Lists fit better: an album only gets in when its genres were read and it shares one with the taste (Best matches and Surprise me no longer fill a list with albums whose genres are unknown), no genre (the first tag of an album) takes more than a fifth of a list (a third when the list would be short), and albums of the same genre are not put next to each other.
+- Hiding an album shows four chips on its card: Wrong genre, Not my sound, Too obscure, Already know it. The reason, with how much evidence the album had (sources, fans in common, genres, fit), is kept in a local record of decisions (up to 1000), never sent anywhere. It will be used to tune the lists.
+- About, What's new, privacy policy and store listing describe the radio, the rules of the lists and the record.
+
 ## 1.3.2
 - The toolbar icon with news is larger: the symbol uses the whole width of the icon (it was about 80% of it), with the dot over its top right corner.
 - The dot also goes away when the toolbar icon is clicked (before: only when "What's new" was opened, or after a week).

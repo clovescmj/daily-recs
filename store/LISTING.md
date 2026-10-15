@@ -21,7 +21,7 @@ New music every day, built from your own taste. Never shows what you already own
 > • My tags: albums with the genres you pick.
 > • Surprise me: albums from deeper in the same ranking, further from what you own. It never repeats Best matches.
 > • The heart adds an album to your Bandcamp wishlist. The + adds songs to Liked Songs, a list that stays in your browser and can be exported to a CSV file. The ⊘ hides an album, its artist and the albums Bandcamp pairs with it.
-> • A player in Bandcamp's style, with a queue, Liked Songs and media keys. Shuffle plays one song from each album, in random order, never the same song twice. While your first list loads, you can play a random song from your own collection.
+> • A player in Bandcamp's style, with a queue, Liked Songs and media keys. Shuffle works like a radio: one song from each album, in random order, an album does not come back the same day, and more albums load in the background as you listen. While your first list loads, you can play a random song from your own collection.
 > • The albums you hide sync between your computers through your Google account. Liked Songs stay in your browser, and the wishlist stays in your Bandcamp account.
 >
 > It runs in your browser and only talks to Bandcamp (bandcamp.com and the servers of its audio and covers). It uses the session you already have open and never sees your password. There are no analytics, no ads and no accounts. The About page (right-click the toolbar icon) has a button that clears everything it saved.

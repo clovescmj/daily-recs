@@ -27,7 +27,7 @@ const player = {
   message: '',          // error text for the bar
   waiting: false,       // a random song of the collection, played while a list is being built (it is not part of any list)
 };
-const plan = createPlayPlan();   // which songs have played (shuffle never plays one twice)
+const plan = createPlayPlan(Math.random, { songsPerAlbum: 1 });   // which songs have played: Shuffle is a radio, one song of each album, and an album does not come back
 const history = [];              // the songs that played, in order: { id, index } (the previous button goes back along it)
 const MODES = ['album', 'shuffle'];
 const PLAYED_KEY = 'playedToday';   // chrome.storage.local: what played today, so a reload of the page or of the extension does not forget it (only today's counts)
@@ -142,6 +142,7 @@ function playTrack(index) {
   setMediaSession();
   markPlaying();
   emit(true);
+  maintainRadio();
 }
 
 export async function playAlbum(id, startIndex = null) {
@@ -285,9 +286,15 @@ export function nextTrack() {
   return next && playAlbum(next);
 }
 
-function skipAlbum() {
+async function skipAlbum() {
   if (!player.current.id) return startFirst();
-  const next = albumAfter(player.current.id);
+  const after = () => { const id = albumAfter(player.current.id); return id === player.current.id ? null : id; };   // (never the album that plays)
+  let next = after();
+  if (!next && player.mode === 'shuffle') {   // the end of what is loaded: the radio asks for the next batch (or it is already on its way)
+    toast('Loading more albums…');
+    if (await moreForRadio()) next = after();
+    else toast('No more albums for today. Come back tomorrow, or pick another list.');
+  }
   return next && playAlbum(next);
 }
 
@@ -324,6 +331,61 @@ export function setMode(mode) {
   if (changed) toast(MODE_NOTICE[mode]); // (clicking the mode that is already on says nothing)
   try { localStorage.setItem(MODE_KEY, player.mode); } catch { /* storage unavailable */ }
   emit(true);
+}
+
+// ── The radio: more albums are asked for in the background, so the list does not end ────────────────────────────────
+
+const RADIO_BATCH = 50;                       // albums asked for at a time
+const RADIO_LOW = 10;                         // when this few albums are left to play, the next batch is asked for
+const RADIO_MAX = 300;                        // a list never grows past this many albums in a day
+const RADIO_RETRY_MS = 10 * 60 * 1000;        // after a batch that brought nothing, nothing is asked for again for a while
+let radioBusy = false;
+let radioPausedUntil = 0;
+let radioPrimed = '';                         // the list that already got its first extra batch
+
+const sleepMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** The cards of new albums arrive through the storage change: waits (a few seconds at most) until they are on the page. */
+async function waitForCards(ids) {
+  for (let i = 0; i < 25 && !ids.every((id) => findCard(id)); i += 1) await sleepMs(200);
+}
+
+/** Asks for the next batch in the background. Resolves with the ids that were added (none when nothing more fits). */
+async function loadMoreAlbums() {
+  if (radioBusy) return [];
+  radioBusy = true;
+  try {
+    const reply = await send({ type: MSG.EXTEND_LIST, view: session.view, tags: session.tagKeys, count: RADIO_BATCH });
+    const ids = reply && reply.ok && Array.isArray(reply.ids) ? reply.ids : [];
+    if (ids.length) await waitForCards(ids); else radioPausedUntil = Date.now() + RADIO_RETRY_MS;
+    return ids;
+  } catch {
+    radioPausedUntil = Date.now() + RADIO_RETRY_MS;
+    return [];
+  } finally {
+    radioBusy = false;
+  }
+}
+
+/** The list ran out while a batch is being loaded (or none was): waits for it. True when there are albums to play again. */
+async function moreForRadio() {
+  for (let i = 0; i < 400 && radioBusy; i += 1) await sleepMs(300);
+  const others = () => visibleCardIds().filter((id) => id !== player.current.id);
+  if (plan.remaining(others()) > 0) return true;
+  return (await loadMoreAlbums()).length > 0;
+}
+
+/** Called when a list is drawn and when a song starts: keeps albums ahead, so the list does not end. */
+export function maintainRadio() {
+  if (radioBusy || Date.now() < radioPausedUntil || player.waiting) return;
+  if (!session.hasList || session.pending || session.landing || session.newDay) return;
+  const ids = visibleCardIds();
+  if (!ids.length || ids.length >= RADIO_MAX) return;
+  const listKey = `${session.view}|${session.tagKeys.join('+')}|${session.loadedDay}`;
+  const first = radioPrimed !== listKey && ids.length <= RADIO_BATCH;   // a list that was just loaded gets a batch at once
+  if (!first && plan.remaining(ids) > RADIO_LOW) return;
+  radioPrimed = listKey;
+  loadMoreAlbums();
 }
 
 /** The album that was playing was removed from the list: move on. */
@@ -493,7 +555,8 @@ function canGoBack() {
 function canGoForward(albumIndex) {
   const { current } = player;
   if (player.waiting) return true;
-  if (player.mode !== 'album') return plan.hasMore(visibleCardIds());
+  // Shuffle is a radio: at the end of what is loaded the button stays on, and asks for more albums (or says there are none)
+  if (player.mode !== 'album') return plan.hasMore(visibleCardIds()) || visibleCardIds().length < RADIO_MAX;
   return current.index + 1 < current.tracks.length || albumIndex + 1 < visibleCardIds().length;
 }
 

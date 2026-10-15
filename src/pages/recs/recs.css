@@ -220,6 +220,14 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .album-card.is-disliked:hover :is(.album-title, .album-artist, .album-reason) { opacity: .7; }
 .album-card.is-disliked .cover-play { display: none; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
+/* after hiding an album: one click says why (it is kept on this computer, to tune the lists) */
+.hide-reasons { display: none; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-top: 6px; font-size: var(--dr-font-s); }
+.album-card.is-disliked .hide-reasons { display: flex; }
+.hide-reasons-label { color: var(--muted); }
+.hide-reasons button { background: none; border: 1px solid var(--dr-border-soft); border-radius: 999px; padding: 1px 8px; font: inherit; color: var(--muted); cursor: pointer; }
+.hide-reasons button:hover:not(:disabled) { border-color: var(--dr-border); color: var(--dr-text); }
+.hide-reasons button:disabled { cursor: default; opacity: .5; }
+.hide-reasons button.is-picked { opacity: 1; color: var(--dr-text); border-color: var(--dr-border); }
 
 /* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
 .album-actions { margin-top: auto; padding-top: 8px; font-size: var(--dr-font-base); color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: var(--dr-icon-gap); }

@@ -33,9 +33,13 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
       case MSG.WISHLIST_QUEUE: await jobs.runWishlistQueue(message); break;
       case MSG.WISHLIST_DONE: await jobs.runWishlistDone(message.id); break;
       case MSG.OPEN_MAIN: await openMain(); break;
-      case MSG.EXTEND_LIST: return { ok: true, id: await jobs.runExtend(message) };
+      case MSG.EXTEND_LIST: {
+        const ids = await jobs.runExtend(message);
+        return message.count > 1 ? { ok: true, ids } : { ok: true, id: ids[0] || null };
+      }
       case MSG.COLOR_SCHEME: await setScheme(message.dark); break;
       case MSG.MARK_OPENED: await jobs.runMarkOpened(message.id); break;
+      case MSG.HIDE_REASON: await jobs.runHideReason(message); break;
       case MSG.WISHLIST_OP: return runInPage(sender.tab.id, message);
       default: return { ok: false, error: 'unknown message' };
     }

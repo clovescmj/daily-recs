@@ -1,6 +1,7 @@
 // Message protocol between the extension's pages / content script and the service worker.
 // Every message is validated and normalised here before it is acted upon (the sender is checked in the service worker).
 import { toNumericId } from './bandcamp.js';
+import { HIDE_REASONS } from './decisions.js';
 
 export const MSG = Object.freeze({
   REFRESH: 'refresh',
@@ -9,13 +10,15 @@ export const MSG = Object.freeze({
   WISHLIST_QUEUE: 'wishlist-queue',  // remember an operation for later (a failure)
   WISHLIST_DONE: 'wishlist-done',
   MARK_OPENED: 'mark-opened',
-  EXTEND_LIST: 'extend-list',        // one more album at the end of a list (when the user hides one)
+  EXTEND_LIST: 'extend-list',        // more albums at the end of a list: one when the user hides one, 50 at a time for the radio
   COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
+  HIDE_REASON: 'hide-reason',        // { id, reason }: why an album was hidden
 });
 
 export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish', 'save', 'unsave']);
 export const WISHLIST_OPS = Object.freeze(['add', 'remove']);
+export const MAX_EXTEND_COUNT = 60;   // albums asked for at once at the end of a list (the radio asks for 50)
 
 /** Returns the normalised message, or null if it isn't a well-formed message of ours. */
 export function parseMessage(raw) {
@@ -30,10 +33,13 @@ export function parseMessage(raw) {
     case MSG.EXTEND_LIST:
       return {
         type: raw.type, view: ['surprise', 'tags'].includes(raw.view) ? raw.view : 'best',
+        count: Number.isInteger(raw.count) && raw.count >= 1 && raw.count <= MAX_EXTEND_COUNT ? raw.count : 1,
         tags: Array.isArray(raw.tags) ? raw.tags.filter((tag) => typeof tag === 'string' && /^[\p{L}\p{N}]{1,40}$/u.test(tag)).slice(0, 5) : [],
       };
     case MSG.COLOR_SCHEME:
       return { type: raw.type, dark: raw.dark === true };
+    case MSG.HIDE_REASON:
+      return id && HIDE_REASONS.includes(raw.reason) ? { type: raw.type, id, reason: raw.reason } : null;
     case MSG.OPEN_MAIN:
       return { type: raw.type };
     case MSG.FEEDBACK:

@@ -1,9 +1,12 @@
 // Everything that reads or writes the state goes through one queue, so a like clicked during a refresh is never lost.
 // The service worker can be terminated at any time, so nothing here is kept only in memory in a way that matters:
 // the queue and the in-flight map are just coordination for the current worker instance.
-import { applyFeedback, extendList, refresh, refreshTags } from '../lib/recommender.js';
+import { applyFeedback, extendList, extendListMany, refresh, refreshTags } from '../lib/recommender.js';
 import { scanSources } from '../lib/scanner.js';
+import { addDecision, decisionEntry, withReason } from '../lib/decisions.js';
 import { dequeueWishlistOp, emptyState, queueWishlistOp } from '../lib/state.js';
+import { DECISIONS_KEY } from '../lib/storage-keys.js';
+import { tagFit } from '../lib/taste-profile.js';
 import { syncState } from '../lib/taste-sync.js';
 import { loadStatus, markOpened, store, todaySummary } from './storage.js';
 import { pendingWhatsNew } from './icon.js';
@@ -118,14 +121,36 @@ export const runScan = () => enqueue(async () => {
 });
 
 /** One more album for the end of a list. Resolves with its id, or null. Never shown as progress: it happens in the background. */
-export const runExtend = ({ view, tags }) => enqueue(async () => {
-  if (await isCoolingDown()) return null;
-  return extendList({ fetch: (...args) => fetch(...args), store, view, tags });
+export const runExtend = ({ view, tags, count = 1 }) => enqueue(async () => {
+  if (await isCoolingDown()) return [];
+  const fetchFn = (...args) => fetch(...args);
+  if (count > 1) return extendListMany({ fetch: fetchFn, store, view, tags, count });
+  const id = await extendList({ fetch: fetchFn, store, view, tags });
+  return id ? [id] : [];
 });
 
 export const runFeedback = ({ id, kind, tags, index, track }) => enqueue(async () => {
-  await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track });
+  const state = await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track });
+  await recordDecision(state, { id, kind, tags });
   await syncNow();
+});
+
+/** Remembers, on this computer, what was done with the album and what the album looked like (see lib/decisions.js). */
+async function recordDecision(state, { id, kind, tags = [] }) {
+  try {
+    const candidate = state && state.pool && state.pool[id];
+    const entry = decisionEntry({
+      id, kind, view: tags.length ? 'tags' : 'best', candidate, fit: candidate ? tagFit(state, candidate.tags) : null,
+    });
+    if (!entry) return;
+    const stored = (await chrome.storage.local.get(DECISIONS_KEY))[DECISIONS_KEY];
+    await chrome.storage.local.set({ [DECISIONS_KEY]: addDecision(stored, entry) });
+  } catch { /* the record is a help for tuning: it never gets in the way */ }
+}
+
+export const runHideReason = ({ id, reason }) => enqueue(async () => {
+  const stored = (await chrome.storage.local.get(DECISIONS_KEY))[DECISIONS_KEY];
+  await chrome.storage.local.set({ [DECISIONS_KEY]: withReason(stored, id, reason) });
 });
 
 export const runWishlistQueue = (op) => enqueue(async () => {
