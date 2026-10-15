@@ -3,6 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.3.2
+- The toolbar icon with news is larger: the symbol uses the whole width of the icon (it was about 80% of it), with the dot over its top right corner.
+- The dot also goes away when the toolbar icon is clicked (before: only when "What's new" was opened, or after a week).
+- Starting from "My tags" keeps "My tags" as the active list in the toggle even when the run ends without a list (an error, or no album of that genre) or the list arrives later; before, the toggle fell back to "Best matches".
+
 ## 1.3.1
 - A tab left open past midnight: a banner says "A new day has started. Get today's recommendations." (with a smaller line saying that the current list will be replaced) and has a "Get new recs" button. Nothing changes on screen until it is clicked (the music and the list stay), and the click asks for today's list of the same kind the user was in (Best matches, Surprise me or the same genres). The banner is checked when the tab becomes visible or focused, and at midnight.
 - Liked Songs: "Export liked songs" at the bottom of the list saves a CSV file (artist, song, album, album link, album ID, track number). The footer now says "Saved in this browser · not synced". The file is built in the extension's page and saved by the browser; text that a spreadsheet would run as a formula is kept as text.

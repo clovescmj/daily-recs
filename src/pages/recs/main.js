@@ -9,6 +9,7 @@ import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
 import { initNewDay } from './new-day.js';
+import { pendingOutcome } from '../../lib/pending.js';
 import { $ } from './dom.js';
 import { initViewSwitch } from './views.js';
 import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-actions.js';
@@ -17,14 +18,14 @@ import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-ac
 function resolvePending(state, status) {
   const pending = session.pending;
   if (!pending) return;
-  if (status.running) { pending.sawRunning = true; return; }
-  if (listFor(state, pending.view, pending.keys)) {
-    session.view = pending.view;
-    session.tagKeys = pending.keys;
-    session.pending = null;
-  } else if (pending.sawRunning) {
-    session.pending = null; // the run ended without a list (an error, or no album of that genre): the status box says why
-  }
+  const outcome = pendingOutcome(pending, { hasList: Boolean(listFor(state, pending.view, pending.keys)), running: Boolean(status.running) });
+  if (outcome === 'running') pending.sawRunning = true;
+  if (outcome !== 'ready' && outcome !== 'ended') return;
+  // The choice stays the active one in both cases: with a list it is shown, and when the run ended without one (an error, or no album of
+  // that genre) the status box says why, while the toggle still shows what the user asked for (not the list that was there before).
+  session.view = pending.view;
+  session.tagKeys = pending.keys;
+  session.pending = null;
 }
 
 async function refreshView() {

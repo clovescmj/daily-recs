@@ -5,8 +5,12 @@ import { WHATS_NEW_KEY } from '../lib/storage-keys.js';
 
 const SCHEME_KEY = 'colorScheme';   // true when the browser reported dark mode
 const DOT_COLOR = '#FF7300';
-const BOX_WIDTH = 198;
-const BOX_HEIGHT = 206;
+// The part of the 198 x 206 drawing that is used: the symbol (x 16 to 182, y 54 to 152) and the dot (up to x 191, ring up to y 29),
+// so the symbol is as large as the icon allows.
+const CROP_X = 16;
+const CROP_Y = 29;
+const CROP_WIDTH = 175;
+const CROP_HEIGHT = 123;
 const DOT_X = 168;
 const DOT_Y = 60;
 const DOT_RADIUS = 23;              // the orange part; the ring around it is 8 units wide
@@ -29,7 +33,7 @@ export async function pendingWhatsNew() {
 }
 
 /**
- * The icon with news: the symbol a little smaller and an orange dot over its top right corner, in a box of 198 x 206 units (as designed).
+ * The icon with news: the symbol and an orange dot over its top right corner (as designed, in units of a 198 x 206 drawing).
  * It is drawn from the paths of the icon files, because Chrome has no way to put a dot on an icon. The ring around the dot is cut out, so
  * it takes the colour of the toolbar, light or dark.
  */
@@ -38,8 +42,8 @@ function iconWithDot(dark) {
   for (const size of [16, 32]) {
     const canvas = new OffscreenCanvas(size, size);
     const context = canvas.getContext('2d');
-    const scale = size / BOX_HEIGHT;
-    context.setTransform(scale, 0, 0, scale, (size - BOX_WIDTH * scale) / 2, 0);
+    const scale = size / CROP_WIDTH;
+    context.setTransform(scale, 0, 0, scale, -CROP_X * scale, (size - CROP_HEIGHT * scale) / 2 - CROP_Y * scale);
     context.fillStyle = dark ? '#ffffff' : '#111111';
     context.fill(new Path2D(SYMBOL_PATH));
     context.globalCompositeOperation = 'destination-out';

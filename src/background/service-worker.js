@@ -43,7 +43,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === RETRY_ALARM) retryAfterRateLimit();
   else if (alarm.name === SCAN_ALARM) runScan();
 });
-chrome.action.onClicked.addListener(openMainPage);
+chrome.action.onClicked.addListener(() => {
+  chrome.storage.local.remove(WHATS_NEW_KEY);   // the user came to the extension: the dot has done its job
+  return openMainPage();
+});
 // After the toolbar icon sent a signed-out user to Bandcamp's login page, take that tab on to "daily recs" once they're in.
 chrome.tabs.onUpdated.addListener(continueAfterLogin);
 chrome.tabs.onRemoved.addListener(forgetLoginTab);
