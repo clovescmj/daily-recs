@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.3
+- What's new: the 1.4 entry is about the rules for what gets into a list and the number of albums (the stricter genre rule, the limit per genre, 50 more albums in the background, the radio, shorter lists when few albums fit).
+
 ## 1.4.2
 - The hide button (⊘) hides at once again and applies the rule as before (the album, its artist and the albums Bandcamp pairs with it stop coming): the list of reasons of 1.4.1 and the reasons of 1.4.0 are gone, with the messages and styles that went with them. The local record of what was hidden, wishlisted or liked stays (without a reason).
 
