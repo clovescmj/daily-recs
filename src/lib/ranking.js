@@ -1,7 +1,7 @@
 // Pure ranking and selection logic (no I/O). Everything here works on the persisted state.
 import { hashSource } from './taste-sync.js';
 import { isBandcampUrl, normalizeTag } from './bandcamp.js';
-import { createSourceWeigher, savedAlbumIds, tagFit, tagShare } from './taste-profile.js';
+import { GENERIC_GENRES, createSourceWeigher, savedAlbumIds, tagFit, tagShare } from './taste-profile.js';
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Ownership lookup: Sets are built once per `owned` snapshot instead of scanning arrays for every candidate.
@@ -39,6 +39,8 @@ const TAG_CAP_SLACK = 1.5;         // a genre may take up to 1.5x its share of t
 const MIN_TAG_CAP = 2;
 const BROAD_TAG_SHARE = 0.4;       // tags this common ("electronic") are not limited: they say little and don't distort a list
 const MAX_SOURCES_PER_ARTIST = 2;  // an artist's albums recommend the same things: more than two add nothing
+const MAX_GENRE_SHARE = 0.2;       // one genre (the first tag of an album) takes at most a fifth of a list...
+const RELAXED_GENRE_SHARE = 0.35;  // ...and a little more when that would leave the list short
 
 /** Net taste points of a source: likes that came from it minus dislikes that came from it. */
 export const sourceNet = (state, sourceUrl) => {
@@ -100,6 +102,24 @@ export function rankedCandidates(state, exclude = {}) {
     .map(({ candidate }) => candidate);
 }
 
+/** The genre an album is filed under: its first tag that says something (not "electronic"), or '' when its tags are not known. */
+const genreOf = (candidate) => ((candidate && candidate.tags) || []).map(normalizeTag).find((tag) => tag && !GENERIC_GENRES.has(tag)) || '';
+
+/** Moves albums so that two of the same genre do not come one after the other (the order is otherwise kept). */
+export function spreadByGenre(ids, genreFor) {
+  const rest = [...ids];
+  const out = [];
+  let last = null;
+  while (rest.length) {
+    let at = rest.findIndex((id) => genreFor(id) === '' || genreFor(id) !== last);
+    if (at < 0) at = 0;
+    const [id] = rest.splice(at, 1);
+    out.push(id);
+    last = genreFor(id);
+  }
+  return out;
+}
+
 /**
  * Keeps a list in proportion to the user's taste. Recommendations from Bandcamp tend to pile up in a few popular
  * neighbourhoods (say, darkwave next to post-punk and EBM), so without a limit one of them can take a quarter of the
@@ -125,17 +145,34 @@ function pickInProportion(state, order, count, onPick = () => {}) {
   const limiter = createTagLimiter(state, count);
   const artists = new Set();
   const picks = [];
-  const take = (candidate) => { artists.add(candidate.artistId); picks.push(candidate.id); limiter.take(candidate); onPick(candidate); };
-  for (const candidate of order) {
-    if (picks.length >= count) break;
-    if (artists.has(candidate.artistId) || (hasProfile && !limiter.allows(candidate))) continue;
-    take(candidate);
+  const genres = new Map();
+  const take = (candidate) => {
+    artists.add(candidate.artistId); picks.push(candidate.id); limiter.take(candidate); onPick(candidate);
+    const genre = genreOf(candidate);
+    if (genre) genres.set(genre, (genres.get(genre) || 0) + 1);
+  };
+  const genreFull = (candidate, share) => {
+    const genre = genreOf(candidate);
+    return Boolean(genre) && (genres.get(genre) || 0) >= Math.max(MIN_TAG_CAP, Math.ceil(count * share));
+  };
+  // Four passes, from the strictest to the loosest, until the list is full: (1) in proportion to the library and no genre above a fifth
+  // of the list; (2) the same with a genre allowed up to about a third; (3) only the proportion to the library; (4) one album per artist.
+  const passes = [
+    { proportional: true, share: MAX_GENRE_SHARE },
+    { proportional: true, share: RELAXED_GENRE_SHARE },
+    { proportional: true, share: 1 },
+    { proportional: false, share: 1 },
+  ];
+  for (const { proportional, share } of passes) {
+    for (const candidate of order) {
+      if (picks.length >= count) break;
+      if (artists.has(candidate.artistId)) continue;
+      if (proportional && hasProfile && !limiter.allows(candidate)) continue;
+      if (genreFull(candidate, share)) continue;
+      take(candidate);
+    }
   }
-  for (const candidate of order) { // relax the genre limit
-    if (picks.length >= count) break;
-    if (!artists.has(candidate.artistId)) take(candidate);
-  }
-  return picks;
+  return spreadByGenre(picks, (id) => genreOf(state.pool[id]));
 }
 
 const SAMPLE_DEPTH = 3;   // "Best matches" draws from the top 3 × the list size, not only from the very top
@@ -152,7 +189,12 @@ function sampleFromTop(ranked, count) {
 
 /** "Best matches": good candidates drawn from the top of the ranking, one per artist, kept in proportion to the user's taste. */
 export function pickBest(state, count, exclude) {
-  const ranked = rankedCandidates(state, exclude);
+  const all = rankedCandidates(state, exclude);
+  // With a taste profile an album must share a genre with it (its tags known and one of them in the profile): "nothing to do with
+  // what I have" never gets in. If no tag could be read at all, the ranking alone is used rather than returning nothing.
+  const hasProfile = Object.keys(state.tasteTags || {}).length > 0;
+  const fitting = hasProfile ? all.filter((candidate) => (tagFit(state, candidate.tags) ?? 0) > 0) : all;
+  const ranked = fitting.length ? fitting : all;
   const picks = pickInProportion(state, sampleFromTop(ranked, count), count);
   for (const candidate of ranked) { // last resort: repeated artists
     if (picks.length >= count) break;
@@ -168,16 +210,15 @@ export function pickBest(state, count, exclude) {
 export function pickSurprise(state, count, exclude) {
   const ranked = rankedCandidates(state, exclude);
   // Surprising is not random: it must share something with the user's taste, and not come from rejected sources.
-  // Albums whose tags are unknown only fill in when there aren't enough known ones.
+  // Albums whose tags were not read are never taken on trust to fill the list: a short list makes the run read more albums and check
+  // their genres (see refresh in recommender.js).
   const notRejected = (candidate) => candidateNet(candidate, state) >= 0;
   const fits = (candidate) => notRejected(candidate) && (tagFit(state, candidate.tags) ?? 0) > 0;
-  const unknown = (candidate) => notRejected(candidate) && tagFit(state, candidate.tags) === null;
   const hasProfile = Object.keys(state.tasteTags || {}).length > 0;
   const acceptable = hasProfile ? fits : notRejected;
   const deeper = shuffle(ranked.slice(count).filter(acceptable));
   const top = shuffle(ranked.slice(0, count).filter(acceptable)); // fallback when the deeper part is small
-  const fillers = hasProfile ? shuffle(ranked.filter(unknown)) : [];
-  return pickInProportion(state, [...deeper, ...top, ...fillers], count, (candidate) => { candidate.surprise = true; });
+  return pickInProportion(state, [...deeper, ...top], count, (candidate) => { candidate.surprise = true; });
 }
 
 /** Random order where heavier items tend to come first (weighted sampling without replacement). */

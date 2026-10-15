@@ -4,7 +4,7 @@ import { emptyState, migrateState, rollShownOver } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { createSourceWeigher } from '../src/lib/taste-profile.js';
 import {
-  candidateNet, isOwned, markShown, pickBest, pickFocused, pickSources, pickSurprise, score, sourceNet,
+  candidateNet, isOwned, markShown, pickBest, pickFocused, pickSources, pickSurprise, score, sourceNet, spreadByGenre,
 } from '../src/lib/ranking.js';
 
 const candidate = (id, artistId, srcs) => ({ id, artistId, title: `T${id}`, artist: `A${artistId}`, url: `https://c.bandcamp.com/album/${id}`, srcs });
@@ -258,5 +258,50 @@ describe('lists stay in proportion to the user taste', () => {
     assert.equal(state.tasteTags.ebm, 39);
     assert.equal(state.tasteTags.darkwave, 10);
     assert.equal(Object.keys(state.tasteTags).length, 2);
+  });
+});
+
+describe('a list that fits and varies', () => {
+  const album = (n, tags, srcs = { s1: 3 }) => ({ id: String(n), artistId: `a${n}`, title: `T${n}`, artist: `A${n}`, url: `https://c.bandcamp.com/album/${n}`, srcs, tags });
+  const profileState = () => {
+    const state = stateWith([]);
+    state.tasteTags = { postpunk: 20, darkwave: 20, ebm: 20, synthpop: 20 };
+    for (let i = 0; i < 100; i++) state.sampled[`https://s${i}.bandcamp.com/a`] = 1;
+    return state;
+  };
+
+  test('an album that shares no genre with the taste, or whose tags were not read, does not get in', () => {
+    const state = profileState();
+    for (let i = 0; i < 6; i++) state.pool[`f${i}`] = album(`f${i}`, ['postpunk']);
+    state.pool.x1 = album('x1', ['bossa nova'], { s1: 9, s2: 9, s3: 9 });   // ranks high, but nothing to do with the taste
+    state.pool.x2 = album('x2', undefined, { s1: 9, s2: 9, s3: 9 });        // tags not read
+    const picks = pickBest(state, 6);
+    assert.equal(picks.length, 6);
+    assert.ok(!picks.includes('x1') && !picks.includes('x2'));
+  });
+
+  test('without a single album with known tags, the ranking alone is used', () => {
+    const state = profileState();
+    for (let i = 0; i < 4; i++) state.pool[`n${i}`] = album(`n${i}`, undefined);
+    assert.equal(pickBest(state, 4).length, 4);
+  });
+
+  test('one genre does not take more than about a fifth of the list while others are available', () => {
+    const state = profileState();
+    for (let i = 0; i < 40; i++) state.pool[`p${i}`] = album(`p${i}`, ['postpunk'], { s1: 9, s2: 9 });   // ranks first
+    for (let i = 0; i < 10; i++) state.pool[`d${i}`] = album(`d${i}`, ['darkwave']);
+    for (let i = 0; i < 10; i++) state.pool[`e${i}`] = album(`e${i}`, ['ebm']);
+    for (let i = 0; i < 10; i++) state.pool[`y${i}`] = album(`y${i}`, ['synthpop']);
+    const picks = pickBest(state, 20);
+    assert.equal(picks.length, 20);
+    const first = picks.filter((id) => id.startsWith('p')).length;
+    assert.ok(first <= 7, `postpunk: ${first}`);   // a third of 20, at most (the fifth is relaxed only when it has to)
+  });
+
+  test('two albums of the same genre are not put next to each other when it can be avoided', () => {
+    const genre = { a: 'x', b: 'x', c: 'y', d: 'x', e: 'y' };
+    const spread = spreadByGenre(['a', 'b', 'c', 'd', 'e'], (id) => genre[id]);
+    assert.deepEqual([...spread].sort(), ['a', 'b', 'c', 'd', 'e']);
+    for (let i = 1; i < spread.length; i += 1) assert.notEqual(genre[spread[i]], genre[spread[i - 1]]);
   });
 });
