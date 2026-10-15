@@ -220,11 +220,6 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .album-card.is-disliked:hover :is(.album-title, .album-artist, .album-reason) { opacity: .7; }
 .album-card.is-disliked .cover-play { display: none; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
-/* the menu of the hide button: why it is hidden (kept on this computer, to tune the lists) */
-.hide-menu { z-index: 30; min-width: 190px; }
-.hide-menu .dr-menu-row { width: 100%; background: none; border: 0; text-align: left; font: inherit; font-size: var(--dr-font-s); }
-.hide-menu .dr-menu-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.hide-menu .hide-menu-plain { border-top: 1px solid var(--dr-divider); color: var(--muted); }
 
 /* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
 .album-actions { margin-top: auto; padding-top: 8px; font-size: var(--dr-font-base); color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: var(--dr-icon-gap); }

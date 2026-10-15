@@ -9,7 +9,6 @@ import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
 import { initNewDay } from './new-day.js';
-import { openHideMenu } from './hide-menu.js';
 import { pendingOutcome } from '../../lib/pending.js';
 import { $ } from './dom.js';
 import { initViewSwitch } from './views.js';
@@ -73,8 +72,7 @@ function onGridClick(event) {
     saveAlbumSong(id);
   } else if (event.target.closest('[data-dislike]')) {
     event.preventDefault();
-    if (session.dislikedThisVisit.has(id)) undoDislike(id);
-    else openHideMenu(event.target.closest('[data-dislike]'), (reason) => dislikeAlbum(id, reason));   // the button asks why first
+    if (session.dislikedThisVisit.has(id)) undoDislike(id); else dislikeAlbum(id);
   } else if (event.target.closest('[data-open]')) {
     send({ type: MSG.MARK_OPENED, id });
   }

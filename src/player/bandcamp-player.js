@@ -26,8 +26,6 @@
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let savedCount = null;
-  // The menu of the hide button: why the album is hidden (the labels are those of HIDE_REASON_LABELS in src/lib/decisions.js).
-  const HIDE_REASONS = [['genre', 'Wrong genre'], ['sound', 'Not my sound'], ['obscure', 'Too obscure'], ['known', 'Already know it']];
   const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', saveSong: 'save', dislike: 'dislike' };
   /** One icon of a row of the queue or of the Liked list. */
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
@@ -150,41 +148,7 @@
     q('.x-shuffle').addEventListener('click', (e) => { e.preventDefault(); onCmd('mode', shuffleOn ? 'album' : 'shuffle'); });
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
     q('.save').addEventListener('click', (e) => { e.preventDefault(); onCmd('save'); });
-    // The hide button asks why first (the menu opens over the bar); when the album is already hidden, the click takes it back.
-    let hideMenu = null;
-    const closeHideMenu = () => { if (hideMenu) { hideMenu.remove(); hideMenu = null; } };
-    const openHideMenu = (anchor, albumId) => {
-      closeHideMenu();
-      hideMenu = document.createElement('div');
-      hideMenu.className = 'dr-menu dr-hide-menu';
-      hideMenu.setAttribute('role', 'menu');
-      hideMenu.setAttribute('aria-label', 'Why hide this album?');
-      const row = (reason, label, extra = '') => `<button type="button" class="dr-menu-row${extra}" role="menuitem" data-hide-reason="${reason}">${esc(label)}</button>`;
-      hideMenu.innerHTML = '<div class="dr-menu-head"><b>Why hide it?</b></div>'
-        + HIDE_REASONS.map(([reason, label]) => row(reason, label)).join('') + row('', 'Just hide it', ' dr-hide-plain');
-      el.appendChild(hideMenu);
-      const box = el.getBoundingClientRect();
-      const rect = anchor.getBoundingClientRect();
-      const width = hideMenu.offsetWidth;
-      hideMenu.style.left = `${Math.max(0, Math.min(rect.left - box.left, box.width - width - 8))}px`;
-      // above the button (the bar is at the bottom of the window), and never out of the top of it
-      hideMenu.style.bottom = `${Math.max(0, Math.min(box.bottom - rect.top + 6, box.bottom - hideMenu.offsetHeight - 8))}px`;
-      hideMenu.addEventListener('click', (event) => {
-        const item = event.target.closest('[data-hide-reason]');
-        if (!item) return;
-        event.stopPropagation();
-        const reason = item.dataset.hideReason;
-        closeHideMenu();
-        onCmd('dislike', albumId ? { id: albumId, reason } : { reason });
-      });
-      hideMenu.querySelector('button').focus();
-    };
-    document.addEventListener('click', (event) => { if (hideMenu && !hideMenu.contains(event.target) && !event.target.closest('.dislike, .q-dislike')) closeHideMenu(); }, true);
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeHideMenu(); });
-    q('.dislike').addEventListener('click', (e) => {
-      e.preventDefault();
-      if (lastState && lastState.disliked) onCmd('dislike'); else openHideMenu(e.currentTarget, '');
-    });
+    q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
     // the queue and the Liked list are two panels over the bar: opening one closes the other
     /** Opening the queue brings the album that is playing to the top of the list, under its "Playing now" heading. */
     const scrollToPlaying = () => {
@@ -219,7 +183,6 @@
       if (!act && li.classList.contains('active')) { onCmd('toggle'); return; } // the song that plays: the click pauses or resumes it
       const i = li.dataset.i === undefined ? -1 : Number(li.dataset.i);
       const track = { id: li.dataset.id, i, title: li.dataset.title || '' };
-      if (act && act.dataset.act === 'dislike') { e.preventDefault(); openHideMenu(act, li.dataset.id); return; } // (the hide button asks why first)
       if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'save' ? track : li.dataset.id); } // (a song row: its own + )
       else if (i >= 0) onCmd('playTrack', track); // a song of the queue: its album from that song
       else onCmd('playAlbum', li.dataset.id);

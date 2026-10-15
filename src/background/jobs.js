@@ -129,18 +129,18 @@ export const runExtend = ({ view, tags, count = 1 }) => enqueue(async () => {
   return id ? [id] : [];
 });
 
-export const runFeedback = ({ id, kind, tags, index, track, reason }) => enqueue(async () => {
+export const runFeedback = ({ id, kind, tags, index, track }) => enqueue(async () => {
   const state = await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track });
-  await recordDecision(state, { id, kind, tags, reason });
+  await recordDecision(state, { id, kind, tags });
   await syncNow();
 });
 
 /** Remembers, on this computer, what was done with the album and what the album looked like (see lib/decisions.js). */
-async function recordDecision(state, { id, kind, tags = [], reason = '' }) {
+async function recordDecision(state, { id, kind, tags = [] }) {
   try {
     const candidate = state && state.pool && state.pool[id];
     const entry = decisionEntry({
-      id, kind, view: tags.length ? 'tags' : 'best', candidate, fit: candidate ? tagFit(state, candidate.tags) : null, reason,
+      id, kind, view: tags.length ? 'tags' : 'best', candidate, fit: candidate ? tagFit(state, candidate.tags) : null,
     });
     if (!entry) return;
     const stored = (await chrome.storage.local.get(DECISIONS_KEY))[DECISIONS_KEY];

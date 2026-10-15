@@ -21,11 +21,4 @@ describe('the record of decisions', () => {
     assert.equal(list.length, MAX_DECISIONS);
     assert.equal(list[0].at, 5);
   });
-
-  test('the reason picked when hiding goes with the hide, and only a known reason on a hide is kept', () => {
-    assert.equal(decisionEntry({ id: 7, kind: 'dislike', reason: 'genre', now: 1 }).reason, 'genre');
-    assert.equal(decisionEntry({ id: 7, kind: 'dislike', reason: 'because', now: 1 }).reason, undefined);
-    assert.equal(decisionEntry({ id: 7, kind: 'dislike', now: 1 }).reason, undefined);
-    assert.equal(decisionEntry({ id: 7, kind: 'wish', reason: 'genre', now: 1 }).reason, undefined);
-  });
 });

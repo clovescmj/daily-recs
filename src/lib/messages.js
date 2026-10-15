@@ -1,7 +1,6 @@
 // Message protocol between the extension's pages / content script and the service worker.
 // Every message is validated and normalised here before it is acted upon (the sender is checked in the service worker).
 import { toNumericId } from './bandcamp.js';
-import { HIDE_REASONS } from './decisions.js';
 
 export const MSG = Object.freeze({
   REFRESH: 'refresh',
@@ -49,9 +48,7 @@ export function parseMessage(raw) {
         const track = typeof raw.track === 'string' ? raw.track.replace(/[\u0000-\u001f]/g, ' ').slice(0, 200) : '';
         return index < 0 ? null : { type: raw.type, id, kind: raw.kind, index, track };
       }
-      const message = tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
-      if (raw.kind === 'dislike' && HIDE_REASONS.includes(raw.reason)) message.reason = raw.reason;   // why it was hidden (the menu of the hide button)
-      return message;
+      return tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
     }
     case MSG.WISHLIST_OP:
     case MSG.WISHLIST_QUEUE: {

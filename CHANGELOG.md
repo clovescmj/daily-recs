@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.2
+- The hide button (⊘) hides at once again and applies the rule as before (the album, its artist and the albums Bandcamp pairs with it stop coming): the list of reasons of 1.4.1 and the reasons of 1.4.0 are gone, with the messages and styles that went with them. The local record of what was hidden, wishlisted or liked stays (without a reason).
+
 ## 1.4.1
 - The hide button (⊘) opens a list of reasons instead of hiding at once and showing chips afterwards: Wrong genre, Not my sound, Too obscure, Already know it, and Just hide it. It works on the cards, in the player bar and in the rows of the queue; taking an album back (when it is already hidden) is still one click. The reason goes with the hide in the local record of decisions.
 
@@ -10,7 +13,7 @@ a small adjustment raises the patch number.
 - Shuffle is a radio: one song from each album, and an album does not come back the same day (before: rounds that came back to albums with songs left). More albums are asked for in the background: 50 as soon as a list is loaded, and 50 more when 10 or fewer are left to play, up to 300 in a day. At the end of what is loaded the next button asks for more albums, or says there are none.
 - Skipping a song does not hide the album or teach the taste anything (as before; now it is a rule).
 - Lists fit better: an album only gets in when its genres were read and it shares one with the taste (Best matches and Surprise me no longer fill a list with albums whose genres are unknown), no genre (the first tag of an album) takes more than a fifth of a list (a third when the list would be short), and albums of the same genre are not put next to each other.
-- Hiding an album shows four chips on its card: Wrong genre, Not my sound, Too obscure, Already know it. The reason, with how much evidence the album had (sources, fans in common, genres, fit), is kept in a local record of decisions (up to 1000), never sent anywhere. It will be used to tune the lists.
+- A local record of decisions (up to 1000: hid, wishlisted, liked a song) with how much evidence the album had (sources, fans in common, genres, fit) is kept on this computer, never sent anywhere. It is meant to tune the lists.
 - About, What's new, privacy policy and store listing describe the radio, the rules of the lists and the record.
 
 ## 1.3.2
