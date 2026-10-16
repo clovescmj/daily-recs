@@ -29,13 +29,13 @@ export function describeCount({ total, unopened }) {
 }
 
 /**
- * Shows how many of today's albums haven't been opened yet: the number on the icon, and what it means in the icon's
- * tooltip and in the first (disabled) item of its right-click menu.
+ * Shows how many of today's albums haven't been opened yet in the icon's tooltip and in the first (disabled) item of its
+ * right-click menu. The icon itself carries no number.
  */
 export async function updateBadge() {
   const summary = await todaySummary();
   const label = describeCount(summary);
-  await chrome.action.setBadgeText({ text: summary.unopened ? String(summary.unopened) : '' });
+  await chrome.action.setBadgeText({ text: '' });   // no number on the icon (versions before 1.5.16 had one: this clears it)
   const news = await pendingWhatsNew();
   await chrome.action.setTitle({ title: `Daily Recs\n${label}${news ? `\nNew in ${news.version}: right-click the icon, What's new` : ''}` });
   try {

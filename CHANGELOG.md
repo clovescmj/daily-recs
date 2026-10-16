@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.16
+- The number of unopened albums is no longer drawn on the toolbar icon (the tooltip and the menu still say it).
+
 ## 1.5.15
 - Only the albums you played (a song for a few seconds) are kept out of the next days' lists; albums that were shown and not played can come back.
 - "A new day has started" is a notice at the bottom of the page with a Get new recs button, like the other notices (it was a banner in the page).
