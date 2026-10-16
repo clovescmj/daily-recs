@@ -27,6 +27,12 @@ export async function pickedToday() {
 }
 export const savePicked = (view, tags = []) => chrome.storage.local.set({ [PICKED_KEY]: { date: todayKey(), view, tags } });
 
+/** A song of the list on screen played: the tag "new list" of the tab has done its job (it is on until the list of the day is played). */
+export async function markPickedPlayed() {
+  const picked = (await chrome.storage.local.get(PICKED_KEY))[PICKED_KEY];
+  if (picked && picked.date === todayKey() && !picked.played) await chrome.storage.local.set({ [PICKED_KEY]: { ...picked, played: true } });
+}
+
 /** Calls `onChange` whenever the stored state or the run status changes. */
 export function watchStorage(onChange) {
   chrome.storage.onChanged.addListener((changes, area) => {

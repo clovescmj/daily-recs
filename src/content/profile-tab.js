@@ -51,12 +51,12 @@
     } catch { return false; }
   }
 
-  /** The list of today was not picked yet: the tab says there is a new list. */
+  /** The list of today was picked and none of its songs played yet: the tab says it is a new list. */
   async function hasNewList() {
     const { pickedDate: picked } = await chrome.storage.local.get('pickedDate');
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    return !(picked && picked.date === today);
+    return Boolean(picked && picked.date === today && !picked.played);
   }
 
   const collectionGrids = () => [...(tabsContainer.closest('#grids') || document).querySelectorAll('.grid')]
@@ -353,7 +353,7 @@
     chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.updateAvailable) showUpdateNotice(); });
   }
 
-  /** "daily recs new list": until the list of today is picked. A page left open past midnight keeps showing its list: the notice says that a new day started, not the tag. */
+  /** "daily recs new list": from the moment the list of the day is on screen until a song of it plays. A page left open past midnight keeps its old list: the notice says that a new day started, not the tag. */
   async function updateTabTag() {
     if (!state.tagEl) return;
     state.tagEl.textContent = (await hasNewList()) ? 'new list' : '';

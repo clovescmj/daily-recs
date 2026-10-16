@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.20
+- The "new list" tag shows once the list of the day is on screen (after Get new recs, too) and goes away when a song of that list plays.
+
 ## 1.5.19
 - A page left open past midnight no longer gets the "new list" tag while it still shows the old list: the notice "A new day has started" says it, and the tag is for the tab when the list of the day was not picked yet.
 

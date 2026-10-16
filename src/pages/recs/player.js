@@ -2,7 +2,7 @@
 // (src/player, drawn by the content script in the Bandcamp page) only shows state and sends commands back.
 import { embeddedPlayerUrl, isBandcampUrl, parseEmbeddedTracks, parseTracks, toMediaUrl } from '../../lib/bandcamp.js';
 import { findCard, visibleCardIds } from './cards.js';
-import { loadState, send } from './data.js';
+import { loadState, markPickedPlayed, send } from './data.js';
 import { session } from './session.js';
 import { postToHost } from './host-bridge.js';
 import { toast } from './toast.js';
@@ -45,6 +45,7 @@ function countAsPlayed() {
   if (player.waiting || !/^\d+$/.test(String(current.id)) || playedSent.has(current.id) || audio.paused || audio.currentTime < PLAYED_AFTER_S) return;
   playedSent.add(current.id);
   send({ type: MSG.MARK_PLAYED, id: current.id });
+  if (findCard(current.id)) markPickedPlayed().catch(() => {});   // (a song of the list on screen: not one that goes on from yesterday's list)
 }
 const NOW_KEY = 'nowPlaying';       // the song that plays and where it is, in chrome.storage.local too
 let lastNowSave = 0;
