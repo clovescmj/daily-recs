@@ -129,8 +129,8 @@ export const runExtend = ({ view, tags, count = 1 }) => enqueue(async () => {
   return id ? [id] : [];
 });
 
-export const runFeedback = ({ id, kind, tags, index, track }) => enqueue(async () => {
-  const state = await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track });
+export const runFeedback = ({ id, kind, tags, index, track, trackId }) => enqueue(async () => {
+  const state = await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track, trackId });
   await recordDecision(state, { id, kind, tags });
   await syncNow();
 });

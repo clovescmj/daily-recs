@@ -8,7 +8,7 @@
 //     setStatus(status):       Promise<void>      – publishes progress (small, frequent, not part of the state)
 //   }
 import {
-  NotLoggedInError, RateLimitedError, HttpError, fetchText, getFan, isBandcampUrl, loadLibrary, normalizeTag, parseRecommendations, parseTagLabels, parseTags, sleep,
+  NotLoggedInError, RateLimitedError, HttpError, featuredSong, fetchText, getFan, isBandcampUrl, loadLibrary, normalizeTag, parseRecommendations, parseTagLabels, parseTags, sleep,
 } from './bandcamp.js';
 import { GENERIC_GENRES, addTasteTags, createSourceWeigher, recordSourceRead, savedAlbumIds, tagsOfAlbum } from './taste-profile.js';
 import { hashSource, recordVote, rebuildVoteLists, VOTE } from './taste-sync.js';
@@ -121,12 +121,15 @@ function applyCachedTags(state) {
   const cutoff = Date.now() - TAG_CACHE_DAYS * 86_400_000;
   for (const candidate of Object.values(state.pool)) {
     const entry = !candidate.tags && state.tagCache[candidate.id];
-    if (entry && entry.at >= cutoff) candidate.tags = entry.t ? entry.t.split('|') : [];
+    if (entry && entry.at >= cutoff) {
+      candidate.tags = entry.t ? entry.t.split('|') : [];
+      if (candidate.song === undefined && 's' in entry) candidate.song = entry.s ? { title: entry.s, i: entry.i, trackId: entry.k || '' } : null;
+    }
   }
 }
 
 function rememberTags(state, candidate) {
-  state.tagCache[candidate.id] = { t: candidate.tags.join('|'), at: Date.now() };
+  state.tagCache[candidate.id] = { t: candidate.tags.join('|'), at: Date.now(), s: candidate.song ? candidate.song.title : '', i: candidate.song ? candidate.song.i : -1, k: candidate.song ? candidate.song.trackId : '' };
   const ids = Object.keys(state.tagCache);
   if (ids.length <= TAG_CACHE_MAX) return;
   const oldest = ids.sort((a, b) => state.tagCache[a].at - state.tagCache[b].at).slice(0, ids.length - TAG_CACHE_MAX);
@@ -139,7 +142,8 @@ function rememberTags(state, candidate) {
  */
 async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
   applyCachedTags(state);
-  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => !candidate.tags && isBandcampUrl(candidate.url));
+  // (a candidate whose genres are known from an older run, but not its song, is read again: the cards show the song)
+  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => (!candidate.tags || candidate.song === undefined) && isBandcampUrl(candidate.url));
   const total = queue.length;
   let done = 0;
   let consecutiveFailures = 0;
@@ -147,7 +151,9 @@ async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
     while (queue.length && consecutiveFailures < MAX_CONSECUTIVE_FAILURES) {
       const candidate = queue.shift();
       try {
-        candidate.tags = parseTags(await fetchText(fetchFn, candidate.url, httpOptions(pacing)));
+        const html = await fetchText(fetchFn, candidate.url, httpOptions(pacing));
+        candidate.tags = parseTags(html);
+        candidate.song = featuredSong(html);   // (null when no song of the page streams)
         rememberTags(state, candidate);
         consecutiveFailures = 0;
       } catch {
@@ -530,7 +536,7 @@ async function neighboursOf(fetchFn, candidate, tuning) {
  * wishlist (the heart) is remembered apart from the like, and it is read the same way.
  * kind: 'like' | 'unlike' | 'dislike' | 'undislike' | 'wish' | 'unwish'
  */
-export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], index = 0, track = '', tuning }) {
+export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = [], index = 0, track = '', trackId = '', tuning }) {
   const state = await store.load();
   const candidate = state && state.pool[id];
   if (!candidate) return state;
@@ -563,6 +569,7 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = []
     await readOwnRecommendations();
   } else if (kind === 'wish' && !state.wishlisted.includes(id)) {
     state.wishlisted.push(id);
+    if (trackId) (state.wishlistedSongs ||= {})[id] = trackId;
     await store.save(state);
     await readOwnRecommendations();
   } else if (kind === 'save') { // the Liked list: a track is added, and its album starts to feed the search like the library does
@@ -573,6 +580,7 @@ export async function applyFeedback({ fetch: fetchFn, store, id, kind, tags = []
     state.saved = state.saved.filter((entry) => !(entry.id === id && entry.i === index));
   } else if (kind === 'unwish') {
     state.wishlisted = state.wishlisted.filter((other) => other !== id);
+    if (state.wishlistedSongs) delete state.wishlistedSongs[id];
   } else if (kind === 'unlike' && state.liked.includes(id)) {
     recordVote(state, id, VOTE.UNLIKE); // tombstone, so the removal also spreads to other devices
     adjust(state.sourceLikes, -1, 2);

@@ -280,6 +280,7 @@ export function parseEmbeddedTracks(html) {
   return (data.tracks || [])
     .map((track) => ({
       title: toLabel(track.title),
+      trackId: toNumericId(track.track_id ?? track.id),
       link: typeof track.title_link === 'string' ? track.title_link : '', // the song's own page (relative to the album's site)
       src: toMediaUrl(track.file && track.file['mp3-128']),
       duration: track.duration,
@@ -299,10 +300,26 @@ export function parseTracks(html) {
   return (tralbum.trackinfo || [])
     .map((track) => ({
       title: toLabel(track.title),
+      trackId: toNumericId(track.track_id ?? track.id),
       link: typeof track.title_link === 'string' ? track.title_link : '', // the song's own page (relative to the album's site)
       src: toMediaUrl(track.file && track.file['mp3-128']),
       duration: track.duration,
       featured: Boolean(tralbum.featured_track_id) && String(track.track_id ?? track.id) === String(tralbum.featured_track_id),
     }))
     .filter((track) => track.src);
+}
+
+/**
+ * The song an album starts with in the radio: the one its artist highlights, or the first that streams (the same rule the player uses,
+ * over the same list). `{ title, i, trackId }`, or null when the page has no song that streams.
+ */
+export function featuredSong(html) {
+  try {
+    const tracks = parseTracks(html);
+    if (!tracks.length) return null;
+    const i = Math.max(0, tracks.findIndex((track) => track.featured));
+    return { title: tracks[i].title, i, trackId: tracks[i].trackId || '' };
+  } catch {
+    return null;
+  }
 }

@@ -4,7 +4,7 @@ import { MSG } from '../../lib/messages.js';
 import { findCard, paintDislike, paintWish, visibleCardIds } from './cards.js';
 import { loadState, send, updateLiked } from './data.js';
 import { requestWishlistOp } from './host-bridge.js';
-import { albumSongs, continueAfterRemoval, currentId, emit, playAlbum } from './player.js';
+import { albumSongs, continueAfterRemoval, currentId, emit, playAlbum, playingSongOf } from './player.js';
 import { session } from './session.js';
 import { toast } from './toast.js';
 
@@ -14,7 +14,20 @@ let flushing = false;
 
 const poolAlbum = async (id) => ((await loadState()) || { pool: {} }).pool[id];
 
-/** Heart: the Bandcamp wishlist. Adding counts only if Bandcamp confirms; removing is best effort. */
+/**
+ * What the heart puts in (or takes out of) the wishlist: the song of the card (or the one that plays, when that album is playing), as an
+ * item of type "t"; an album whose song is not known is put in as a whole. Taking out follows what was put in.
+ */
+function wishTarget(album, on) {
+  if (!on) {
+    const trackId = session.wishedSongs.get(album.id);
+    return trackId ? { id: trackId, itemType: 't' } : { id: album.id, itemType: 'a' };
+  }
+  const song = playingSongOf(album.id) || album.song;
+  return song && song.trackId ? { id: song.trackId, itemType: 't' } : { id: album.id, itemType: 'a' };
+}
+
+/** Heart: the Bandcamp wishlist, for the song of the card. Adding counts only if Bandcamp confirms; removing is best effort. */
 export async function setWish(id, on) {
   if (busyHearts.has(id)) return;
   const album = await poolAlbum(id);
@@ -23,15 +36,22 @@ export async function setWish(id, on) {
   const card = findCard(id);
   if (card) paintWish(card, on); // optimistic; rolled back on failure
   try {
-    const result = await requestWishlistOp(on ? 'add' : 'remove', album);
+    const target = wishTarget(album, on);
+    const result = await requestWishlistOp(on ? 'add' : 'remove', { id: target.id, artistId: album.artistId, itemType: target.itemType });
     if (!result.ok && on) {
       if (card) paintWish(card, false);
       toast("Couldn't add it to your wishlist. Try again.");
       return;
     }
     toast(result.ok ? (on ? 'Added to your wishlist. Reload the page to see it there.' : 'Removed from your wishlist') : "Couldn't confirm the wishlist removal.");
-    if (on) session.wished.add(id); else session.wished.delete(id);
-    send({ type: MSG.FEEDBACK, id, kind: on ? 'wish' : 'unwish' });
+    if (on) {
+      session.wished.add(id);
+      if (target.itemType === 't') session.wishedSongs.set(id, target.id);
+    } else {
+      session.wished.delete(id);
+      session.wishedSongs.delete(id);
+    }
+    send({ type: MSG.FEEDBACK, id, kind: on ? 'wish' : 'unwish', ...(on && target.itemType === 't' ? { trackId: target.id } : {}) });
     emit(true);
   } finally {
     busyHearts.delete(id);
@@ -53,8 +73,18 @@ async function setSongs(songs, on, message) {
   for (const { id, i, title } of songs) await send({ type: MSG.FEEDBACK, id, kind: on ? 'save' : 'unsave', index: i, track: String(title || '').slice(0, 200) });
 }
 
-/** The + of a card: adds all the songs of the album to Liked Songs, or, when the album was added whole, takes its songs out. */
+/**
+ * The + of a card: adds the song of the card to Liked Songs (or takes it out). A card whose song is not known adds all the songs of the
+ * album, or, when the album was added whole, takes its songs out.
+ */
 export async function saveAlbumSong(id) {
+  const album = await poolAlbum(id);
+  if (album && album.song && album.song.title) {
+    const song = { id, i: album.song.i, title: album.song.title };
+    const on = !session.saved.has(`${id}:${song.i}`);
+    await setSongs([song], on, on ? 'Added song to Liked Songs' : 'Removed song from Liked Songs');
+    return;
+  }
   if (session.savedAlbums.has(id)) { // already in: take the album's songs out
     const keys = [...session.saved].filter((key) => key.startsWith(`${id}:`));
     const saved = ((await loadState()) || {}).saved || [];

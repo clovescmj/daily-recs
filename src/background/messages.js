@@ -46,10 +46,10 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
   };
 }
 
-async function runWishlistInPage(tabId, { op, id, bandId }) {
+async function runWishlistInPage(tabId, { op, id, bandId, itemType }) {
   try {
     const [injection] = await chrome.scripting.executeScript({
-      target: { tabId }, world: 'MAIN', func: wishlistOpInPage, args: [{ op, id, bandId }],
+      target: { tabId }, world: 'MAIN', func: wishlistOpInPage, args: [{ op, id, bandId, itemType }],
     });
     return (injection && injection.result) || { ok: false, error: 'no result' };
   } catch (error) {

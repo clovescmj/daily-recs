@@ -31,10 +31,18 @@ test('cardHtml escapes album text and exposes accessible names', () => {
   assert.match(html, /aria-label="Add to wishlist: /);
   assert.match(html, /aria-label="Don't show music like this: |aria-label="Don&#39;t show music like this: /);
   assert.ok(!/data-like|thumb/i.test(html), 'there is no like button');
-  assert.match(html, /data-save[^>]*aria-label="Add album to Liked Songs: /);
+  assert.match(html, /data-save[^>]*aria-label="Add album to Liked Songs: /);   // (no song known: the album as before)
   assert.ok(!/go to album/i.test(html), 'no "go to album" link: the cover and the title already open it');
-  assert.match(html, /People who own “Other” also own/);
-  assert.match(html, /3 fans in common/);
+  assert.ok(!/People who own|fans in common/.test(html), 'the card does not say where the album came from');
+});
+
+test('a card is for one song: its title, the artist and the album under it, and the + is for the song', () => {
+  const html = cardHtml({ ...album, song: { title: 'The <i>Song</i>', i: 2, trackId: '77' } }, { saved: false, disliked: false });
+  assert.match(html, /class="album-title"[^>]*>The &lt;i&gt;Song&lt;\/i&gt;<\/a>/);
+  assert.match(html, /class="album-artist"[^>]*>O&#39;Brien<\/a>/);
+  assert.match(html, /class="album-album"[^>]*>A &lt;b&gt;&quot;Title&quot;&lt;\/b&gt;<\/a>/);
+  assert.match(html, /data-save[^>]*aria-label="Add song to Liked Songs: /);
+  assert.match(html, /data-album="A &lt;b&gt;/);   // (the queue reads the album title from here, not from the first line)
 });
 
 test('cardHtml reflects liked / disliked state', () => {

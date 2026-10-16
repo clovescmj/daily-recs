@@ -21,7 +21,10 @@ describe('parseMessage', () => {
     assert.equal(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'save', index: -1, track: 'x' }), null, 'a track needs its number');
     assert.equal(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'unsave', track: 'x' }), null);
     assert.deepEqual(parseMessage({ type: MSG.FEEDBACK, id: '9', kind: 'wish' }), { type: 'feedback', id: '9', kind: 'wish' });
-    assert.deepEqual(parseMessage({ type: MSG.WISHLIST_OP, op: 'add', id: 5, bandId: '6' }), { type: 'wishlist-op', op: 'add', id: '5', bandId: '6' });
+    assert.deepEqual(parseMessage({ type: MSG.WISHLIST_OP, op: 'add', id: 5, bandId: '6' }), { type: 'wishlist-op', op: 'add', id: '5', bandId: '6', itemType: 'a' });
+    assert.equal(parseMessage({ type: MSG.WISHLIST_OP, op: 'add', id: 5, bandId: '6', itemType: 't' }).itemType, 't');
+    assert.equal(parseMessage({ type: MSG.WISHLIST_OP, op: 'add', id: 5, bandId: '6', itemType: 'x' }).itemType, 'a');
+    assert.equal(parseMessage({ type: MSG.FEEDBACK, id: 5, kind: 'wish', trackId: '77' }).trackId, '77');
   });
 
   test('rejects malformed or hostile payloads', () => {

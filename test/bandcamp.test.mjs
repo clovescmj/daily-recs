@@ -2,7 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   HttpError, NotLoggedInError, RateLimitedError, fetchText, getFan, loadLibrary, parseRecommendations, parseTracks,
-  toHttpsUrl, toMediaUrl, toNumericId, decodeHtmlEntities,
+  toHttpsUrl, toMediaUrl, toNumericId, decodeHtmlEntities, featuredSong,
 } from '../src/lib/bandcamp.js';
 import { createFakeBandcamp } from './helpers/fake-bandcamp.js';
 
@@ -245,5 +245,26 @@ describe('hardening', () => {
     const answer = (url) => async () => ({ json: async () => ({ fan_id: 1, collection_summary: { url } }) });
     await assert.rejects(getFan(answer('https://evil.example/me')), /Unexpected profile address/);
     assert.equal((await getFan(answer('https://bandcamp.com/me'))).profileUrl, 'https://bandcamp.com/me');
+  });
+});
+
+describe('the song of a card', () => {
+  const page = (tralbum) => `<div data-tralbum="${JSON.stringify(tralbum).replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">`;
+  const file = (n) => ({ 'mp3-128': `https://t4.bcbits.com/stream/${n}` });
+
+  test('the highlighted song, with its id; the first that streams when none is highlighted', () => {
+    const tracks = [{ title: 'One', track_id: 11, file: file(1) }, { title: 'Two', track_id: 22, file: file(2) }, { title: 'Three', track_id: 33, file: file(3) }];
+    assert.deepEqual(featuredSong(page({ trackinfo: tracks, featured_track_id: 22 })), { title: 'Two', i: 1, trackId: '22' });
+    assert.deepEqual(featuredSong(page({ trackinfo: tracks })), { title: 'One', i: 0, trackId: '11' });
+  });
+
+  test('the position counts only the songs that stream (the same list the player reads)', () => {
+    const tracks = [{ title: 'No file', track_id: 5 }, { title: 'Streams', track_id: 6, file: file(6) }];
+    assert.deepEqual(featuredSong(page({ trackinfo: tracks })), { title: 'Streams', i: 0, trackId: '6' });
+  });
+
+  test('null when nothing streams, or the page has no tracks', () => {
+    assert.equal(featuredSong(page({ trackinfo: [{ title: 'x', track_id: 1 }] })), null);
+    assert.equal(featuredSong('<html></html>'), null);
   });
 });

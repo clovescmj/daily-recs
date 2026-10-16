@@ -134,10 +134,10 @@
     toastTimer = setTimeout(() => el.classList.remove('show'), TOAST_MS);
   }
 
-  async function forwardWishlistRequest({ rid, op, id, bandId }) {
+  async function forwardWishlistRequest({ rid, op, id, bandId, itemType }) {
     const reply = (result) => state.frame && state.frame.contentWindow.postMessage({ dr: 'wishResult', rid, ...result }, EXTENSION_ORIGIN);
     try {
-      const result = await chrome.runtime.sendMessage({ type: WISHLIST_OP_MESSAGE, op, id, bandId });
+      const result = await chrome.runtime.sendMessage({ type: WISHLIST_OP_MESSAGE, op, id, bandId, itemType });
       reply({ ok: Boolean(result && result.ok), error: result && result.error });
     } catch (error) {
       reply({ ok: false, error: String((error && error.message) || error) });
@@ -153,7 +153,9 @@
         if (Number.isFinite(message.h) && message.h > 0 && message.h < 100000) state.frame.style.height = `${Math.ceil(message.h)}px`;
         break;
       case 'wish':
-        if (Number.isInteger(message.rid) && OPS.includes(message.op) && isNumericId(message.id) && isNumericId(message.bandId)) forwardWishlistRequest(message);
+        if (Number.isInteger(message.rid) && OPS.includes(message.op) && isNumericId(message.id) && isNumericId(message.bandId)) {
+          forwardWishlistRequest({ ...message, itemType: message.itemType === 't' ? 't' : 'a' });
+        }
         break;
       case 'toast':
         if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH));

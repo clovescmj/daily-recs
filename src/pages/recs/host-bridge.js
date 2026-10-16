@@ -10,13 +10,13 @@ export function postToHost(message) {
   parent.postMessage(message, HOST_ORIGIN);
 }
 
-/** Asks the Bandcamp page (via the service worker) to add/remove an album. */
-export function requestWishlistOp(op, { id, artistId }) {
+/** Asks the Bandcamp page (via the service worker) to add/remove an album ('a') or a song ('t', `id` is then the id of the track). */
+export function requestWishlistOp(op, { id, artistId, itemType = 'a' }) {
   return new Promise((resolve) => {
     const rid = ++nextRequestId;
     const timer = setTimeout(() => { pendingWishlistOps.delete(rid); resolve({ ok: false, error: 'timeout' }); }, WISHLIST_TIMEOUT_MS);
     pendingWishlistOps.set(rid, (result) => { clearTimeout(timer); resolve(result); });
-    postToHost({ dr: 'wish', rid, op, id, bandId: artistId });
+    postToHost({ dr: 'wish', rid, op, id, bandId: artistId, itemType });
   });
 }
 

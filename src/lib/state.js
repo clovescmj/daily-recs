@@ -26,6 +26,7 @@ export const emptyState = () => ({
   avoid: {},             // albumId -> { artistId, near: [ids] }: albums hidden with "don't show music like this", and the albums Bandcamp pairs with them
   saved: [],             // the "Liked" list, newest last: tracks as { id (album), i (track number), title }. Their albums feed the search like the library does (kept on this computer)
   wishlisted: [],        // albums the user put in the Bandcamp wishlist from the extension (kept on this computer)
+  wishlistedSongs: {},   // albumId -> id of the song that was put in the wishlist (the heart of a card is for one song)
   dismissed: [],         // derived from `votes` (albums marked "don't show again")
   votes: {},             // albumId -> "<vote>.<time>" (see taste-sync.js)
   tasteBootstrapped: false, // true once a run has read enough of the library to learn the genre profile
@@ -53,6 +54,7 @@ export function migrateState(state) {
   state.tagCache ||= {};
   state.saved ||= [];
   state.wishlisted ||= [...(state.liked || [])]; // before the two were separated, a like was also a wishlist entry
+  state.wishlistedSongs ||= {};
   normalizeTasteTags(state);
   splitMergedTags(state);
   if (state.owned && state.owned.count !== undefined) { // legacy names
@@ -84,7 +86,9 @@ export function reconcileWishlist(state) {
   const inLibrary = new Set((owned.ids || []).map(String));
   const pool = state.pool || {};
   const before = state.wishlisted || [];
-  const kept = before.filter((id) => !pool[id] || inLibrary.has(String(id)) || inWishlist.has(stripQuery(pool[id].url)));
+  const songs = state.wishlistedSongs || {};
+  // (an album is wishlisted too when its song is: the library then lists the song, with the page of the song)
+  const kept = before.filter((id) => !pool[id] || inLibrary.has(String(id)) || inLibrary.has(String(songs[id] || '')) || inWishlist.has(stripQuery(pool[id].url)));
   const added = Object.keys(pool).filter((id) => !kept.includes(id) && inWishlist.has(stripQuery(pool[id].url)));
   const next = [...kept, ...added];
   const changed = next.length !== before.length || next.some((id, i) => id !== before[i]);

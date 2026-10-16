@@ -36,6 +36,6 @@
 .dr-act svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-icon); display: block; }
 .dr-act:hover svg { fill: var(--dr-act-hover); }
 .dr-act.is-on svg, .dr-act.is-on:hover svg, .dr-act.on svg, .dr-act.on:hover svg { fill: var(--dr-act-on); }
-.dr-act--wish { --dr-act-hover: var(--dr-accent); --dr-act-on: var(--dr-wish); }       /* blue on hover, orange when it is in the wishlist */
+.dr-act--wish { --dr-act-hover: var(--dr-wish); --dr-act-on: var(--dr-wish); }         /* orange (Bandcamp's own) on hover, and when it is in the wishlist */
 .dr-act--save { --dr-act-hover: var(--dr-success); --dr-act-on: var(--dr-success); }   /* green: a song of it is in Liked Songs */
 .dr-act--dislike { --dr-act-hover: var(--dr-danger); --dr-act-on: var(--dr-danger); } /* red on hover and when active; click again to bring it back */

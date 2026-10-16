@@ -241,6 +241,13 @@ describe('reconcileWishlist', () => {
     assert.equal(reconcileWishlist({ ...emptyState(), owned: null }), false);
   });
 
+  test('an album whose song is in the wishlist stays wishlisted', () => {
+    const state = stateWith({ wishlisted: ['1'], pool: { 1: album('1') }, ids: ['777'] });   // the library lists the song (777), not the album
+    state.wishlistedSongs = { 1: '777' };
+    reconcileWishlist(state);
+    assert.deepEqual(state.wishlisted, ['1']);
+  });
+
   test('an album of the collection is not taken for a wishlist entry', () => {
     const state = stateWith({ pool: { 3: album('3') }, sources: [{ url: 'https://a.bandcamp.com/album/3', kind: 'collection' }], ids: ['3'] });
     reconcileWishlist(state);

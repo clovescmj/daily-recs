@@ -9,7 +9,7 @@ export const BLOCK = 'M7.861 21.833q-1.944 -0.833 -3.403 -2.292T2.167 16.139q-0.
 export const ADD_CIRCLE = 'M11 17.333h2v-4.333h4.333v-2H13v-4.333h-2v4.333H6.667v2h4.333v4.333Zm1.008 5.333Q9.806 22.667 7.861 21.833t-3.403 -2.292Q3 18.083 2.167 16.14t-0.833 -4.153Q1.333 9.778 2.167 7.847q0.833 -1.931 2.292 -3.389T7.86 2.167q1.943 -0.833 4.153 -0.833t4.14 0.833q1.931 0.833 3.389 2.292T21.833 7.853q0.833 1.937 0.833 4.139Q22.667 14.194 21.833 16.139t-2.292 3.403Q18.083 21 16.147 21.833q-1.937 0.833 -4.139 0.833Zm-0.008 -2q3.611 0 6.139 -2.528t2.528 -6.139q0 -3.611 -2.528 -6.139t-6.139 -2.528q-3.611 0 -6.139 2.528t-2.528 6.139q0 3.611 2.528 6.139t6.139 2.528Zm0 -8.667Z';
 export const CHECK_CIRCLE = 'M10.583 16l6.611 -6.583 -1.417 -1.417 -5.194 5.167 -2.361 -2.333 -1.417 1.417 3.778 3.75Zm1.417 6.667q-2.194 0 -4.139 -0.833t-3.403 -2.292Q3 18.083 2.167 16.139T1.333 12q0 -2.222 0.833 -4.153t2.292 -3.389Q5.917 3 7.861 2.167t4.139 -0.833q2.222 0 4.153 0.833t3.389 2.292Q21 5.917 21.833 7.847T22.667 12q0 2.194 -0.833 4.139t-2.292 3.403Q18.083 21 16.153 21.833T12 22.667Z';
 export const wishlistLabel = (on) => (on ? 'Remove from wishlist' : 'Add to wishlist');
-export const saveLabel = (on) => (on ? 'Remove album from Liked Songs' : 'Add album to Liked Songs'); // on the cards: the whole album
+export const saveLabel = (on, song = false) => (song ? (on ? 'Remove song from Liked Songs' : 'Add song to Liked Songs') : (on ? 'Remove album from Liked Songs' : 'Add album to Liked Songs')); // on the cards: the song of the card, or the whole album when its song is not known
 export const dislikeLabel = (on) => (on ? 'Show this album again' : "Don't show music like this");
 
 /** An icon that carries its own accessible name. */

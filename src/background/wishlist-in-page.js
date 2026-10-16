@@ -9,7 +9,7 @@
 // which Bandcamp only changes after the server responds:
 //   Fanpage.collectItem(itemId, itemType, bandId, key, element)    -> add to wishlist
 //   Fanpage.uncollectItem(itemId, element, removeControls)         -> remove from wishlist
-export function wishlistOpInPage({ op, id, bandId, timeoutMs = 8000 }) {
+export function wishlistOpInPage({ op, id, bandId, itemType = 'a', timeoutMs = 8000 }) {
   const POLL_INTERVAL_MS = 100;
   return new Promise((resolve) => {
     /** Bandcamp's own functions, confirmed through the counter of the menu. */
@@ -21,7 +21,7 @@ export function wishlistOpInPage({ op, id, bandId, timeoutMs = 8000 }) {
       if (typeof before !== 'number') return resolve({ ok: false, error: "can't verify the result" });
       const element = typeof document !== 'undefined' ? document.createElement('div') : {}; // Bandcamp only uses it to update its own interface
       try {
-        if (op === 'add') Fanpage.collectItem(id, 'album', bandId, `a${id}`, element);
+        if (op === 'add') Fanpage.collectItem(id, itemType === 't' ? 'track' : 'album', bandId, `${itemType === 't' ? 't' : 'a'}${id}`, element);
         else Fanpage.uncollectItem(id, element, false);
       } catch { /* the request already left; errors after it (onboarding tooltips) don't matter: the counter decides */ }
       const startedAt = Date.now();
@@ -41,7 +41,7 @@ export function wishlistOpInPage({ op, id, bandId, timeoutMs = 8000 }) {
       if (typeof Crumb !== 'undefined' && Crumb && typeof Crumb.ajax === 'function') {
         const data = { fan_id: CurrentFan.fan_id, item_id: id };
         if (op === 'add') {
-          data.item_type = 'a';   // "a" is what the wishlist button of a profile sends for an album
+          data.item_type = itemType === 't' ? 't' : 'a';   // what the wishlist button of a profile sends: "a" for an album, "t" for a song
           data.band_id = bandId;
           if (!CurrentFan.is_own_collection && typeof FanData !== 'undefined' && FanData) data.ref_username = FanData.username;
         }

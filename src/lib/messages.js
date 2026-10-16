@@ -16,6 +16,7 @@ export const MSG = Object.freeze({
 
 export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish', 'save', 'unsave']);
 export const WISHLIST_OPS = Object.freeze(['add', 'remove']);
+export const WISHLIST_ITEM_TYPES = Object.freeze(['a', 't']);   // an album, or a song (a track of an album)
 export const MAX_EXTEND_COUNT = 60;   // albums asked for at once at the end of a list (the radio asks for 50)
 
 /** Returns the normalised message, or null if it isn't a well-formed message of ours. */
@@ -48,12 +49,17 @@ export function parseMessage(raw) {
         const track = typeof raw.track === 'string' ? raw.track.replace(/[\u0000-\u001f]/g, ' ').slice(0, 200) : '';
         return index < 0 ? null : { type: raw.type, id, kind: raw.kind, index, track };
       }
+      if (raw.kind === 'wish') { // the heart of a card is for one song: which one
+        const trackId = toNumericId(raw.trackId);
+        return trackId ? { type: raw.type, id, kind: raw.kind, trackId } : { type: raw.type, id, kind: raw.kind };
+      }
       return tags.length ? { type: raw.type, id, kind: raw.kind, tags } : { type: raw.type, id, kind: raw.kind };
     }
     case MSG.WISHLIST_OP:
     case MSG.WISHLIST_QUEUE: {
       const bandId = toNumericId(raw.bandId);
-      return id && bandId && WISHLIST_OPS.includes(raw.op) ? { type: raw.type, op: raw.op, id, bandId } : null;
+      const itemType = WISHLIST_ITEM_TYPES.includes(raw.itemType) ? raw.itemType : 'a';
+      return id && bandId && WISHLIST_OPS.includes(raw.op) ? { type: raw.type, op: raw.op, id, bandId, itemType } : null;
     }
     case MSG.WISHLIST_DONE:
     case MSG.MARK_OPENED:

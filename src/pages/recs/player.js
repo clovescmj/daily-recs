@@ -198,6 +198,13 @@ export async function featuredSongOf(id) {
   return { id, i, title: tracks[i].title };
 }
 
+/** The song of album `id` that is playing right now (with the id Bandcamp gives it), or null when another album plays. */
+export function playingSongOf(id) {
+  const { current } = player;
+  const track = current.id === id && current.tracks[current.index];
+  return track && track.trackId ? { i: current.index, title: track.title, trackId: track.trackId } : null;
+}
+
 /** The track that is playing, as the Liked list keeps it. */
 export function currentTrack() {
   const { current, album } = player;
@@ -487,7 +494,7 @@ function rowBaseReader() {
       const pooled = (session.state && session.state.pool && session.state.pool[id]) || {};
       cache.set(id, card ? {
         id,
-        album: card.querySelector('.album-title').textContent,
+        album: card.dataset.album || card.querySelector('.album-title').textContent,
         artist: card.querySelector('.album-artist').textContent,
         art: pooled.art || '',
         url: httpsOrEmpty(pooled.url),

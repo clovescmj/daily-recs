@@ -54,11 +54,15 @@ function visibleAlbumIds(state, list) {
   return list.ids.filter((id) => !hiddenIn(state, id, list) || session.dislikedThisVisit.has(id));
 }
 
+/** The + of a card: the song of the card is in Liked Songs (an album without a known song: a song of it was added whole). */
+const cardSaved = (album) => (album.song ? session.saved.has(`${album.id}:${album.song.i}`) : session.savedAlbums.has(album.id));
+
 function renderGrid(state, status) {
   const list = currentList(state);
   const ids = list ? visibleAlbumIds(state, list) : [];
   session.hasList = Boolean(list) && list.ids.some((id) => !hiddenIn(state, id, list));
   session.wished = new Set(state ? state.wishlisted || [] : []);
+  session.wishedSongs = new Map(Object.entries((state && state.wishlistedSongs) || {}));
   session.saved = new Set((state ? state.saved || [] : []).map((entry) => `${entry.id}:${entry.i}`)); // the Liked list: tracks
   session.savedAlbums = new Set((state ? state.saved || [] : []).filter((entry) => entry.all).map((entry) => entry.id));
 
@@ -71,7 +75,7 @@ function renderGrid(state, status) {
   const key = ids.join(',');
   if (key !== renderedKey) {
     $('album-grid').innerHTML = ids.map((id) => cardHtml(state.pool[id], {
-      wished: session.wished.has(id), saved: session.savedAlbums.has(id), disliked: session.dislikedThisVisit.has(id),
+      wished: session.wished.has(id), saved: cardSaved(state.pool[id]), disliked: session.dislikedThisVisit.has(id),
     })).join('');
     renderedKey = key;
   } else {
@@ -79,7 +83,7 @@ function renderGrid(state, status) {
       const card = findCard(id);
       if (!card) continue;
       paintWish(card, session.wished.has(id));
-      paintSave(card, session.savedAlbums.has(id));
+      paintSave(card, cardSaved(state.pool[id]));
       paintDislike(card, session.dislikedThisVisit.has(id));
     }
   }

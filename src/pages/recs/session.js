@@ -21,6 +21,8 @@ export const session = {
   savedAlbums: new Set(),
   /** Albums the user put in the wishlist from here (the heart). */
   wished: new Set(),
+  /** For each of them, the id of the song that was put in the wishlist. */
+  wishedSongs: new Map(),
   /** True when a list for today exists, which is when the player bar is shown even if nothing is playing. */
   hasList: false,
   /** True until a list has been drawn: nothing was on screen yet, so there is no other list to show while the chosen one is built. The loading box offers a song to play only while it is true. */
