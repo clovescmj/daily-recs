@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.2
+- About: "the list of the day" instead of a number of songs (the list grows while you listen, and can be shorter when few albums fit).
+
 ## 1.5.1
 - About: the texts say "songs" where the cards are songs, say that lists can be switched at any time (not once a day), describe the genre rule and the radio in plain words, and say that Liked Songs stay in this browser.
 
