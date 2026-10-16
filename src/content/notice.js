@@ -1,6 +1,12 @@
-// Small notices at the bottom right of the Bandcamp page, above the player bar, in the style of the snackbar: a dark box with a close
-// button. Classic script (content scripts cannot import): it adds `DRNotice` for profile-tab.js.
-// DRNotice.show({ id, title, lines, action: { label, onClick }, onClose }) shows one (a second call with the same id replaces it).
+// Small notices at the bottom of the Bandcamp page, above the player bar, in the centre like the snackbar of the confirmations. Classic script
+// (content scripts cannot import): it adds `DRNotice` for profile-tab.js.
+//
+// The pattern is the one of a snackbar with an action (Material) and of a toast with an action (Carbon): one line of text, the action as a
+// text button at its end, and, when the notice can be dismissed, a close icon after it. A notice that asks for something (to update, to
+// reload) has no close icon: it stays until the action is taken.
+//
+// DRNotice.show({ id, text, action: { label, onClick }, closable = true, autoHide = 0, onClose }) shows one (the same id replaces it); `autoHide`
+// is the time in ms after which it goes away by itself (a confirmation); the pointer over it keeps it.
 // DRNotice.hide(id) takes one away without calling onClose.
 window.DRNotice = (() => {
   const FADE_MS = 200;
@@ -15,11 +21,12 @@ window.DRNotice = (() => {
     box.setAttribute('role', 'region');
     box.setAttribute('aria-label', 'Daily Recs notices');
     document.body.appendChild(box);
-    // Escape closes the notice that has the focus
+    // Escape closes the notice that has the focus (when it can be closed)
     box.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
       const el = event.target.closest('.dr-notice');
-      if (el) el.querySelector('.dr-notice-close').click();
+      const close = el && el.querySelector('.dr-notice-close');
+      if (close) close.click();
     });
     return box;
   }
@@ -34,12 +41,7 @@ window.DRNotice = (() => {
     if (el) remove(el);
   }
 
-  function show({ id, title, lines = [], action = null, onClose = () => {} }) {
-    hide(id);
-    const el = document.createElement('section');
-    el.className = 'dr-notice';
-    el.dataset.notice = id;
-    el.setAttribute('role', 'status');
+  function closeButton(onClick) {
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'dr-notice-close';
@@ -53,35 +55,35 @@ window.DRNotice = (() => {
     path.setAttribute('d', CLOSE_PATH);
     icon.appendChild(path);
     close.appendChild(icon);
-    close.addEventListener('click', () => { remove(el); onClose(); });
-    const heading = document.createElement('strong');
-    heading.className = 'dr-notice-title';
-    heading.textContent = title;
-    el.append(close, heading);
-    if (lines.length === 1) {   // one message: a line of text (a bullet before a single line says nothing)
-      const text = document.createElement('p');
-      text.className = 'dr-notice-text';
-      text.textContent = lines[0];   // (text only: what comes from a page is never markup)
-      el.appendChild(text);
-    } else if (lines.length > 1) {
-      const list = document.createElement('ul');
-      for (const line of lines) {
-        const item = document.createElement('li');
-        item.textContent = line;
-        list.appendChild(item);
-      }
-      el.appendChild(list);
-    }
+    close.addEventListener('click', onClick);
+    return close;
+  }
+
+  function show({ id, text, action = null, closable = true, autoHide = 0, onClose = () => {} }) {
+    hide(id);
+    const el = document.createElement('section');
+    el.className = 'dr-notice';
+    el.dataset.notice = id;
+    el.setAttribute('role', 'status');
+    const message = document.createElement('span');
+    message.className = 'dr-notice-text';
+    message.textContent = text;   // (text only: what comes from a page is never markup)
+    el.appendChild(message);
     if (action) {
-      const row = document.createElement('div');   // the action sits at the end of the row, as a text button (Material snackbar, Carbon toast)
-      row.className = 'dr-notice-actions';
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'dr-notice-action';
       button.textContent = action.label;
-      button.addEventListener('click', () => { button.disabled = true; action.onClick(); });
-      row.appendChild(button);
-      el.appendChild(row);
+      button.addEventListener('click', () => { button.disabled = true; action.onClick(); if (autoHide) remove(el); });
+      el.appendChild(button);
+    }
+    if (closable) el.appendChild(closeButton(() => { remove(el); onClose(); }));
+    if (autoHide) {
+      let timer = null;
+      const arm = () => { clearTimeout(timer); timer = setTimeout(() => remove(el), autoHide); };
+      el.addEventListener('pointerenter', () => clearTimeout(timer));
+      el.addEventListener('pointerleave', arm);
+      arm();
     }
     container().appendChild(el);
     void el.offsetWidth;   // (the first state is drawn before `show` is added, so it opens with a transition)

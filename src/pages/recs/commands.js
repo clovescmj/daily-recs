@@ -2,6 +2,7 @@
 import { session } from './session.js';
 import * as player from './player.js';
 import { exportLikedSongs } from './export.js';
+import { runUndo } from './toast.js';
 import { dislikeAlbum, saveAlbumSong, setSave, setWish, undoDislike } from './wishlist-actions.js';
 
 const isFraction = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -27,6 +28,7 @@ const COMMANDS = {
   // the + of a row of the queue or of a card: the song of the card (an album whose song is not known: the album)
   saveAlbum: (v) => isAlbumId(v) && saveAlbumSong(String(v)),
   exportLiked: () => exportLikedSongs(),
+  undo: (v) => Number.isInteger(v) && runUndo(v),                              // the Undo of a confirmation
   playLiked: (v) => isTrack(v) && player.playSavedTrack(String(v.id), v.i),     // a song of Liked Songs: playback goes on with the Liked Songs
   playTrack: (v) => isTrack(v) && player.playEarlierTrack(String(v.id), v.i),   // a song that played before: it plays again, and playback goes on as it was
   dislike: (v) => {

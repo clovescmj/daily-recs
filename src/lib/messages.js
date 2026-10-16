@@ -12,6 +12,7 @@ export const MSG = Object.freeze({
   EXTEND_LIST: 'extend-list',        // more albums at the end of a list: one when the user hides one, 50 at a time for the radio
   COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
+  OPEN_WHATS_NEW: 'open-whats-new',  // the profile tab asks to open the What's new page
   APPLY_UPDATE: 'apply-update',      // the profile tab asks to load the new version that is waiting
   FILL_SONGS: 'fill-songs',          // the page asks for the song of cards that do not have one yet (lists made by an older version)
 
@@ -42,6 +43,7 @@ export function parseMessage(raw) {
     case MSG.COLOR_SCHEME:
       return { type: raw.type, dark: raw.dark === true };
     case MSG.OPEN_MAIN:
+    case MSG.OPEN_WHATS_NEW:
     case MSG.APPLY_UPDATE:
       return { type: raw.type };
     case MSG.FILL_SONGS: {

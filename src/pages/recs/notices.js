@@ -12,6 +12,6 @@ export async function showNewsIfNew() {
     const stored = await chrome.storage.local.get([NEWS_SEEN_KEY, STATE_KEY]);
     const action = newsAction({ title: news.title, seen: stored[NEWS_SEEN_KEY], hasLibrary: Boolean(stored[STATE_KEY] && stored[STATE_KEY].owned) });
     if (action === 'mark') await chrome.storage.local.set({ [NEWS_SEEN_KEY]: news.title });
-    if (action === 'show') postToHost({ dr: 'notice', kind: 'news', key: news.title, title: `What's new: ${news.title}`, items: news.items });
+    if (action === 'show') postToHost({ dr: 'notice', kind: 'news', key: news.title, title: news.title });
   } catch { /* the notice is a courtesy: the page works without it */ }
 }

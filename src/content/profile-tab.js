@@ -118,20 +118,15 @@
 
   const sendCommand = (cmd, v) => state.frame && state.frame.contentWindow.postMessage({ dr: 'cmd', cmd, v }, EXTENSION_ORIGIN);
 
-  let toastTimer = null;
-  function showToast(message) {
-    let el = document.getElementById('dr-toast');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'dr-toast';
-      el.setAttribute('role', 'status');
-      el.setAttribute('aria-live', 'polite');
-      document.body.appendChild(el);
-    }
-    el.textContent = message;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), TOAST_MS);
+  /** A confirmation (a song added, a wishlist change): one line that goes away by itself. When it can be undone, it has an Undo that asks the page. */
+  function showToast(message, undoToken) {
+    DRNotice.show({
+      id: 'toast',
+      text: message,
+      closable: false,
+      autoHide: TOAST_MS,
+      action: undoToken ? { label: 'Undo', onClick: () => sendCommand('undo', undoToken) } : null,
+    });
   }
 
   async function forwardWishlistRequest({ rid, op, id, bandId, itemType }) {
@@ -157,19 +152,12 @@
           forwardWishlistRequest({ ...message, itemType: message.itemType === 't' ? 't' : 'a' });
         }
         break;
-      case 'notice': // what's new: closed, it is not shown again until there is a new block (and the dot of the toolbar icon is done)
+      case 'notice':
         if (message.kind === 'reload') showReloadNotice();
-        else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string' && Array.isArray(message.items)) {
-          DRNotice.show({
-            id: 'news',
-            title: message.title.slice(0, 200),
-            lines: message.items.filter((item) => typeof item === 'string').slice(0, 8).map((item) => item.slice(0, 240)),
-            onClose: () => chrome.storage.local.set({ newsSeen: message.key.slice(0, 200) }).then(() => chrome.storage.local.remove('whatsNew')).catch(() => {}),
-          });
-        }
+        else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string') showNewsNotice(message.key.slice(0, 200), message.title.slice(0, 120));
         break;
       case 'toast':
-        if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH));
+        if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH), Number.isInteger(message.undo) ? message.undo : 0);
         break;
       case 'close': // a click inside the page: the menu of the player bar closes too
         if (state.bar) state.bar.closeMenus();
@@ -276,14 +264,35 @@
 
   let applyingUpdate = false;   // the Update button was clicked: the page reloads by itself, no notice is needed
 
+  /**
+   * There is news in this version: a line with a button for the What's new page and a close icon. Closing it, or opening the page, marks the
+   * block as seen (it is not shown again until there is a new one) and takes the dot off the toolbar icon.
+   */
+  function showNewsNotice(key, title) {
+    const markSeen = () => chrome.storage.local.set({ newsSeen: key }).then(() => chrome.storage.local.remove('whatsNew')).catch(() => {});
+    DRNotice.show({
+      id: 'news',
+      text: `Daily Recs ${title.replace(' · ', ': ')}`,
+      action: {
+        label: "See what's new",
+        onClick: () => {
+          markSeen();
+          chrome.runtime.sendMessage({ type: 'open-whats-new' }).catch(() => {});
+          DRNotice.hide('news');
+        },
+      },
+      onClose: markSeen,
+    });
+  }
+
   /** The extension was updated or reloaded with this tab open: this copy of the script is cut off from it. Only a reload brings the new one. */
   function showReloadNotice() {
     if (applyingUpdate) return;
     DRNotice.hide('update');
     DRNotice.show({
       id: 'reload',
-      title: 'Daily Recs was updated',
-      lines: ['Reload this page to keep using it.'],
+      text: 'Daily Recs was updated. Reload this page to keep using it.',
+      closable: false,
       action: { label: 'Reload', onClick: () => location.reload() },
     });
   }
@@ -297,8 +306,8 @@
     if (!stored || typeof stored.version !== 'string') { DRNotice.hide('update'); return; }
     DRNotice.show({
       id: 'update',
-      title: `Daily Recs ${stored.version.slice(0, 20)} is ready`,
-      lines: ['Update now to get the latest changes. The page reloads.'],
+      text: `Daily Recs ${stored.version.slice(0, 20)} is ready to install.`,
+      closable: false,
       action: {
         label: 'Update',
         onClick: () => {
