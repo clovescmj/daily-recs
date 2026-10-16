@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.3
+- About: "Every day you get a new list of songs." (the extra "the list of the day" is gone).
+
 ## 1.5.2
 - About: "the list of the day" instead of a number of songs (the list grows while you listen, and can be shorter when few albums fit).
 
