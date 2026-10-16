@@ -307,7 +307,6 @@
   /** The day changed with this tab open: the list stays as it is until the button asks for the new one. */
   function showNewDayNotice() {
     if (reloadNeeded) return;
-    updateTabTag();
     DRNotice.show({
       id: 'newday',
       text: 'A new day has started',
@@ -354,7 +353,7 @@
     chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.updateAvailable) showUpdateNotice(); });
   }
 
-  /** "daily recs new list": until the list of today is picked (it comes back when a new day starts with the page open). */
+  /** "daily recs new list": until the list of today is picked. A page left open past midnight keeps showing its list: the notice says that a new day started, not the tag. */
   async function updateTabTag() {
     if (!state.tagEl) return;
     state.tagEl.textContent = (await hasNewList()) ? 'new list' : '';

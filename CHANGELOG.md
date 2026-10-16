@@ -3,8 +3,11 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.19
+- A page left open past midnight no longer gets the "new list" tag while it still shows the old list: the notice "A new day has started" says it, and the tag is for the tab when the list of the day was not picked yet.
+
 ## 1.5.18
-- The tag of the daily recs tab says "new list" until you pick the list of the day (it was the number of albums not opened yet). It comes back when a new day starts with the page open.
+- The tag of the daily recs tab says "new list" until you pick the list of the day (it was the number of albums not opened yet).
 - The record of opened albums is gone (it only fed the number on the tab and on the icon).
 
 ## 1.5.17
