@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.4
+- When the extension is updated or reloaded with the tab open, the page and the player bar stay as they are and a notice at the bottom right says "Daily Recs was updated. Reload this page to keep using it." with a Reload button (before: the list was replaced by a message and the music was stopped).
+
 ## 1.5.3
 - About: "Every day you get a new list of songs." (the extra "the list of the day" is gone).
 

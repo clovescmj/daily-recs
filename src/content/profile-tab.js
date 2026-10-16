@@ -158,7 +158,8 @@
         }
         break;
       case 'notice': // what's new: closed, it is not shown again until there is a new block (and the dot of the toolbar icon is done)
-        if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string' && Array.isArray(message.items)) {
+        if (message.kind === 'reload') showReloadNotice();
+        else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string' && Array.isArray(message.items)) {
           DRNotice.show({
             id: 'news',
             title: message.title.slice(0, 200),
@@ -192,8 +193,7 @@
   window.addEventListener('unhandledrejection', (event) => {
     if (!/Extension context invalidated/i.test(String((event.reason && event.reason.message) || event.reason || ''))) return;
     event.preventDefault();
-    document.getElementById('dr-player')?.remove();
-    document.body.classList.remove('dr-player-on');
+    showReloadNotice();   // (the page and the bar stay as they are: only the notice says that a reload is needed)
   });
 
   // ── Player bar ────────────────────────────────────────────────────────────────────────────────────────────────
@@ -272,6 +272,16 @@
     updateTabCount();
     if (location.hash === HASH) openPanel(); else showProfile();
     watchForUpdate();
+  }
+
+  /** The extension was updated or reloaded with this tab open: this copy of the script is cut off from it. Only a reload brings the new one. */
+  function showReloadNotice() {
+    DRNotice.show({
+      id: 'reload',
+      title: 'Daily Recs was updated',
+      lines: ['Reload this page to keep using it.'],
+      action: { label: 'Reload', onClick: () => location.reload() },
+    });
   }
 
   // ── A new version is waiting ──────────────────────────────────────────────────────────────────────────────────

@@ -3,8 +3,8 @@ import { reportBugUrl, supportUrl } from '../../lib/config.js';
 import { MSG } from '../../lib/messages.js';
 import { runCommand } from './commands.js';
 import { loadState, loadStatus, pickedToday, savePicked, send, watchStorage } from './data.js';
-import { listenToHost } from './host-bridge.js';
-import { initPlayer, pause, playAlbum, togglePlay } from './player.js';
+import { listenToHost, postToHost } from './host-bridge.js';
+import { initPlayer, playAlbum, togglePlay } from './player.js';
 import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
@@ -114,19 +114,15 @@ async function init() {
 }
 
 /**
- * The extension was reloaded or updated while this page was open: the page stays on screen (and its music keeps playing), but every call to
- * the extension fails with "Extension context invalidated". It stops the music and asks for a reload of the tab, instead of failing in silence.
+ * The extension was reloaded or updated while this page was open: every call to the extension now fails with "Extension context
+ * invalidated". The page stays as it is (the song that plays keeps playing, nothing is taken from the screen) and a notice at the bottom
+ * right says that a reload is needed, with a button for it. Nothing here may call chrome.*, which is what no longer works.
  */
 let contextLost = false;
 function handleLostContext() {
   if (contextLost) return;
   contextLost = true;
-  try { pause(); } catch { /* the player may be gone as well */ }
-  document.title = 'Daily Recs';
-  const grid = $('album-grid');
-  if (grid) grid.innerHTML = '<div class="empty-state">Daily Recs was updated. Reload this page to keep using it.</div>';
-  const status = $('status');
-  if (status) status.hidden = true;
+  postToHost({ dr: 'notice', kind: 'reload', title: 'Daily Recs was updated', items: ['Reload this page to keep using it.'] });
 }
 const isLostContext = (reason) => /Extension context invalidated/i.test(String((reason && reason.message) || reason || ''));
 addEventListener('unhandledrejection', (event) => { if (isLostContext(event.reason)) { event.preventDefault(); handleLostContext(); } });
