@@ -1,10 +1,11 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { refresh, refreshTags, extendList, applyFeedback, PHASE } from '../src/lib/recommender.js';
+import { refresh, refreshTags, extendList, applyFeedback, fillSongs, PHASE } from '../src/lib/recommender.js';
 import { createSourceWeigher } from '../src/lib/taste-profile.js';
 import { DAILY_COUNT } from '../src/lib/state.js';
 import { createFakeBandcamp } from './helpers/fake-bandcamp.js';
 import { createMemoryStore } from './helpers/memory-store.js';
+import { emptyState } from '../src/lib/state.js';
 
 const TUNING = { delayMs: 0, stagePauseMs: 0, retryDelayMs: 1, pageDelayMs: 0 };
 const NOW = new Date(2026, 9, 7, 12);
@@ -598,5 +599,41 @@ describe('feedback', () => {
     const ctx = await withList();
     const state = await apply(ctx, 'like', '123');
     assert.deepEqual(state.liked, []);
+  });
+});
+
+describe('the song of a card', () => {
+  const albumPage = (title, id) => {
+    const attribute = JSON.stringify({ trackinfo: [{ title, track_id: id, file: { 'mp3-128': `https://t4.bcbits.com/stream/${id}` } }] }).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return `<div data-tralbum="${attribute}"></div><a class="tag" href="https://bandcamp.com/discover/ebm">ebm</a>`;
+  };
+  const fakeFetch = (pages) => async (url) => ({
+    ok: true, status: 200, headers: { get: () => null }, text: async () => pages[url] || '<html></html>', json: async () => ({}),
+  });
+  const withPool = (pool) => createMemoryStore({ ...emptyState(), pool });
+  const album = (id) => ({ id, artistId: `a${id}`, title: `Album ${id}`, artist: `Artist ${id}`, url: `https://x${id}.bandcamp.com/album/y`, srcs: {} });
+
+  test('cards of a list made by an older version get their song, and the genres they lacked', async () => {
+    const store = withPool({ 1: album('1'), 2: album('2') });
+    const fetch = fakeFetch({ 'https://x1.bandcamp.com/album/y': albumPage('First song', 11), 'https://x2.bandcamp.com/album/y': albumPage('Second song', 22) });
+    const filled = await fillSongs({ fetch, store, ids: ['1', '2'], tuning: TUNING });
+    assert.equal(filled, 2);
+    const { pool } = store.peek();
+    assert.deepEqual(pool['1'].song, { title: 'First song', i: 0, trackId: '11' });
+    assert.deepEqual(pool['2'].tags, ['ebm']);
+  });
+
+  test('a card that already knows its song (or has none) is not read again', async () => {
+    const store = withPool({ 1: { ...album('1'), song: { title: 'Known', i: 0, trackId: '5' } }, 2: { ...album('2'), song: null } });
+    let calls = 0;
+    const fetch = async () => { calls += 1; return { ok: true, status: 200, headers: { get: () => null }, text: async () => '' }; };
+    assert.equal(await fillSongs({ fetch, store, ids: ['1', '2'], tuning: TUNING }), 0);
+    assert.equal(calls, 0);
+  });
+
+  test('a page without a song that streams leaves the song as "none", so it is not asked again', async () => {
+    const store = withPool({ 1: album('1') });
+    await fillSongs({ fetch: fakeFetch({}), store, ids: ['1'], tuning: TUNING });
+    assert.equal(store.peek().pool['1'].song, null);
   });
 });

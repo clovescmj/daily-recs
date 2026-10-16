@@ -33,6 +33,7 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
       case MSG.WISHLIST_QUEUE: await jobs.runWishlistQueue(message); break;
       case MSG.WISHLIST_DONE: await jobs.runWishlistDone(message.id); break;
       case MSG.OPEN_MAIN: await openMain(); break;
+      case MSG.FILL_SONGS: return { ok: true, filled: await jobs.runFillSongs(message) };
       case MSG.APPLY_UPDATE: setTimeout(() => reload(), 150); break;   // (after the answer is sent)
       case MSG.EXTEND_LIST: {
         const ids = await jobs.runExtend(message);

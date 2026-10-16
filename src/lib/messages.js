@@ -13,12 +13,14 @@ export const MSG = Object.freeze({
   COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
   OPEN_MAIN: 'open-main',            // open the daily recs tab (asks to sign in first when needed)
   APPLY_UPDATE: 'apply-update',      // the profile tab asks to load the new version that is waiting
+  FILL_SONGS: 'fill-songs',          // the page asks for the song of cards that do not have one yet (lists made by an older version)
 
 });
 
 export const FEEDBACK_KINDS = Object.freeze(['like', 'unlike', 'dislike', 'undislike', 'wish', 'unwish', 'save', 'unsave']);
 export const WISHLIST_OPS = Object.freeze(['add', 'remove']);
 export const WISHLIST_ITEM_TYPES = Object.freeze(['a', 't']);   // an album, or a song (a track of an album)
+export const MAX_FILL_SONGS = 20;    // cards asked for at a time
 export const MAX_EXTEND_COUNT = 60;   // albums asked for at once at the end of a list (the radio asks for 50)
 
 /** Returns the normalised message, or null if it isn't a well-formed message of ours. */
@@ -42,6 +44,10 @@ export function parseMessage(raw) {
     case MSG.OPEN_MAIN:
     case MSG.APPLY_UPDATE:
       return { type: raw.type };
+    case MSG.FILL_SONGS: {
+      const ids = (Array.isArray(raw.ids) ? raw.ids : []).map(toNumericId).filter(Boolean).slice(0, MAX_FILL_SONGS);
+      return ids.length ? { type: raw.type, ids } : null;
+    }
     case MSG.FEEDBACK:
     {
       if (!id || !FEEDBACK_KINDS.includes(raw.kind)) return null;

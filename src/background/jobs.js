@@ -1,7 +1,7 @@
 // Everything that reads or writes the state goes through one queue, so a like clicked during a refresh is never lost.
 // The service worker can be terminated at any time, so nothing here is kept only in memory in a way that matters:
 // the queue and the in-flight map are just coordination for the current worker instance.
-import { applyFeedback, extendList, extendListMany, refresh, refreshTags } from '../lib/recommender.js';
+import { applyFeedback, extendList, extendListMany, fillSongs, refresh, refreshTags } from '../lib/recommender.js';
 import { scanSources } from '../lib/scanner.js';
 import { addDecision, decisionEntry } from '../lib/decisions.js';
 import { dequeueWishlistOp, emptyState, queueWishlistOp } from '../lib/state.js';
@@ -127,6 +127,12 @@ export const runExtend = ({ view, tags, count = 1 }) => enqueue(async () => {
   if (count > 1) return extendListMany({ fetch: fetchFn, store, view, tags, count });
   const id = await extendList({ fetch: fetchFn, store, view, tags });
   return id ? [id] : [];
+});
+
+/** The song of some cards that do not have one (a list made by an older version): their pages are read, at a polite pace. */
+export const runFillSongs = ({ ids }) => enqueue(async () => {
+  if (await isCoolingDown()) return 0;
+  return fillSongs({ fetch: (...args) => fetch(...args), store, ids });
 });
 
 export const runFeedback = ({ id, kind, tags, index, track, trackId }) => enqueue(async () => {

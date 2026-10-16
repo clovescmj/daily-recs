@@ -503,6 +503,34 @@ export async function extendListMany({ fetch: fetchFn, store, view = 'best', tag
   }
 }
 
+/**
+ * Reads the song of the cards that do not have one (their lists were made by an older version): one request each, two at a time, with the
+ * pause of the other reads. It also fills their genres when those are missing. Returns how many cards were filled.
+ */
+export async function fillSongs({ fetch: fetchFn, store, ids, tuning }) {
+  const pacing = withDefaults(tuning);
+  const state = await store.load();
+  if (!state || !state.pool) return 0;
+  const queue = [...new Set(ids)].map((id) => state.pool[id]).filter((candidate) => candidate && candidate.song === undefined && isBandcampUrl(candidate.url));
+  let filled = 0;
+  async function worker() {
+    while (queue.length) {
+      const candidate = queue.shift();
+      try {
+        const html = await fetchText(fetchFn, candidate.url, httpOptions(pacing));
+        candidate.song = featuredSong(html);
+        if (!candidate.tags) candidate.tags = parseTags(html);
+        rememberTags(state, candidate);
+        filled += 1;
+      } catch { /* the card keeps showing the album; it is asked for again next time */ }
+      await politePause(pacing.delayMs);
+    }
+  }
+  await Promise.all(Array.from({ length: SAMPLE_CONCURRENCY }, worker));
+  if (filled) await store.save(state);
+  return filled;
+}
+
 async function rememberProfileUrl(fetchFn, state, store) {
   try {
     state.profileUrl = (await getFan(fetchFn)).profileUrl;

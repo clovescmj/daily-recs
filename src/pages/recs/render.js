@@ -3,6 +3,7 @@ import { hiddenIn, tagListKey, todayKey } from '../../lib/state.js';
 import { cardHtml, findCard, paintDislike, paintSave, paintWish } from './cards.js';
 import { $ } from './dom.js';
 import { emit, maintainRadio, markPlaying } from './player.js';
+import { fillMissingSongs } from './songs.js';
 import { session } from './session.js';
 import { renderStatus } from './status-line.js';
 import { renderViewSwitch } from './views.js';
@@ -72,7 +73,8 @@ function renderGrid(state, status) {
   if (!ids.length) { setEmpty('Nothing new for now. Come back tomorrow.'); return; }
 
   // Rebuild the cards only when the list itself changed; otherwise just sync the wishlist / dislike controls.
-  const key = ids.join(',');
+  // (the key says which cards know their song: they are drawn again when it arrives)
+  const key = ids.map((id) => (state.pool[id].song === undefined ? id : `${id}s`)).join(',');
   if (key !== renderedKey) {
     $('album-grid').innerHTML = ids.map((id) => cardHtml(state.pool[id], {
       wished: session.wished.has(id), saved: cardSaved(state.pool[id]), disliked: session.dislikedThisVisit.has(id),
@@ -98,5 +100,6 @@ export function render(state, status) {
   $('play-all').hidden = !session.hasList;
   emit(true);
   maintainRadio();
+  fillMissingSongs();
   if (state && state.wishQueue && state.wishQueue.length) flushWishlistQueue();
 }
