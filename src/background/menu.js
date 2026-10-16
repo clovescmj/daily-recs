@@ -8,14 +8,14 @@ const PAGES = Object.freeze({
   whatsnew: 'src/pages/about/whats-new.html',
 });
 
-/** Menu items are created on install/update; clicks are handled on every worker start (listeners must be top-level). */
+/** Chrome shows at most 6 top-level items in this menu and drops the rest, so the count line plus 5 actions is the limit.
+ * Menu items are created on install/update; clicks are handled on every worker start (listeners must be top-level). */
 export function registerMenu() {
   chrome.runtime.onInstalled.addListener(() => {
     const version = chrome.runtime.getManifest().version;
     chrome.contextMenus.removeAll(() => {
       const item = (id, title) => chrome.contextMenus.create({ id, title, contexts: ['action'] });
       chrome.contextMenus.create({ id: 'count', title: 'Loading…', enabled: false, contexts: ['action'] });
-      chrome.contextMenus.create({ id: 'separator', type: 'separator', contexts: ['action'] });
       item('open', 'Open Daily Recs');
       item('feedback', 'Feedback');
       item('bug', 'Report a bug');
