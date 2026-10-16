@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.6
+- A line under the list says "Loading more albums…" while the next batch is being loaded in the background (the first one right after a list is drawn, and each one when 10 or fewer are left to play). It goes away when the albums arrive, or when nothing more fits.
+
 ## 1.4.5
 - The heart asks Bandcamp for the wishlist change the way Bandcamp's own button does (the same request, through its own security-token machinery), with our own callbacks: the answer says if it worked, so the heart no longer opens Bandcamp's error dialog on the first click, and the next click does not have to wait for a failed attempt that was still counting down. If that request fails, Bandcamp's own function is tried once, as before.
 

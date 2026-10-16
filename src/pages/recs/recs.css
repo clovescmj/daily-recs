@@ -110,6 +110,8 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .button--large { height: 40px; padding: 0 28px 2px; font-size: var(--bc-font-size-200); justify-content: center; }
 
 /* ── Status (progress of a run) ─────────────────────────────────────────────────────────────────────────────────── */
+.more-status { margin: 24px 0 8px; text-align: center; color: var(--muted); font-size: var(--bc-font-size-200); }
+.more-status[hidden] { display: none; }
 .new-day { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--soft); border: 1px solid var(--line); padding: 12px 16px; margin-bottom: 20px; }
 .new-day[hidden] { display: none; }
 .new-day-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

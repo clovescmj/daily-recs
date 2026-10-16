@@ -350,10 +350,17 @@ async function waitForCards(ids) {
   for (let i = 0; i < 25 && !ids.every((id) => findCard(id)); i += 1) await sleepMs(200);
 }
 
+/** The line under the list that says more albums are on their way. */
+function showMoreStatus(on) {
+  const line = document.getElementById('more-status');
+  if (line) line.hidden = !on;
+}
+
 /** Asks for the next batch in the background. Resolves with the ids that were added (none when nothing more fits). */
 async function loadMoreAlbums() {
   if (radioBusy) return [];
   radioBusy = true;
+  showMoreStatus(true);
   try {
     const reply = await send({ type: MSG.EXTEND_LIST, view: session.view, tags: session.tagKeys, count: RADIO_BATCH });
     const ids = reply && reply.ok && Array.isArray(reply.ids) ? reply.ids : [];
@@ -364,6 +371,7 @@ async function loadMoreAlbums() {
     return [];
   } finally {
     radioBusy = false;
+    showMoreStatus(false);
   }
 }
 
