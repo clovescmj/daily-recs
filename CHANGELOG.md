@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.14
+- After the Update or Reload button, the page comes back on the daily recs tab (it went back to the profile's first tab).
+
 ## 1.5.13
 - The right-click menu of the icon shows About again: Chrome keeps only 6 items there, and the separator was taking the place of the last one.
 

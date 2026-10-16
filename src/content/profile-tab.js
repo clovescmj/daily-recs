@@ -258,8 +258,22 @@
     state.tab = tab;
     state.countEl = badge;
     updateTabCount();
-    if (location.hash === HASH) openPanel(); else showProfile();
+    if (location.hash === HASH || takeReopenFlag()) openPanel(); else showProfile();
     watchForUpdate();
+  }
+
+  const REOPEN_KEY = 'dr-reopen';
+  /** Reloads the page and, if the daily recs tab was open, brings it back open (the address may not keep #dailyrecs). */
+  function reloadKeepingTab() {
+    try { if (state.isOpen) sessionStorage.setItem(REOPEN_KEY, '1'); } catch { /* the reload still works */ }
+    location.reload();
+  }
+  function takeReopenFlag() {
+    try {
+      const found = sessionStorage.getItem(REOPEN_KEY) === '1';
+      sessionStorage.removeItem(REOPEN_KEY);
+      return found;
+    } catch { return false; }
   }
 
   let applyingUpdate = false;   // the Update button was clicked: the page reloads by itself, no notice is needed
@@ -297,7 +311,7 @@
       id: 'reload',
       text: 'Daily Recs was updated. Reload this page to keep using it.',
       closable: false,
-      action: { label: 'Reload', onClick: () => location.reload() },
+      action: { label: 'Reload', onClick: reloadKeepingTab },
     });
   }
 
@@ -317,7 +331,7 @@
         onClick: () => {
           applyingUpdate = true;
           chrome.runtime.sendMessage({ type: 'apply-update' }).catch(() => {});
-          setTimeout(() => location.reload(), 1500);   // the extension reloads itself; the page then comes back with the new version
+          setTimeout(reloadKeepingTab, 1500);   // the extension reloads itself; the page then comes back with the new version
         },
       },
     });
