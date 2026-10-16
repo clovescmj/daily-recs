@@ -8,7 +8,7 @@ import { dequeueWishlistOp, emptyState, markPlayed, queueWishlistOp } from '../l
 import { DECISIONS_KEY } from '../lib/storage-keys.js';
 import { tagFit } from '../lib/taste-profile.js';
 import { syncState } from '../lib/taste-sync.js';
-import { loadStatus, markOpened, store, todaySummary } from './storage.js';
+import { loadStatus, markOpened, store } from './storage.js';
 import { pendingWhatsNew } from './icon.js';
 
 let chain = Promise.resolve();
@@ -20,27 +20,13 @@ export function enqueue(task) {
   return result;
 }
 
-export const COUNT_MENU_ID = 'count';
-
-/** Plain-language meaning of the number on the icon: today's albums you haven't opened yet. */
-export function describeCount({ total, unopened }) {
-  if (unopened) return `${unopened} new album${unopened === 1 ? '' : 's'} for today`;
-  return total ? "You've opened all of today's albums" : 'No recommendations yet';
-}
-
 /**
- * Shows how many of today's albums haven't been opened yet in the icon's tooltip and in the first (disabled) item of its
- * right-click menu. The icon itself carries no number.
+ * The toolbar icon carries no number (versions before 1.5.16 had one: this clears it); its tooltip says when there are news.
  */
-export async function updateBadge() {
-  const summary = await todaySummary();
-  const label = describeCount(summary);
-  await chrome.action.setBadgeText({ text: '' });   // no number on the icon (versions before 1.5.16 had one: this clears it)
+export async function updateToolbarTitle() {
+  await chrome.action.setBadgeText({ text: '' });
   const news = await pendingWhatsNew();
-  await chrome.action.setTitle({ title: `Daily Recs\n${label}${news ? `\nNew in ${news.version}: right-click the icon, What's new` : ''}` });
-  try {
-    await chrome.contextMenus.update(COUNT_MENU_ID, { title: label });
-  } catch { /* the menu isn't created yet (first start): it is created with the right text on install */ }
+  await chrome.action.setTitle({ title: `Daily Recs${news ? `\nNew in ${news.version}: right-click the icon, What's new` : ''}` });
 }
 
 /** Syncs taste with the user's Google account. Never throws: without sync (signed out, quota…) taste stays local. */
@@ -104,7 +90,6 @@ export function runRefresh({ force = false, mode = 'best', tags = [] } = {}) {
     if (mode === 'tags') await refreshTags({ fetch: (...args) => fetch(...args), store, tags, force });
     else await refresh({ fetch: (...args) => fetch(...args), store, force, mode });
     await planRetry();
-    await updateBadge();
   }).finally(() => inFlight.delete(key));
   inFlight.set(key, job);
   return job;
@@ -170,7 +155,6 @@ export const runWishlistDone = (id) => enqueue(async () => {
 
 export const runMarkOpened = (id) => enqueue(async () => {
   await markOpened(id);
-  await updateBadge();
 });
 
 export const runMarkPlayed = (id) => enqueue(async () => {

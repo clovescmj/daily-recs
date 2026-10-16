@@ -1,8 +1,8 @@
 // Storage adapter for the service worker. The recommender talks to this through the `store` interface
 // (see recommender.js); the pages read the same keys directly.
-import { LIKED_KEY, OPENED_KEY, PICKED_KEY, STATE_KEY, STATUS_KEY } from '../lib/storage-keys.js';
+import { LIKED_KEY, OPENED_KEY, STATE_KEY, STATUS_KEY } from '../lib/storage-keys.js';
 import { loadLiked, mirrorLiked } from '../lib/liked.js';
-import { activeList, hiddenIn, todayKey } from '../lib/state.js';
+import { todayKey } from '../lib/state.js';
 
 export const store = {
   /** The state, with the Liked Songs of their own key (the first time, the list kept in the state by an older version moves there). */
@@ -53,13 +53,4 @@ export async function markOpened(id) {
     opened.ids.push(id);
     await chrome.storage.local.set({ [OPENED_KEY]: opened });
   }
-}
-
-/** The albums of the list being used today: how many there are, and how many haven't been opened yet (nor hidden). */
-export async function todaySummary() {
-  const [state, picked] = [await store.load(), (await chrome.storage.local.get(PICKED_KEY))[PICKED_KEY]];
-  const list = activeList(state, picked);
-  if (!list) return { total: 0, unopened: 0 };
-  const opened = new Set((await loadOpened()).ids);
-  return { total: list.ids.length, unopened: list.ids.filter((id) => !opened.has(id) && !hiddenIn(state, id, list)).length };
 }

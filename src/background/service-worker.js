@@ -6,10 +6,10 @@
 //    worker is detected and cleared on startup (see clearStaleStatus).
 import { registerMenu } from './menu.js';
 import { registerMessageHandler } from './messages.js';
-import { RETRY_ALARM, enqueue, retryAfterRateLimit, runScan, syncNow, updateBadge } from './jobs.js';
+import { RETRY_ALARM, enqueue, retryAfterRateLimit, runScan, syncNow, updateToolbarTitle } from './jobs.js';
 import { refreshToolbarIcon, restoreToolbarIcon, startColorSchemeWatcher } from './icon.js';
 import { continueAfterLogin, forgetLoginTab, openMainPage } from './navigation.js';
-import { PICKED_KEY, UPDATE_KEY, WHATS_NEW_KEY } from '../lib/storage-keys.js';
+import { UPDATE_KEY, WHATS_NEW_KEY } from '../lib/storage-keys.js';
 import { isMajorUpdate } from '../lib/versions.js';
 import { clearStaleStatus } from './storage.js';
 
@@ -23,7 +23,7 @@ registerMessageHandler();
 registerMenu();
 
 // Queued first, so it runs before any work that arrives while the worker is waking up.
-enqueue(clearStaleStatus).then(updateBadge);
+enqueue(clearStaleStatus).then(updateToolbarTitle);
 restoreToolbarIcon();
 startColorSchemeWatcher();
 
@@ -65,8 +65,6 @@ chrome.tabs.onRemoved.addListener(forgetLoginTab);
 // Another device changed the shared taste: merge it.
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'sync' && changes['taste:meta']) enqueue(syncNow);
-  // The user picked another list: the numbers on the icon follow it.
-  if (area === 'local' && changes[PICKED_KEY]) enqueue(updateBadge);
   // The news were opened (or the dot expired): the icon and its tooltip lose the dot.
-  if (area === 'local' && changes[WHATS_NEW_KEY]) { refreshToolbarIcon(); enqueue(updateBadge); }
+  if (area === 'local' && changes[WHATS_NEW_KEY]) { refreshToolbarIcon(); enqueue(updateToolbarTitle); }
 });

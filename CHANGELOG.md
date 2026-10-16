@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.17
+- The tooltip and the menu of the toolbar icon no longer say "N new albums for today" (the lists are songs now, and nothing counts on the icon).
+- The orange dot of the news also goes away when the news were already seen (it stayed on the icon in that case).
+
 ## 1.5.16
 - The number of unopened albums is no longer drawn on the toolbar icon (the tooltip and the menu still say it).
 

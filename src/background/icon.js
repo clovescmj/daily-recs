@@ -65,7 +65,6 @@ function iconWithDot(dark) {
 export async function refreshToolbarIcon() {
   const stored = (await chrome.storage.local.get(SCHEME_KEY))[SCHEME_KEY];
   const news = await pendingWhatsNew();
-  if (stored === undefined && !news) return;
   const dark = stored === undefined ? true : stored;   // (the manifest default is the white symbol)
   try {
     if (news) {
