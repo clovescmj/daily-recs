@@ -150,8 +150,10 @@
       const from = row.previousElementSibling && row.previousElementSibling.classList.contains('qsec') ? row.previousElementSibling : row;
       list.scrollTop += from.getBoundingClientRect().top - list.getBoundingClientRect().top;
     };
-    const setQueue = (on) => { if (on) setSaved(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); if (on) scrollToPlaying(); };
-    const setSaved = (on) => { if (on) setQueue(false); q('.saved').classList.toggle('show', on); q('.x-saved').classList.toggle('active', on); };
+    // (a panel open: the notices of the page move to its left, see profile-tab.css)
+    const markPanelOpen = () => document.body.classList.toggle('dr-panel-open', q('.queue').classList.contains('show') || q('.saved').classList.contains('show'));
+    const setQueue = (on) => { if (on) setSaved(false); q('.queue').classList.toggle('show', on); q('.x-queue').classList.toggle('active', on); if (on) scrollToPlaying(); markPanelOpen(); };
+    const setSaved = (on) => { if (on) setQueue(false); q('.saved').classList.toggle('show', on); q('.x-saved').classList.toggle('active', on); markPanelOpen(); };
     q('.x-queue').addEventListener('click', (e) => { e.preventDefault(); setQueue(!q('.queue').classList.contains('show')); });
     q('.x-saved').addEventListener('click', (e) => { e.preventDefault(); setSaved(!q('.saved').classList.contains('show')); });
     // a click outside the bar closes the panels too (the page inside the frame reports its clicks through closeMenus)

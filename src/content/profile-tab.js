@@ -274,8 +274,12 @@
     watchForUpdate();
   }
 
+  let applyingUpdate = false;   // the Update button was clicked: the page reloads by itself, no notice is needed
+
   /** The extension was updated or reloaded with this tab open: this copy of the script is cut off from it. Only a reload brings the new one. */
   function showReloadNotice() {
+    if (applyingUpdate) return;
+    DRNotice.hide('update');
     DRNotice.show({
       id: 'reload',
       title: 'Daily Recs was updated',
@@ -298,6 +302,7 @@
       action: {
         label: 'Update',
         onClick: () => {
+          applyingUpdate = true;
           chrome.runtime.sendMessage({ type: 'apply-update' }).catch(() => {});
           setTimeout(() => location.reload(), 1500);   // the extension reloads itself; the page then comes back with the new version
         },
@@ -305,7 +310,21 @@
     });
   }
 
+  /**
+   * The moment the extension is updated or reloaded, `chrome.runtime.id` is gone for this copy of the script: the notice appears then,
+   * before anything fails (the page and the bar are left as they are).
+   */
+  function watchContext() {
+    const alive = () => { try { return Boolean(chrome.runtime && chrome.runtime.id); } catch { return false; } };
+    const timer = setInterval(() => {
+      if (alive()) return;
+      clearInterval(timer);
+      showReloadNotice();
+    }, 2000);
+  }
+
   function watchForUpdate() {
+    watchContext();
     showUpdateNotice();
     chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.updateAvailable) showUpdateNotice(); });
   }

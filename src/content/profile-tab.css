@@ -22,25 +22,36 @@ body.dr-player-on { padding-bottom: 92px; }
   opacity: 0; pointer-events: none; transition: opacity var(--dr-menu-dur);
 }
 #dr-toast.show { opacity: 1; }
-/* Notices (src/content/notice.js): bottom right, above the player bar, in the style of the snackbar above */
+/* Notices (src/content/notice.js): bottom right, above the player bar, in the style of the snackbar above. They open with a short slide up
+   and a fade; with a panel of the bar open (queue, Liked Songs) they move to its left, so they do not cover it. */
 #dr-notices {
   position: fixed; right: 16px; bottom: 100px; z-index: 2147483001; width: 340px; max-width: calc(100vw - 32px);
   display: flex; flex-direction: column-reverse; gap: 8px; pointer-events: none;
+  transition: right var(--dr-menu-dur) var(--dr-ease);
 }
+body.dr-panel-open #dr-notices { right: 404px; }
 .dr-notice {
-  position: relative; padding: 12px 36px 12px 16px; background: var(--dr-gray-600); color: var(--dr-white); border-radius: var(--dr-radius);
-  font: var(--dr-font-base)/1.4 var(--dr-font-family); opacity: 0; transform: translateY(6px); pointer-events: auto;
-  transition: opacity var(--dr-menu-dur), transform var(--dr-menu-dur);
+  position: relative; max-height: min(60vh, 420px); overflow-y: auto; padding: 14px 48px 14px 16px;
+  background: var(--dr-gray-600); color: var(--dr-white); border-radius: var(--dr-radius); box-shadow: var(--dr-shadow-menu);
+  font: var(--dr-font-base)/1.4 var(--dr-font-family); opacity: 0; transform: translateY(16px); pointer-events: auto;
+  transition: opacity .22s var(--dr-ease), transform .22s var(--dr-ease);
 }
 .dr-notice.show { opacity: 1; transform: none; }
 .dr-notice-title { display: block; font-weight: var(--dr-weight-bold); }
 .dr-notice ul { margin: 6px 0 0; padding-left: 18px; font-size: var(--dr-font-s); }
 .dr-notice li { margin: 3px 0; }
-.dr-notice-close { position: absolute; top: 6px; right: 8px; width: 24px; height: 24px; border: 0; background: none; color: var(--dr-white); font-size: 20px; line-height: 1; cursor: pointer; opacity: .8; }
-.dr-notice-close:hover { opacity: 1; }
+/* the X is the one of the panels of the bar: a 28 px box, the icon of the bar, a plain hover and the same focus ring */
+.dr-notice-close {
+  position: absolute; top: 8px; right: 8px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+  padding: 0; border: 0; border-radius: var(--dr-radius); background: none; cursor: pointer;
+}
+.dr-notice-close svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-white); display: block; }
+.dr-notice-close:hover { background: rgba(255, 255, 255, .16); }
+.dr-notice-close:active { background: rgba(255, 255, 255, .24); }
+.dr-notice-close:focus-visible { outline: 2px solid var(--dr-white); outline-offset: 1px; }
 .dr-notice-action { margin-top: 10px; padding: 6px 14px; border: 0; border-radius: var(--dr-radius); background: var(--dr-white); color: var(--dr-gray-700); font: inherit; font-weight: var(--dr-weight-bold); cursor: pointer; }
 .dr-notice-action:disabled { opacity: .6; cursor: default; }
-@media (prefers-reduced-motion: reduce) { .dr-notice { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .dr-notice, #dr-notices { transition: none; } }
 /* Opened straight on the daily recs tab (#dailyrecs): Bandcamp's own collection stays out of sight until the panel is there (see early.js). The tab bar stays. */
 html.dr-pending #grids { visibility: hidden; }
 html.dr-pending #grids #grid-tabs { visibility: visible; }
