@@ -154,7 +154,7 @@
         break;
       case 'notice':
         if (message.kind === 'reload') showReloadNotice();
-        else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string') showNewsNotice(message.key.slice(0, 200), message.title.slice(0, 120));
+        else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string') showNewsNotice(message.key.slice(0, 200));
         break;
       case 'toast':
         if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH), Number.isInteger(message.undo) ? message.undo : 0);
@@ -268,11 +268,11 @@
    * There is news in this version: a line with a button for the What's new page and a close icon. Closing it, or opening the page, marks the
    * block as seen (it is not shown again until there is a new one) and takes the dot off the toolbar icon.
    */
-  function showNewsNotice(key, title) {
+  function showNewsNotice(key) {
     const markSeen = () => chrome.storage.local.set({ newsSeen: key }).then(() => chrome.storage.local.remove('whatsNew')).catch(() => {});
     DRNotice.show({
       id: 'news',
-      text: `Daily Recs ${title.replace(' · ', ': ')}`,
+      text: 'Daily Recs was updated',
       action: {
         label: "See what's new",
         onClick: () => {
@@ -291,7 +291,7 @@
     DRNotice.hide('update');
     DRNotice.show({
       id: 'reload',
-      text: 'Daily Recs was updated',
+      text: 'Daily Recs was updated. Reload this page to keep using it.',
       closable: false,
       action: { label: 'Reload', onClick: () => location.reload() },
     });
