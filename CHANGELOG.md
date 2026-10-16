@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.1
+- About: the texts say "songs" where the cards are songs, say that lists can be switched at any time (not once a day), describe the genre rule and the radio in plain words, and say that Liked Songs stay in this browser.
+
 ## 1.5.0
 - **A card is one song.** It shows the song (the one the artist highlights, or the first), the artist and the album ("People who own…" is gone). The heart adds that song to the Bandcamp wishlist (an item of type "t") and the + adds it to Liked Songs. A list made by an older version, with no song known, shows the album as before.
 - **No Shuffle, no Full album.** The player plays the song of the card and then the next card, in the order of the page (that order already spreads the genres). The only other sequence is Liked Songs: a song played from there goes on with the Liked Songs, and when they run out the list goes on from where it was. The queue is the cards after the one that plays (up to 100 rows) and what played; the play plan, the window of songs of the queue and the two modes are gone.
