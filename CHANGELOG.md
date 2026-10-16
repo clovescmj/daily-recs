@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.22
+- The confirmations (a song added or removed, a wishlist change) no longer have an Undo button: to undo, press the icon again.
+
 ## 1.5.21
 - Only one notice is on screen at a time: the current one fades out before the next comes in (they overlapped when you added and removed a song quickly). A notice that asks for something (update, reload) comes back after a passing one.
 

@@ -43,7 +43,7 @@ export async function setWish(id, on) {
       toast("Couldn't add it to your wishlist. Try again.");
       return;
     }
-    toast(result.ok ? (on ? 'Added to your wishlist' : 'Removed from your wishlist') : "Couldn't confirm the wishlist removal.", result.ok ? () => setWish(id, !on) : null);
+    toast(result.ok ? (on ? 'Added to your wishlist' : 'Removed from your wishlist') : "Couldn't confirm the wishlist removal.");
     if (on) {
       session.wished.add(id);
       if (target.itemType === 't') session.wishedSongs.set(id, target.id);
@@ -68,7 +68,7 @@ async function setSongs(songs, on, message) {
     if (on) { session.saved.add(`${id}:${i}`); if (all) session.savedAlbums.add(id); } else { session.saved.delete(`${id}:${i}`); session.savedAlbums.delete(id); }
   }
   emit(true);
-  toast(message, () => setSongs(songs, !on, on ? 'Removed from Liked Songs' : 'Added to Liked Songs'));   // (Undo does the opposite)
+  toast(message);
   await updateLiked(songs.map(({ id, i, title, all }) => ({ id, i, title: String(title || '').slice(0, 200), ...(all ? { all: true } : {}) })), on); // saved for good before anything else
   for (const { id, i, title } of songs) await send({ type: MSG.FEEDBACK, id, kind: on ? 'save' : 'unsave', index: i, track: String(title || '').slice(0, 200) });
 }

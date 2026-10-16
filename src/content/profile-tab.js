@@ -104,14 +104,13 @@
 
   const sendCommand = (cmd, v) => state.frame && state.frame.contentWindow.postMessage({ dr: 'cmd', cmd, v }, EXTENSION_ORIGIN);
 
-  /** A confirmation (a song added, a wishlist change): one line that goes away by itself. When it can be undone, it has an Undo that asks the page. */
-  function showToast(message, undoToken) {
+  /** A confirmation (a song added, a wishlist change): one line that goes away by itself. */
+  function showToast(message) {
     DRNotice.show({
       id: 'toast',
       text: message,
       closable: false,
       autoHide: TOAST_MS,
-      action: undoToken ? { label: 'Undo', onClick: () => sendCommand('undo', undoToken) } : null,
     });
   }
 
@@ -144,7 +143,7 @@
         else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string') showNewsNotice(message.key.slice(0, 200));
         break;
       case 'toast':
-        if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH), Number.isInteger(message.undo) ? message.undo : 0);
+        if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH));
         break;
       case 'close': // a click inside the page: the menu of the player bar closes too
         if (state.bar) state.bar.closeMenus();
