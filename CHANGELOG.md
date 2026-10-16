@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.5
+- The heart asks Bandcamp for the wishlist change the way Bandcamp's own button does (the same request, through its own security-token machinery), with our own callbacks: the answer says if it worked, so the heart no longer opens Bandcamp's error dialog on the first click, and the next click does not have to wait for a failed attempt that was still counting down. If that request fails, Bandcamp's own function is tried once, as before.
+
 ## 1.4.4
 - Texts aligned with the radio and the rules of the lists: About (up to 50 albums, more in the background, shorter lists when few fit), README (install from the store, how it works, layout), INSTALL (tips), privacy policy (the radio reads more album pages while you listen) and the three list buttons, which now say what each list contains instead of "perfect matches" and "go beyond".
 

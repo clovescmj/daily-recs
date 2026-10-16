@@ -122,6 +122,75 @@ describe('wishlistOpInPage (runs inside the Bandcamp page)', () => {
   });
 });
 
+
+describe('wishlistOpInPage through Bandcamp\'s own request (Crumb.ajax)', () => {
+  const install = ({ answer = { ok: true }, fail = false, silent = false, own = true } = {}) => {
+    globalThis.CurrentFan = { fan_id: 7, collection_count: 100, is_own_collection: own };
+    globalThis.FanData = { username: 'someone' };
+    globalThis.Fanpage = { collectItem() { throw new Error('the page function must not be used'); }, uncollectItem() { throw new Error('the page function must not be used'); } };
+    globalThis.Crumb = {
+      sent: [],
+      ajax(options) {
+        this.sent.push(options);
+        if (silent) return;
+        setTimeout(() => (fail ? options.error({ status: 500 }) : options.success(answer)), 5);
+      },
+    };
+  };
+  const uninstall = () => { for (const name of ['CurrentFan', 'FanData', 'Fanpage', 'Crumb']) delete globalThis[name]; };
+
+  test('adds with the request of Bandcamp\'s own button, and the count of the menu follows', async () => {
+    install();
+    assert.deepEqual(await wishlistOpInPage({ op: 'add', id: '111', bandId: '222' }), { ok: true });
+    const [sent] = Crumb.sent;
+    assert.equal(sent.url, '/collect_item_cb');
+    assert.equal(sent.type, 'POST');
+    assert.deepEqual(sent.data, { fan_id: 7, item_id: '111', item_type: 'a', band_id: '222' });
+    assert.equal(CurrentFan.collection_count, 101);
+    uninstall();
+  });
+
+  test('removes with "/uncollect_item_cb" and the id of the item', async () => {
+    install();
+    assert.deepEqual(await wishlistOpInPage({ op: 'remove', id: '111', bandId: '222' }), { ok: true });
+    assert.equal(Crumb.sent[0].url, '/uncollect_item_cb');
+    assert.deepEqual(Crumb.sent[0].data, { fan_id: 7, item_id: '111' });
+    assert.equal(CurrentFan.collection_count, 99);
+    uninstall();
+  });
+
+  test('an answer with an error goes on to Bandcamp\'s own function once, and that one decides', async () => {
+    install({ answer: { error: true, exception: 'nope' } });
+    const calls = [];
+    Fanpage.collectItem = (...args) => { calls.push(args); setTimeout(() => CurrentFan.collection_count++, 10); };
+    assert.deepEqual(await wishlistOpInPage({ op: 'add', id: '1', bandId: '2' }), { ok: true });
+    assert.equal(calls.length, 1);
+    assert.equal(Crumb.sent.length, 1, 'the direct request is not repeated');
+    uninstall();
+  });
+
+  test('when both ways fail it is a failure, and says why', async () => {
+    install({ fail: true });
+    Fanpage.collectItem = () => {};   // Bandcamp answers nothing either
+    const result = await wishlistOpInPage({ op: 'add', id: '1', bandId: '2', timeoutMs: 150 });
+    assert.equal(result.ok, false);
+    uninstall();
+  });
+
+  test('no answer at all to the direct request is a failure', async () => {
+    install({ silent: true });
+    assert.match((await wishlistOpInPage({ op: 'add', id: '1', bandId: '2', timeoutMs: 100 })).error, /no answer/);
+    uninstall();
+  });
+
+  test('on a page that is not the user\'s own collection the request names the profile it came from', async () => {
+    install({ own: false });
+    await wishlistOpInPage({ op: 'add', id: '1', bandId: '2' });
+    assert.equal(Crumb.sent[0].data.ref_username, 'someone');
+    uninstall();
+  });
+});
+
 import { activeList } from '../src/lib/state.js';
 test('activeList: the list the user picked today, or any list of today', () => {
   const state = emptyState();
