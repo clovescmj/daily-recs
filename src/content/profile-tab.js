@@ -263,12 +263,14 @@
   }
 
   let applyingUpdate = false;   // the Update button was clicked: the page reloads by itself, no notice is needed
+  let reloadNeeded = false;     // the extension was updated under this tab: its notice replaces the others
 
   /**
    * There is news in this version: a line with a button for the What's new page and a close icon. Closing it, or opening the page, marks the
    * block as seen (it is not shown again until there is a new one) and takes the dot off the toolbar icon.
    */
   function showNewsNotice(key) {
+    if (reloadNeeded) return;   // the page needs a reload first: the notice of news comes back with the new code, if it was not seen
     const markSeen = () => chrome.storage.local.set({ newsSeen: key }).then(() => chrome.storage.local.remove('whatsNew')).catch(() => {});
     DRNotice.show({
       id: 'news',
@@ -288,7 +290,9 @@
   /** The extension was updated or reloaded with this tab open: this copy of the script is cut off from it. Only a reload brings the new one. */
   function showReloadNotice() {
     if (applyingUpdate) return;
+    reloadNeeded = true;
     DRNotice.hide('update');
+    DRNotice.hide('news');   // (both say that Daily Recs was updated: only the one that asks for the reload stays)
     DRNotice.show({
       id: 'reload',
       text: 'Daily Recs was updated. Reload this page to keep using it.',
