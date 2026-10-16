@@ -74,7 +74,7 @@ function renderGrid(state, status) {
 
   // Rebuild the cards only when the list itself changed; otherwise just sync the wishlist / dislike controls.
   // (the key says which cards know their song: they are drawn again when it arrives)
-  const key = ids.map((id) => (state.pool[id].song === undefined ? id : `${id}s`)).join(',');
+  const key = ids.map((id) => { const song = state.pool[id].song; return song === undefined || (song && song.url === undefined) ? id : `${id}s`; }).join(',');
   if (key !== renderedKey) {
     $('album-grid').innerHTML = ids.map((id) => cardHtml(state.pool[id], {
       wished: session.wished.has(id), saved: cardSaved(state.pool[id]), disliked: session.dislikedThisVisit.has(id),

@@ -206,21 +206,19 @@ a:hover { color: var(--link-dark); text-decoration: underline; }
 .cover-badge svg { width: 30px; height: 30px; fill: var(--white); display: block; }
 
 .album-body { padding: 8px 0 0; display: flex; flex-direction: column; gap: 1px; flex: 1; }
-.album-title, .album-artist, .album-album { align-self: flex-start; } /* hover only over the text, not the whole row */
+.album-title, .album-line { align-self: flex-start; } /* hover only over the text, not the whole row */
 .album-title { font-size: var(--dr-font-m); font-weight: var(--dr-weight-bold); color: var(--text); line-height: var(--dr-line-tight); }
-.album-artist { color: var(--muted); }
-.album-artist::before { content: "by "; }
-.album-album { color: var(--muted); }
-.album-album::before { content: "from "; }
-/* Like Bandcamp's collection: hovering the title or the artist underlines both and darkens the artist. */
-.album-title:hover, .album-artist:hover, .album-album:hover { color: var(--text); text-decoration: none; }
-.album-body:has(.album-title:hover, .album-artist:hover, .album-album:hover) :is(.album-title, .album-artist, .album-album) { color: var(--text); text-decoration: underline; }
+.album-line { color: var(--muted); }   /* "by" and "from" are plain text; the name after each is the link */
+.album-artist, .album-album { color: inherit; }
+/* each of the three is a link of its own: the hover of the card does nothing to them, and only the one under the pointer is underlined
+   (and darkened, for the artist and the album) */
+.album-title:hover, .album-artist:hover, .album-album:hover { color: var(--text); text-decoration: underline; }
 
 /* Disliked this visit: dimmed (not removed) so it can be undone; the action row keeps its full colours. */
 .album-card.is-disliked .album-cover img { filter: grayscale(1); opacity: .5; transition: opacity var(--dr-menu-dur); }
-.album-card.is-disliked :is(.album-title, .album-artist, .album-album) { opacity: .4; transition: opacity var(--dr-menu-dur); }
+.album-card.is-disliked :is(.album-title, .album-line) { opacity: .4; transition: opacity var(--dr-menu-dur); }
 .album-card.is-disliked:hover .album-cover img,
-.album-card.is-disliked:hover :is(.album-title, .album-artist, .album-album) { opacity: .7; }
+.album-card.is-disliked:hover :is(.album-title, .album-line) { opacity: .7; }
 .album-card.is-disliked .cover-play { display: none; }
 .album-card.is-disliked .cover-badge { display: inline-flex; }
 

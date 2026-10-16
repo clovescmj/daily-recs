@@ -116,6 +116,9 @@ async function readSources(fetchFn, state, sources, onProgress = () => {}, pacin
 const TAG_CACHE_MAX = 1500;                     // entries kept (about 80 KB)
 const TAG_CACHE_DAYS = 30;                      // an album's tags are read again after this long, in case the artist edited them
 
+/** A card needs its song read when it was never looked for, or when it was saved before songs had the address of their page. */
+const needsSong = (candidate) => candidate.song === undefined || (candidate.song !== null && candidate.song.url === undefined);
+
 /** Gives the candidates whose tags were read in an earlier run their tags back, without a request. */
 function applyCachedTags(state) {
   const cutoff = Date.now() - TAG_CACHE_DAYS * 86_400_000;
@@ -123,13 +126,13 @@ function applyCachedTags(state) {
     const entry = !candidate.tags && state.tagCache[candidate.id];
     if (entry && entry.at >= cutoff) {
       candidate.tags = entry.t ? entry.t.split('|') : [];
-      if (candidate.song === undefined && 's' in entry) candidate.song = entry.s ? { title: entry.s, i: entry.i, trackId: entry.k || '' } : null;
+      if (candidate.song === undefined && 's' in entry) candidate.song = entry.s ? { title: entry.s, i: entry.i, trackId: entry.k || '', url: entry.u || '' } : null;
     }
   }
 }
 
 function rememberTags(state, candidate) {
-  state.tagCache[candidate.id] = { t: candidate.tags.join('|'), at: Date.now(), s: candidate.song ? candidate.song.title : '', i: candidate.song ? candidate.song.i : -1, k: candidate.song ? candidate.song.trackId : '' };
+  state.tagCache[candidate.id] = { t: candidate.tags.join('|'), at: Date.now(), s: candidate.song ? candidate.song.title : '', i: candidate.song ? candidate.song.i : -1, k: candidate.song ? candidate.song.trackId : '', u: candidate.song ? candidate.song.url || '' : '' };
   const ids = Object.keys(state.tagCache);
   if (ids.length <= TAG_CACHE_MAX) return;
   const oldest = ids.sort((a, b) => state.tagCache[a].at - state.tagCache[b].at).slice(0, ids.length - TAG_CACHE_MAX);
@@ -143,7 +146,7 @@ function rememberTags(state, candidate) {
 async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
   applyCachedTags(state);
   // (a candidate whose genres are known from an older run, but not its song, is read again: the cards show the song)
-  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => (!candidate.tags || candidate.song === undefined) && isBandcampUrl(candidate.url));
+  const queue = rankedCandidates(state).slice(0, limit).filter((candidate) => (!candidate.tags || needsSong(candidate)) && isBandcampUrl(candidate.url));
   const total = queue.length;
   let done = 0;
   let consecutiveFailures = 0;
@@ -153,7 +156,7 @@ async function readCandidateTags(fetchFn, state, limit, onProgress, pacing) {
       try {
         const html = await fetchText(fetchFn, candidate.url, httpOptions(pacing));
         candidate.tags = parseTags(html);
-        candidate.song = featuredSong(html);   // (null when no song of the page streams)
+        candidate.song = featuredSong(html, candidate.url);   // (null when no song of the page streams)
         rememberTags(state, candidate);
         consecutiveFailures = 0;
       } catch {
@@ -511,14 +514,14 @@ export async function fillSongs({ fetch: fetchFn, store, ids, tuning }) {
   const pacing = withDefaults(tuning);
   const state = await store.load();
   if (!state || !state.pool) return 0;
-  const queue = [...new Set(ids)].map((id) => state.pool[id]).filter((candidate) => candidate && candidate.song === undefined && isBandcampUrl(candidate.url));
+  const queue = [...new Set(ids)].map((id) => state.pool[id]).filter((candidate) => candidate && needsSong(candidate) && isBandcampUrl(candidate.url));
   let filled = 0;
   async function worker() {
     while (queue.length) {
       const candidate = queue.shift();
       try {
         const html = await fetchText(fetchFn, candidate.url, httpOptions(pacing));
-        candidate.song = featuredSong(html);
+        candidate.song = featuredSong(html, candidate.url);
         if (!candidate.tags) candidate.tags = parseTags(html);
         rememberTags(state, candidate);
         filled += 1;

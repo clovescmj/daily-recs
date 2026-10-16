@@ -619,12 +619,12 @@ describe('the song of a card', () => {
     const filled = await fillSongs({ fetch, store, ids: ['1', '2'], tuning: TUNING });
     assert.equal(filled, 2);
     const { pool } = store.peek();
-    assert.deepEqual(pool['1'].song, { title: 'First song', i: 0, trackId: '11' });
+    assert.deepEqual(pool['1'].song, { title: 'First song', i: 0, trackId: '11', url: '' });
     assert.deepEqual(pool['2'].tags, ['ebm']);
   });
 
   test('a card that already knows its song (or has none) is not read again', async () => {
-    const store = withPool({ 1: { ...album('1'), song: { title: 'Known', i: 0, trackId: '5' } }, 2: { ...album('2'), song: null } });
+    const store = withPool({ 1: { ...album('1'), song: { title: 'Known', i: 0, trackId: '5', url: 'https://x1.bandcamp.com/track/k' } }, 2: { ...album('2'), song: null } });
     let calls = 0;
     const fetch = async () => { calls += 1; return { ok: true, status: 200, headers: { get: () => null }, text: async () => '' }; };
     assert.equal(await fillSongs({ fetch, store, ids: ['1', '2'], tuning: TUNING }), 0);

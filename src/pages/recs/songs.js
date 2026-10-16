@@ -12,7 +12,7 @@ const RETRY_MS = 5 * 60 * 1000;
 /** The ids of the cards on the page, in order, whose song is not known (null means it was looked for and there is none). */
 const missing = () => {
   const pool = (session.state && session.state.pool) || {};
-  return visibleCardIds().filter((id) => pool[id] && pool[id].song === undefined);
+  return visibleCardIds().filter((id) => pool[id] && (pool[id].song === undefined || (pool[id].song && pool[id].song.url === undefined)));
 };
 
 export async function fillMissingSongs() {

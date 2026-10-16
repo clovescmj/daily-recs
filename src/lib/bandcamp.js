@@ -311,14 +311,17 @@ export function parseTracks(html) {
 
 /**
  * The song an album starts with in the radio: the one its artist highlights, or the first that streams (the same rule the player uses,
- * over the same list). `{ title, i, trackId }`, or null when the page has no song that streams.
+ * over the same list). `{ title, i, trackId, url }` (url: the page of the song, '' when it has none), or null when the page has no song that streams.
  */
-export function featuredSong(html) {
+export function featuredSong(html, baseUrl = '') {
   try {
     const tracks = parseTracks(html);
     if (!tracks.length) return null;
     const i = Math.max(0, tracks.findIndex((track) => track.featured));
-    return { title: tracks[i].title, i, trackId: tracks[i].trackId || '' };
+    // the page of the song: its own address (relative to the site of the album), or the album's page when it has none
+    let url = '';
+    try { url = tracks[i].link && baseUrl ? toHttpsUrl(new URL(tracks[i].link, baseUrl).href) : ''; } catch { url = ''; }
+    return { title: tracks[i].title, i, trackId: tracks[i].trackId || '', url: stripQuery(url) };
   } catch {
     return null;
   }

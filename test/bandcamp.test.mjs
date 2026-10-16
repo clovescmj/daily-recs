@@ -254,13 +254,19 @@ describe('the song of a card', () => {
 
   test('the highlighted song, with its id; the first that streams when none is highlighted', () => {
     const tracks = [{ title: 'One', track_id: 11, file: file(1) }, { title: 'Two', track_id: 22, file: file(2) }, { title: 'Three', track_id: 33, file: file(3) }];
-    assert.deepEqual(featuredSong(page({ trackinfo: tracks, featured_track_id: 22 })), { title: 'Two', i: 1, trackId: '22' });
-    assert.deepEqual(featuredSong(page({ trackinfo: tracks })), { title: 'One', i: 0, trackId: '11' });
+    assert.deepEqual(featuredSong(page({ trackinfo: tracks, featured_track_id: 22 })), { title: 'Two', i: 1, trackId: '22', url: '' });
+    assert.deepEqual(featuredSong(page({ trackinfo: tracks })), { title: 'One', i: 0, trackId: '11', url: '' });
   });
 
   test('the position counts only the songs that stream (the same list the player reads)', () => {
     const tracks = [{ title: 'No file', track_id: 5 }, { title: 'Streams', track_id: 6, file: file(6) }];
-    assert.deepEqual(featuredSong(page({ trackinfo: tracks })), { title: 'Streams', i: 0, trackId: '6' });
+    assert.deepEqual(featuredSong(page({ trackinfo: tracks })), { title: 'Streams', i: 0, trackId: '6', url: '' });
+  });
+
+  test('the address of the song, from the address of the album', () => {
+    const tracks = [{ title: 'One', track_id: 11, title_link: '/track/one?from=x', file: file(1) }];
+    assert.equal(featuredSong(page({ trackinfo: tracks }), 'https://band.bandcamp.com/album/a').url, 'https://band.bandcamp.com/track/one');
+    assert.equal(featuredSong(page({ trackinfo: [{ title: 'One', track_id: 11, file: file(1) }] }), 'https://band.bandcamp.com/album/a').url, '');
   });
 
   test('null when nothing streams, or the page has no tracks', () => {
