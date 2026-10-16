@@ -15,7 +15,7 @@ New music every day, built from your own taste. Never shows what you already own
 
 **Description:**
 
-> Daily Recs adds a "daily recs" tab to your own Bandcamp profile with a new list of 50 albums every day. It starts from the albums you own and have in your wishlist, follows what other fans of those albums also own, and shows only albums you don't have, from artists you don't have, with no repeats.
+> Daily Recs adds a "daily recs" tab to your own Bandcamp profile with a new list of up to 50 albums every day, and more albums load in the background while you listen. It starts from the albums you own and have in your wishlist, follows what other fans of those albums also own, and shows only albums you don't have, from artists you don't have, that share a genre with your taste, with no repeats.
 >
 > • Best matches: the albums that the most fans of your albums also own.
 > • My tags: albums with the genres you pick.
@@ -58,7 +58,7 @@ Show a daily list of new album recommendations on the user's own Bandcamp profil
 **Remote code:** No, I am not using remote code.
 
 **Data usage (check what applies, and be accurate)**
-- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides and wishlists from the extension, the user's Liked Songs and what played today. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
+- The extension reads website content (the user's Bandcamp library and album pages) and stores the albums the user hides and wishlists from the extension, the user's Liked Songs, what played today and a short record of what the user hid, wishlisted or liked. All of it stays on the device or in the user's own Chrome sync; none is sent to the developer or to any third party.
 - Certify: the data is not sold to third parties, not used for purposes unrelated to the single purpose, and not used for creditworthiness or lending.
 
 **Privacy policy URL:** https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md
