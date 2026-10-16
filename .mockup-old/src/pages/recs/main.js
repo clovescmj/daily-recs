@@ -1,0 +1,130 @@
+// Entry point of the recommendations page. Everything is wired here, in a fixed order.
+import { reportBugUrl, supportUrl } from '../../lib/config.js';
+import { MSG } from '../../lib/messages.js';
+import { runCommand } from './commands.js';
+import { loadState, loadStatus, pickedToday, savePicked, send, watchStorage } from './data.js';
+import { listenToHost, postToHost } from './host-bridge.js';
+import { initPlayer, playAlbum, togglePlay } from './player.js';
+import { listFor, render } from './render.js';
+import { session } from './session.js';
+import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
+import './mockup-new-list.js';
+import { initNewDay } from './new-day.js';
+import { showNewsIfNew } from './notices.js';
+import { pendingOutcome } from '../../lib/pending.js';
+import { $ } from './dom.js';
+import { initViewSwitch } from './views.js';
+import { dislikeAlbum, saveAlbumSong, setWish, undoDislike } from './wishlist-actions.js';
+
+/** Switches to a list the moment the run that was asked for has produced it. */
+function resolvePending(state, status) {
+  const pending = session.pending;
+  if (!pending) return;
+  const outcome = pendingOutcome(pending, { hasList: Boolean(listFor(state, pending.view, pending.keys)), running: Boolean(status.running) });
+  if (outcome === 'running') pending.sawRunning = true;
+  if (outcome !== 'ready' && outcome !== 'ended') return;
+  // The choice stays the active one in both cases: with a list it is shown, and when the run ended without one (an error, or no album of
+  // that genre) the status box says why, while the toggle still shows what the user asked for (not the list that was there before).
+  session.view = pending.view;
+  session.tagKeys = pending.keys;
+  session.pending = null;
+}
+
+async function refreshView() {
+  const [state, status] = [await loadState(), (await loadStatus()) || {}];
+  resolvePending(state, status);
+  render(state, status);
+  refreshLanding();
+}
+
+/** The user picked a list: show it if it exists today, otherwise ask for it and switch when it is ready. */
+async function chooseView(view, keys = []) {
+  await savePicked(view, keys);   // reopening the tab today brings this list back
+  const state = await loadState();
+  if (listFor(state, view, keys)) {
+    session.view = view;
+    session.tagKeys = keys;
+    await refreshView();
+    return;
+  }
+  session.pending = { view, keys, sawRunning: false };
+  await refreshView();   // the toggle already shows the new choice
+  await send({ type: MSG.REFRESH, mode: view, tags: keys });
+}
+
+/** "Start digging" on the opening screen: remember the choice for today and show the list. */
+async function startFromLanding(view, keys) {
+  session.pending = { view, keys, sawRunning: false };   // the toggle shows the choice right away, before the list is ready
+  await leaveLanding();
+  await refreshView();   // a run that is already going on now shows its progress
+  await chooseView(view, keys);
+}
+
+function onGridClick(event) {
+  const card = event.target.closest('.album-card');
+  if (!card) return;
+  const { id } = card.dataset;
+  if (event.target.closest('[data-play]')) {
+    playAlbum(id);
+  } else if (event.target.closest('[data-wish]')) {
+    event.preventDefault();
+    setWish(id, !session.wished.has(id));
+  } else if (event.target.closest('[data-save]')) {
+    event.preventDefault();
+    saveAlbumSong(id);
+  } else if (event.target.closest('[data-dislike]')) {
+    event.preventDefault();
+    if (session.dislikedThisVisit.has(id)) undoDislike(id); else dislikeAlbum(id);
+  }
+}
+
+/** This page only works inside the Bandcamp profile (the player bar and wishlist live there): if it was opened on its own, go there. */
+async function leaveToProfile() {
+  document.body.textContent = 'Opening your Bandcamp profile…';
+  await send({ type: MSG.OPEN_MAIN });
+  chrome.tabs.getCurrent((tab) => { if (tab) chrome.tabs.remove(tab.id); });
+}
+
+async function init() {
+  if (window.parent === window) { leaveToProfile(); return; }
+  document.title = 'Daily Recs';
+  setTimeout(() => document.documentElement.classList.remove('is-booting'), 3000); // never stays blank, whatever happens below
+  $('version').textContent = chrome.runtime.getManifest().version;
+  $('feedback-link').href = supportUrl(chrome.runtime.id);
+  $('bug-link').href = reportBugUrl(chrome.runtime.getManifest().version, navigator.userAgent);
+
+  initViewSwitch(chooseView);
+  initLanding(startFromLanding);
+  initNewDay(chooseView);
+  $('play-all').addEventListener('click', () => togglePlay());
+  $('album-grid').addEventListener('click', onGridClick);
+
+  initPlayer();
+  listenToHost(runCommand);
+  showNewsIfNew();
+
+  const picked = await pickedToday();
+  if (picked) { session.view = picked.view; session.tagKeys = picked.tags; } // the first drawing is already the list of today's choice
+  setLandingVisible(!picked);   // once a day: the first time the tab is opened. Nothing is loaded until the user presses the button
+  watchStorage(refreshView);
+  await refreshView();
+  document.documentElement.classList.remove('is-booting');
+  if (picked) await chooseView(picked.view, picked.tags);   // already chose today: show that list (build it if it's missing)
+}
+
+/**
+ * The extension was reloaded or updated while this page was open: every call to the extension now fails with "Extension context
+ * invalidated". The page stays as it is (the song that plays keeps playing, nothing is taken from the screen) and a notice at the bottom
+ * right says that a reload is needed, with a button for it. Nothing here may call chrome.*, which is what no longer works.
+ */
+let contextLost = false;
+function handleLostContext() {
+  if (contextLost) return;
+  contextLost = true;
+  postToHost({ dr: 'notice', kind: 'reload', title: 'Daily Recs was updated', items: ['Reload this page to keep using it.'] });
+}
+const isLostContext = (reason) => /Extension context invalidated/i.test(String((reason && reason.message) || reason || ''));
+addEventListener('unhandledrejection', (event) => { if (isLostContext(event.reason)) { event.preventDefault(); handleLostContext(); } });
+addEventListener('error', (event) => { if (isLostContext(event.error || event.message)) { event.preventDefault(); handleLostContext(); } });
+
+init();

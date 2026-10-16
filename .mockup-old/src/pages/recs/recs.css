@@ -1,0 +1,249 @@
+/* Daily Recs page. Built on Bandcamp's own design tokens (colours, type scale, buttons, pills), taken from their public
+   design system stylesheet, so the page looks native inside the profile.
+   Sections: tokens · base · header · controls · lists of the day · status · album grid · card actions · profile-tab layout. */
+
+/* ── Tokens: everything shared lives in src/styles/tokens.css (--dr-*). The names below are only this page's shorter names for them. ─── */
+:root {
+  --white: var(--dr-white); --gray100: var(--dr-gray-100); --gray200: var(--dr-gray-200); --gray600: var(--dr-gray-600); --gray700: var(--dr-gray-700);
+  --link-blue: var(--dr-accent);
+  --bc-font-size-100: var(--dr-font-s); --bc-font-size-200: var(--dr-font-m); --bc-font-size-500: var(--dr-font-xl);
+  --bc-font-weight-regular: var(--dr-weight-regular);
+  --bc-line-height-200: var(--dr-line-m); --bc-line-height-500: var(--dr-line-xl);
+  --bc-radius: var(--dr-radius);
+  --bg: var(--dr-surface);
+  --text: var(--dr-text);
+  --muted: var(--dr-text-muted);
+  --faint: var(--dr-text-faint);
+  --line: var(--dr-line);
+  --soft: var(--dr-surface-soft);
+  --link: var(--dr-accent);
+  --link-dark: var(--dr-accent-dark);
+  --accent: var(--dr-accent);
+  --border-hover: #b4b4b4;
+  --border-active: #c4c4c4;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────────────────────────────────────────── */
+/* Anything with the `hidden` attribute stays hidden even when another rule sets `display`. */
+[hidden]:not(.dr-menu) { display: none !important; } /* (a menu that is hidden is faded and slid out by components.css, so it can be animated) */
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding-bottom: 96px; background: var(--bg); color: var(--text);
+  font: var(--dr-font-base)/1.5 var(--dr-font-family); -webkit-font-smoothing: antialiased;
+}
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-dark); text-decoration: underline; }
+.page { max-width: 960px; margin: 0 auto; padding: 28px 16px 48px; }
+.empty-state { color: var(--muted); padding: 40px 0; text-align: center; }
+
+/* ── Header ─────────────────────────────────────────────────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--line);
+}
+.page-heading { display: flex; align-items: center; gap: 14px; }
+/* Same play / pause button as Bandcamp's player bar: a square with a thin border, black triangle or two bars. */
+.play-all { flex: none; width: 41px; height: 41px; padding: 0; border: 1px solid var(--dr-border-soft); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.play-all:hover { border-color: var(--dr-border); }
+.play-all:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.play-all svg { width: 28px; height: 28px; fill: var(--gray700); display: block; } /* Material's play and pause: the glyph takes about half of the box */
+.play-all .play-all-pause, .play-all.is-playing .play-all-play { display: none; }
+.play-all.is-playing .play-all-pause { display: block; }
+.page-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
+.page-subtitle { margin: 0; font-size: var(--bc-font-size-200); line-height: var(--bc-line-height-200); color: var(--muted); }
+.page-actions { display: flex; }
+/* The buttons sit in the middle between the line under the tabs and the line that ends the header (they were 10px lower: 37px from the one and 17px from the other).
+   `top` and not a margin, so the height of the header does not change. Only while the header is on one row (the buttons wrap under the title on a narrow window). */
+@media (min-width: 760px) { .page-actions { position: relative; top: -10px; } }
+
+/* ── Controls ───────────────────────────────────────────────────────────────────────────────────────────────────── */
+.button {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: var(--bc-font-size-100); padding: 4px 12px 6px; /* a little more room below: the letters sit on the baseline, so they look centred */
+  border-radius: var(--bc-radius); cursor: pointer; border: 1px solid var(--dr-button-bg); background: var(--dr-button-bg); color: var(--dr-button-text); font-weight: var(--dr-weight-bold);
+}
+.button:hover:not(:disabled) { background: var(--dr-button-bg-hover); border-color: var(--dr-button-bg-hover); }
+.button:active:not(:disabled) { background: var(--dr-button-bg-active); border-color: var(--dr-button-bg-active); }
+.button:disabled { background: var(--dr-profile-button-disabled); border-color: var(--dr-profile-button-disabled); color: var(--dr-button-text); cursor: default; }
+.button:focus-visible, .view-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.icon-fill { width: var(--dr-icon-size-button); height: var(--dr-icon-size-button); fill: currentColor; display: block; flex: none; } /* the list buttons: an icon inside a button */
+
+/* ── The lists of the day: a toggle that works like radio buttons (My tags with its genre picker, Best matches, Surprise me) ── */
+.view-switch { display: flex; }
+.view-switch > * + *, .view-switch > .tags-picker + .view-button { margin-left: -1px; }
+.view-button { border-radius: 0; } /* a segment of the toggle: only its two ends are rounded */
+.tags-picker .view-button { border-radius: var(--bc-radius) 0 0 var(--bc-radius); }
+.view-switch > .view-button:last-child { border-radius: 0 var(--bc-radius) var(--bc-radius) 0; }
+.view-button.is-active, .view-button.is-active:hover:not(:disabled) { background: var(--gray700); border-color: var(--gray700); color: var(--white); position: relative; z-index: 1; } /* stays dark on hover */
+.view-button:disabled { opacity: .6; cursor: default; }
+.view-button .icon-chevron { margin-left: -4px; } /* the box of the arrow has its own margin */
+.tags-picker { position: relative; }
+.tags-menu { top: calc(100% + 6px); left: 0; z-index: 25; width: 340px; max-width: calc(100vw - 32px); } /* looks and opening come from .dr-menu */
+.tags-menu.align-right { left: auto; right: 0; }   /* when the left-aligned menu would run past the window */
+.tags-input {
+  display: block; width: calc(100% - 24px); margin: 10px 12px 6px; padding: 6px 8px; font: inherit; font-size: var(--bc-font-size-100);
+  border: 1px solid var(--dr-input-border); border-radius: var(--bc-radius); outline: none; -webkit-appearance: none; appearance: none;
+}
+.tags-input:focus { border-color: var(--dr-focus); box-shadow: 0 0 5px var(--dr-focus-ring); } /* Bandcamp's own search-field focus */
+.tags-list { list-style: none; margin: 0; padding: 0 0 6px; max-height: 210px; overflow-y: auto; }
+.tags-list input { accent-color: var(--gray700); margin: 0; }
+.tags-add-button { display: block; width: 100%; padding: 6px 12px; font: inherit; font-size: var(--bc-font-size-100); text-align: left; color: var(--link); background: none; border: 0; cursor: pointer; }
+.tags-add-button:hover { background: var(--dr-hover); text-decoration: underline; }
+.tag-count { margin-left: auto; color: var(--muted); }
+.tags-empty { padding: 8px 12px; font-size: var(--bc-font-size-100); color: var(--muted); }
+.tags-foot { padding: 10px 12px 12px; border-top: 1px solid var(--dr-divider); }
+.tags-note { margin: 8px 0 0; font-size: var(--bc-font-size-100); line-height: var(--dr-line-tight); color: var(--muted); text-align: center; } /* caption: Bandcamp's small text size */
+.tags-foot .button { width: 100%; justify-content: center; }
+
+/* Until the page knows what to show (the opening screen or a list), it stays blank: no flash of the wrong state. main.js lifts it. */
+.is-booting .page-header, .is-booting .album-grid, .is-booting .status-box { visibility: hidden; }
+
+/* ── Opening screen ──────────────────────────────────────────────────────────────────────────────────────────────── */
+.is-landing .page-header, .is-landing .album-grid { display: none; }
+.landing { text-align: center; padding: 36px 0 28px; min-height: 380px; transition: opacity var(--dr-dur-base) var(--dr-ease); } /* min-height: room for the tags menu (landing.js measures it): no jump when it opens */
+.landing.is-leaving { opacity: 0; pointer-events: none; }  /* "Start digging": it fades out, then the list fades in (is-revealing) */
+.is-revealing .page-header, .is-revealing .status-box, .is-revealing .album-grid { animation: dr-fade-in var(--dr-dur-base) var(--dr-ease); }
+@keyframes dr-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.landing-title { margin: 0; font-size: var(--bc-font-size-500); line-height: var(--bc-line-height-500); font-weight: var(--bc-font-weight-regular); }
+.landing-subtitle { margin: 2px 0 22px; font-size: var(--bc-font-size-200); color: var(--muted); }
+.landing-options { justify-content: center; }
+.landing-hint { max-width: 420px; min-height: var(--dr-line-s); margin: 14px auto 18px; font-size: var(--bc-font-size-100); line-height: var(--dr-line-s); color: var(--muted); } /* one line is always reserved: the text appearing does not push the button */
+.button--large { height: 40px; padding: 0 28px 2px; font-size: var(--bc-font-size-200); justify-content: center; }
+
+/* ── Status (progress of a run) ─────────────────────────────────────────────────────────────────────────────────── */
+.more-status { margin: 24px 0 8px; text-align: center; color: var(--muted); font-size: var(--bc-font-size-200); }
+.more-status[hidden] { display: none; }
+.status-box { background: var(--soft); border: 1px solid var(--line); padding: 14px 16px; margin-bottom: 20px; }
+.status-box p { margin: 8px 0 0; }
+.status-box .button { margin-top: 12px; }
+.status-box strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* always one line */
+.status-box progress { display: block; width: 100%; height: 6px; margin-top: 8px; border: 0; border-radius: var(--bc-radius); overflow: hidden; -webkit-appearance: none; appearance: none; background: var(--gray200); }
+.status-box progress::-webkit-progress-bar { background: var(--gray200); }                  /* a light track, so the bar is easy to see */
+.status-box progress::-webkit-progress-value { background: var(--accent); transition: width var(--dr-dur-base) var(--dr-ease); }
+.status-box progress::-moz-progress-bar { background: var(--accent); }
+/* no known total yet: a bar that slides along the track */
+.status-box progress:indeterminate::-webkit-progress-bar {
+  background: linear-gradient(90deg, var(--gray200) 0 35%, var(--accent) 35% 65%, var(--gray200) 65% 100%) 0 0 / 300% 100%; animation: bar-slide var(--dr-loop-bar) linear infinite;
+}
+@keyframes bar-slide { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .status-box progress:indeterminate::-webkit-progress-bar { animation: none; } }
+
+/* While a list is being built: an equalizer, what is going on (and how far it is, when that is known), a thin bar, and placeholders for the albums */
+.status-box.is-loading { padding: 0; margin-bottom: 20px; }
+.loading { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 68px; box-sizing: border-box; } /* fixed height: the text is centred in it, whether it has one line or two */
+.loading-text { flex: 1; min-width: 0; }
+.loading-text strong { display: block; font-size: var(--bc-font-size-200); }
+.loading-text strong.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); }
+.loading-wait { flex: 0 1 auto; min-width: 0; max-width: 260px; } /* as wide as its text, up to this; in a narrow window it shrinks with the box */
+.loading-wait[hidden] { display: none; }
+.wait-btn { width: max-content; max-width: 100%; height: var(--dr-control-h); box-sizing: border-box; display: flex; align-items: center; gap: 6px; padding: 0 12px 0 8px; font: inherit; font-size: var(--bc-font-size-100); color: var(--dr-text); white-space: nowrap; cursor: pointer; background: var(--dr-surface); border: 1px solid var(--dr-border); border-radius: var(--dr-radius); }
+.wait-btn:hover { background: var(--dr-button-plain-hover); }
+.wait-btn:active { background: var(--dr-button-plain-active); }
+.wait-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wait-btn svg { flex: none; width: var(--dr-icon-size-button); height: var(--dr-icon-size-button); fill: currentColor; display: block; }
+.wait-btn .wait-pause, .wait-btn.is-playing .wait-play { display: none; }
+.wait-btn.is-playing .wait-pause { display: block; }
+.wait-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-align: left; }
+.wait-label.is-new { animation: loading-in var(--dr-dur-base) var(--dr-ease); } /* the same fade as the title of the steps */
+.wait-text { display: inline-block; white-space: nowrap; }
+.wait-label.is-run { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); }
+.wait-label.is-run .wait-text { animation: wait-scroll var(--wait-dur, 8s) linear infinite; } /* a long name runs to its end and back */
+@keyframes wait-scroll { 0%, 12% { transform: none; } 88%, 100% { transform: translateX(var(--wait-x)); } }
+@media (prefers-reduced-motion: reduce) { .wait-label.is-run .wait-text { animation: none; } .wait-label.is-run { -webkit-mask-image: none; mask-image: none; } .wait-label.is-run .wait-text { display: block; overflow: hidden; text-overflow: ellipsis; } }
+.loading-sub { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows var(--dr-dur-base) var(--dr-ease), opacity var(--dr-dur-base) var(--dr-ease), margin-top var(--dr-dur-base) var(--dr-ease); }
+.loading-sub.is-on { grid-template-rows: 1fr; opacity: 1; margin-top: 2px; }
+.loading-sub span { overflow: hidden; min-height: 0; font-size: var(--bc-font-size-100); color: var(--muted); }
+@keyframes loading-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+.status-box.is-loading progress { height: 3px; margin: 0; border-radius: 0; }
+.eq { display: inline-flex; gap: 3px; align-items: flex-end; height: 24px; flex: none; }
+.eq i { display: block; width: 4px; border-radius: 1px; background: var(--accent); transform-origin: bottom; animation: eq-dance var(--dr-loop-eq) ease-in-out infinite; }
+.eq i:nth-child(1) { height: 10px; animation-delay: -.2s; } .eq i:nth-child(2) { height: 22px; animation-delay: -.5s; }
+.eq i:nth-child(3) { height: 15px; animation-delay: -.1s; } .eq i:nth-child(4) { height: 24px; animation-delay: -.7s; }
+.eq i:nth-child(5) { height: 9px; animation-delay: -.35s; }
+@keyframes eq-dance { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+.skeleton { animation: skeleton-in var(--dr-dur-slow) var(--dr-ease) both; animation-delay: calc(var(--i, 0) * var(--dr-stagger)); } /* the cards come in one after the other */
+.skeleton-cover, .skeleton-line {
+  background: linear-gradient(90deg, var(--gray200) 0, var(--gray100) 50%, var(--gray200) 100%) 0 0 / 600px 100%; animation: shimmer var(--dr-loop-shimmer) linear infinite;
+}
+.skeleton-cover { aspect-ratio: 1; margin-bottom: 10px; }
+.skeleton-line { height: 10px; width: 45%; margin-bottom: 7px; border-radius: 2px; }
+.skeleton-line.wide { width: 70%; } .skeleton-line.short { width: 30%; }
+@keyframes shimmer { from { background-position: -300px 0; } to { background-position: 300px 0; } }
+@keyframes skeleton-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .landing { transition: none; } .is-revealing .page-header, .is-revealing .status-box, .is-revealing .album-grid { animation: none; } .loading-text strong.is-new, .wait-label.is-new { animation: none; } .loading-sub { transition: none; } .eq i, .skeleton, .skeleton-cover, .skeleton-line { animation: none; } .eq i { transform: none; } }
+
+/* ── Album grid and cards (same behaviour as Bandcamp's collection cards) ──────────────────────────────────────── */
+.album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px 18px; }
+.album-card { display: flex; flex-direction: column; padding: 10px; border: 1px dotted transparent; background: var(--white); }
+.album-card:hover, .album-card:focus-within { border-color: var(--border-hover); }
+.album-card.is-playing { border: 1px solid var(--border-active); }
+
+.album-cover { position: relative; display: block; }
+.album-cover img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--soft); border: 1px solid var(--dr-line); }
+
+/* Play overlay: Bandcamp's 74×54 black box on a 210px cover (kept proportional), 50% opacity, white 17×20 triangle. */
+.cover-play {
+  position: absolute; left: 32.86%; top: 34.76%; width: 35.24%; height: 25.71%; padding: 0; border: 0; border-radius: var(--bc-radius);
+  background: var(--dr-scrim); font-size: 0; line-height: 0; opacity: 0; transition: opacity var(--dr-dur-fast) ease-out; cursor: pointer;
+}
+.cover-play::before {
+  content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 0; height: 0; border-left: 17px solid var(--white); border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+}
+.album-card:hover .cover-play, .album-card:focus-within .cover-play, .album-card.is-playing .cover-play { opacity: 1; }
+.album-card.is-audible .cover-play::before { /* pause bars while the album is playing */
+  border: 0; width: 17px; height: 20px; background: linear-gradient(90deg, var(--white) 0 5px, transparent 5px 12px, var(--white) 12px 17px);
+}
+
+/* "Don't show again" badge: takes the place of the play overlay, same box. Only exists on disliked cards. */
+.cover-badge {
+  display: none; position: absolute; left: 32.86%; top: 34.76%; width: 35.24%; height: 25.71%; border-radius: var(--bc-radius);
+  background: var(--dr-scrim); align-items: center; justify-content: center; cursor: default; /* hover shows the tooltip */
+}
+.cover-badge svg { width: 30px; height: 30px; fill: var(--white); display: block; }
+
+.album-body { padding: 8px 0 0; display: flex; flex-direction: column; gap: 1px; flex: 1; }
+.album-title, .album-line { align-self: flex-start; } /* hover only over the text, not the whole row */
+.album-title { font-size: var(--dr-font-m); font-weight: var(--dr-weight-bold); color: var(--text); line-height: var(--dr-line-tight); }
+.album-line { color: var(--muted); }   /* "by" and "from" are plain text; the name after each is the link */
+.album-artist, .album-album { color: inherit; }
+/* each of the three is a link of its own: the hover of the card does nothing to them, and only the one under the pointer is underlined
+   (and darkened, for the artist and the album) */
+.album-title:hover, .album-artist:hover, .album-album:hover { color: var(--text); text-decoration: underline; }
+
+/* Disliked this visit: dimmed (not removed) so it can be undone; the action row keeps its full colours. */
+.album-card.is-disliked .album-cover img { filter: grayscale(1); opacity: .5; transition: opacity var(--dr-menu-dur); }
+.album-card.is-disliked :is(.album-title, .album-line) { opacity: .4; transition: opacity var(--dr-menu-dur); }
+.album-card.is-disliked:hover .album-cover img,
+.album-card.is-disliked:hover :is(.album-title, .album-line) { opacity: .7; }
+.album-card.is-disliked .cover-play { display: none; }
+.album-card.is-disliked .cover-badge { display: inline-flex; }
+
+/* ── Card actions: ♥ wishlist on the left · ⊘ don't show music like this on the right ────────────────────────── */
+.album-actions { margin-top: auto; padding-top: 8px; font-size: var(--dr-font-base); color: var(--faint); display: flex; align-items: center; flex-wrap: wrap; gap: var(--dr-icon-gap); }
+.album-actions a { color: var(--accent); -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.album-actions a:hover { text-decoration: underline; }
+.album-actions .action-dislike { margin-left: auto; } /* the "don't show" icon sits at the right edge of the card */
+
+/* ── Footer ───────────────────────────────────────────────────────────────────────────────────────────── */
+.page-footer { margin: 36px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: var(--dr-font-s); color: var(--faint); }
+
+/* ── This page lives in an iframe inside the Bandcamp profile tab: transparent, as wide as the tab bar ───────────── */
+.recs-page, .recs-page body { background: transparent; overflow: hidden; padding-bottom: 0; }
+.recs-page .page { max-width: none; padding: 16px 0 24px; }  /* 16px between Bandcamp's tab bar line and the title */
+.recs-page .page-title { font-size: var(--dr-font-title); }
+.recs-page .page-header { margin-bottom: 14px; }             /* 16px of padding below the subtitle stays */
+.recs-page .page-footer { margin-top: 20px; }
+
+/* No grey flash or box on the icons of a card when they are clicked (the keyboard focus ring stays) */
+.album-actions a:active, .album-actions a:focus { background: transparent; box-shadow: none; }
+.album-actions a:focus:not(:focus-visible) { outline: none; }
+
+.page-actions { gap: 12px; align-items: flex-start; }
+.new-list { position: relative; }
+.new-list-button { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--bc-radius); }
+.new-list-button svg { width: 16px; height: 16px; fill: currentColor; }
+.new-list-menu { right: 0; left: auto; top: calc(100% + 6px); width: 280px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; z-index: 50; }
+.new-list-menu[hidden] { display: none; }
+.new-list-menu span { font-size: var(--dr-font-s); color: var(--muted); }
+.new-list-actions .link-button { background: none; border: 0; padding: 0; color: var(--dr-blue300, #0687f5); font: inherit; cursor: pointer; }
+.new-list-actions { display: flex; align-items: center; gap: 14px; margin-top: 8px; }

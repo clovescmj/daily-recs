@@ -7,7 +7,7 @@
 //
 // DRNotice.show({ id, text, action: { label, onClick }, closable = true, autoHide = 0, onClose }) shows one (the same id replaces it); `autoHide`
 // is the time in ms after which it goes away by itself (a confirmation); the pointer over it keeps it.
-// DRNotice.hide(id) takes one away without calling onClose.
+// DRNotice.hide(id) takes one away without calling onClose. Only one notice is on screen: a new one waits for the previous one to fade out.
 window.DRNotice = (() => {
   const FADE_MS = 200;
   // the close icon of the panels of the player bar (Material "close"), so the X is the same everywhere
@@ -33,11 +33,23 @@ window.DRNotice = (() => {
 
   function remove(el) {
     el.classList.remove('show');
-    setTimeout(() => el.remove(), FADE_MS);
+    el.classList.add('leaving');
+    setTimeout(() => { el.remove(); restoreSticky(); }, FADE_MS);
   }
 
+  /** A notice that asks for something (update, reload) and has no way to be closed comes back when a passing one is gone: it is never lost. */
+  function restoreSticky() {
+    if (pending || !sticky || container().querySelector('.dr-notice')) return;
+    draw(sticky);
+  }
+
+  let pending = null;   // a notice waiting for the one on screen to go: { id, timer }
+  let sticky = null;    // the last notice that stays until the user acts (no close icon, no timer)
+
   function hide(id) {
-    const el = container().querySelector(`[data-notice="${CSS.escape(id)}"]`);
+    if (pending && pending.id === id) { clearTimeout(pending.timer); pending = null; }
+    if (sticky && sticky.id === id) sticky = null;
+    const el = container().querySelector(`[data-notice="${CSS.escape(id)}"]:not(.leaving)`);
     if (el) remove(el);
   }
 
@@ -59,8 +71,21 @@ window.DRNotice = (() => {
     return close;
   }
 
-  function show({ id, text, action = null, closable = true, autoHide = 0, onClose = () => {} }) {
-    hide(id);
+  /**
+   * One notice at a time: the one on screen goes away first, and the new one comes in when it is gone (they never overlap). If another
+   * arrives while that happens, only the last one is shown.
+   */
+  function show(notice) {
+    if (pending) { clearTimeout(pending.timer); pending = null; }
+    const current = [...container().querySelectorAll('.dr-notice')];   // (one that is already leaving counts: the new one waits for it too)
+    if (!current.length) { draw(notice); return; }
+    current.filter((el) => !el.classList.contains('leaving')).forEach(remove);
+    pending = { id: notice.id, timer: setTimeout(() => { pending = null; draw(notice); }, FADE_MS + 30) };
+  }
+
+  function draw(notice) {
+    const { id, text, action = null, closable = true, autoHide = 0, onClose = () => {} } = notice;
+    if (!closable && !autoHide) sticky = notice;
     const el = document.createElement('section');
     el.className = 'dr-notice';
     el.dataset.notice = id;

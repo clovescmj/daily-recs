@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Daily Recs</title>
+<link rel="icon" type="image/svg+xml" href="../shared/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../../../icons/icon-32.png">
+<link rel="stylesheet" href="../../styles/tokens.css">
+<link rel="stylesheet" href="../../styles/components.css">
+<link rel="stylesheet" href="../recs/recs.css">
+<link rel="stylesheet" href="../shared/info.css">
+</head>
+<body class="info">
+<main class="page">
+  <img class="about-logo" src="../../assets/logo.png" alt="Daily Recs for Bandcamp">
+  <h1>About <span data-name>Daily Recs</span></h1>
+  <p class="meta">Version <strong id="version">–</strong> · Developed by Clóves C. ·
+    <a href="https://bandcamp.com/sumof" target="_blank" rel="noopener">Bandcamp</a> ·
+    <a href="https://www.instagram.com/6cl6vs6/" target="_blank" rel="noopener">Instagram</a></p>
+  <h2>Why I built this</h2>
+  <p>I love finding new music. I can lose a whole evening on Bandcamp: one album leads to a label, the label to an artist I'd never heard of, and around the fourth tab I find something I can't stop playing. It's my favorite hobby.</p>
+  <p>I wanted a place that always has something new for me, close to what I already love. I don't want what's trending, and I don't want more of the same. Streaming recommendations stopped doing that for me a while ago.</p>
+  <p>On Bandcamp, the albums people buy and save point to each other: every album page lists what its fans also own. Daily Recs follows those links from your collection and wishlist and does the digging for you.</p>
+  <h2>What you get</h2>
+  <p>Every day you get a new list of songs. Each one comes from an album you don't own, by an artist you don't have yet, picked from what fans of your own albums also own. More songs load in the background while you listen. If you also love finding new music, I hope it saves you some digging and gives you something good to play today.</p>
+  <p>The goal is a list where you'd like every song. Three buttons teach it your taste:</p>
+  <ul>
+    <li><strong>⊘ Hide</strong> a card and its album never comes back. Its artist and the albums Bandcamp pairs with it stop coming too.</li>
+    <li><strong>Heart</strong> a card to add its song to your Bandcamp wishlist, and <strong>+</strong> to add it to Liked Songs. Either way, the extension reads that album's recommendations right away, so similar music shows up in the next lists.</li>
+  </ul>
+  <h2>How it works</h2>
+  <ul>
+    <li>Each day you choose what to hear, and you can switch lists whenever you want. <strong>Best matches</strong> has songs from the albums that the most fans of your albums also own. <strong>My tags</strong> has songs from albums with the genres you choose. <strong>Surprise me</strong> goes further down the same ranking, so it is further from what you own, and it never repeats Best matches.</li>
+    <li>Albums you own or have in your wishlist never show up, and neither does an album you already played (a song that went on for a few seconds). An album that was shown but not played can come back in a later list.</li>
+    <li>A song only gets in if its album shares a genre with your taste. No genre takes more than about a fifth of a list, and songs of the same genre are not played back to back. When few albums fit, the list is shorter: it is better to see fewer songs than ones that do not belong.</li>
+    <li>The heart is the only button that changes your Bandcamp account. Hiding a card or adding a song to Liked Songs stays inside the extension.</li>
+    <li>You can listen right on the page. Each card is one song: the player plays it and then the next card, in the order you see them. A song played from Liked Songs goes on with the Liked Songs. When the loaded songs are about to run out, 50 more are added in the background. While your first list loads, you can press play on a random song from your own collection.</li>
+  </ul>
+  <h2>Sync</h2>
+  <div class="sync-status" role="status">
+    <span class="sync-label">In your Google account</span>
+    <strong id="sync">Checking…</strong>
+    <span id="sync-when" class="sync-when"></span>
+  </div>
+  <p>The albums you hide, and a score for each source of recommendations, are saved in your Google account through Chrome sync, so your other computers get them. Chrome sync has to be on. Liked Songs are not synced: they stay in this browser. Your wishlist is not part of it either, because it lives in your Bandcamp account.</p>
+  <p>To keep a copy of your Liked Songs, or to take them elsewhere, open the Liked Songs list and choose <strong>Export liked songs</strong>. It saves a CSV file with the artist, song, album and album link of each song.</p>
+  <h2>Privacy and the data it uses</h2>
+  <p>Daily Recs runs in your browser and talks only to Bandcamp (bandcamp.com and the servers that serve its audio and covers). It uses the Bandcamp session you already have open, so it never sees your password. Nothing goes to the developer or to any other server. There are no analytics and no ads.</p>
+  <h3>What it reads</h3>
+  <ul>
+    <li>Your <strong>collection and wishlist</strong> (titles, artists and links), to know what you already have.</li>
+    <li>The <strong>album pages</strong> of those albums and of the ones it finds: the "you may also like" list, the genre tags and the song list. While the browser is open it also reads a few of your albums' pages in the background, about every 30 minutes, only to learn their genres.</li>
+  </ul>
+  <h3>What it keeps, and where</h3>
+  <ul>
+    <li><strong>On this computer:</strong> a copy of your library (titles, artists, links), the day's lists, your genre profile, a record of the albums you added to your wishlist from here, your Liked Songs, a short record of what you hid, wishlisted or liked, to tune the lists, and what played today with the position of the song, so the player picks up where it was after a reload.</li>
+    <li><strong>In your Google account:</strong> the albums you hide and the score of each source, as ids and codes. No titles and no links. Chrome's sync settings control it.</li>
+  </ul>
+  <h3>What it changes on Bandcamp</h3>
+  <ul>
+    <li>Your wishlist, and only when you click the heart. The heart writes to your Bandcamp account, and the album counts as added only after Bandcamp confirms it. Each time the extension reads your library, it checks its record against your real wishlist.</li>
+    <li>It doesn't load on Bandcamp's sign-in, settings, cart, checkout and purchases pages.</li>
+  </ul>
+  <p>The full text is in the <a href="https://github.com/clovescmj/daily-recs/blob/main/PRIVACY.md" target="_blank" rel="noopener">privacy policy</a>.</p>
+  <h2>Your data</h2>
+  <p>Clear saved data removes everything listed above from this browser: the library copy, the lists, Liked Songs, the record of what you added to your wishlist from here, and the hidden albums kept in your Google account. Your Bandcamp account and your wishlist there stay as they are. If you use Daily Recs on other computers, clear it there too, or they will send the hidden albums back to your Google account.</p>
+  <p class="clear-row"><button type="button" class="button" id="clear-data">Clear saved data</button>
+    <span id="clear-confirm" hidden>This can't be undone. <button type="button" class="button" id="clear-yes">Yes, clear it</button> <button type="button" class="link-button" id="clear-no">Cancel</button></span>
+    <span id="clear-done" role="status"></span></p>
+  <p class="disclaimer"><strong>Not affiliated.</strong> Daily Recs is an independent project. Bandcamp doesn't make, endorse or support it. Bandcamp and its logo belong to their owners.</p>
+  <p class="links"><a href="whats-new.html">What's new</a> · <a id="feedback-link" href="#" target="_blank" rel="noopener">Send feedback</a> · <a id="bug-link" href="#" target="_blank" rel="noopener">Report a bug</a> · <a href="https://github.com/clovescmj/daily-recs" target="_blank" rel="noopener">GitHub</a></p>
+</main>
+<script type="module" src="about.js"></script>
+</body>
+</html>

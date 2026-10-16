@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" class="recs-page is-booting">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Recs</title>
+<link rel="stylesheet" href="../../styles/tokens.css">
+<link rel="stylesheet" href="../../styles/components.css">
+<link rel="stylesheet" href="recs.css">
+</head>
+<body>
+<main class="page">
+  <header class="page-header">
+    <div class="page-heading">
+      <button type="button" id="play-all" class="play-all" aria-label="Play" title="Play" hidden><svg class="play-all-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 19.333v-14.667l11.333 7.333 -11.333 7.333Z"/></svg><svg class="play-all-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.333 19v-14h4.667v14H14.333Zm-9.333 0v-14h4.667v14H5Z"/></svg></button>
+      <div>
+        <h1 class="page-title" id="page-title">Your recommendations</h1>
+        <p class="page-subtitle">New music, built from your own taste.</p>
+      </div>
+    </div>
+    <div class="page-actions">
+      <div class="view-switch" role="group" aria-label="Choose a list">
+        <div class="tags-picker">
+          <button type="button" id="view-tags" class="dr-select view-button" aria-haspopup="true" aria-expanded="false" aria-controls="tags-menu"></button>
+          <div id="tags-menu" class="dr-menu tags-menu" hidden></div>
+        </div>
+        <button type="button" id="view-best" class="dr-select view-button"></button>
+        <button type="button" id="view-surprise" class="dr-select view-button"></button>
+      </div>
+      <div class="new-list">
+        <button type="button" id="new-list-button" class="dr-select view-button new-list-button" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35Z"/></svg>New list</button>
+        <div id="new-list-menu" class="dr-menu new-list-menu" hidden>
+          <strong>Get a new list?</strong>
+          <span>It replaces this one. What you did not play can come back.</span>
+          <div class="new-list-actions"><button type="button" class="button" id="new-list-go">Get new list</button><button type="button" class="link-button" id="new-list-cancel">Cancel</button></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <section id="landing" class="landing" hidden>
+    <h2 class="landing-title">What do you want to hear today?</h2>
+    <p class="landing-subtitle">Pick one to start.</p>
+    <div class="view-switch landing-options" role="radiogroup" aria-label="What do you want to hear today?">
+      <div class="tags-picker">
+        <button type="button" id="landing-tags-option" class="dr-select view-button" role="radio" aria-checked="false" aria-haspopup="true" aria-expanded="false" aria-controls="landing-tags" data-view="tags"></button>
+        <div id="landing-tags" class="dr-menu tags-menu" hidden></div>
+      </div>
+      <button type="button" id="landing-best-option" class="dr-select view-button" role="radio" aria-checked="false" data-view="best"></button>
+      <button type="button" id="landing-surprise-option" class="dr-select view-button" role="radio" aria-checked="false" data-view="surprise"></button>
+    </div>
+    <p id="landing-hint" class="landing-hint"></p>
+    <button type="button" id="landing-go" class="button button--large">Start digging</button>
+  </section>
+  <section id="status" class="status-box" hidden></section>
+  <section id="album-grid" class="album-grid" aria-label="Today's recommendations"></section>
+  <p id="more-status" class="more-status" role="status" hidden>Loading more albums…</p>
+  <nav class="page-footer" aria-label="Extension info"><span>v<span id="version">–</span></span> · <a href="../about/about.html" target="_blank" rel="noopener">About</a> · <a id="feedback-link" href="#" target="_blank" rel="noopener">Feedback</a> · <a id="bug-link" href="#" target="_blank" rel="noopener">Report a bug</a></nav>
+</main>
+<script src="/mockup/chrome-stub.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Recs: mockup with fake data</title>
+<link rel="stylesheet" href="src/styles/tokens.css">
+<link rel="stylesheet" href="src/styles/components.css">
+<link rel="stylesheet" href="src/player/bandcamp-player.css">
+<link rel="stylesheet" href="src/content/profile-tab.css">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font:13px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#505958;background:#fff;padding-bottom:90px}
+  .top{background:#f7f6f6;border-bottom:1px solid #ddd;padding:10px 16px;font-size:12px;color:#777}
+  .top b{color:#d64541}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+  .tabs{display:flex;gap:24px;border-bottom:1px solid #ddd;margin:24px 0 8px;font-size:15px}
+  .tabs a{padding:10px 0;color:#505958;text-decoration:none;border-bottom:3px solid transparent}
+  .tabs a.on{border-bottom-color:#1da0c3;font-weight:600}
+  .tabs .num{color:#999;margin-left:4px}
+  .dr-new-tag{background:#1da0c3;color:#fff;font-size:11px;padding:1px 6px;border-radius:3px;margin-left:6px}
+  iframe{display:block;width:100%;border:0;height:900px}
+  #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:4px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:2147483100}
+  #toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="top">Mockup of the extension (v1.5.20) with <b>fake data</b>. Nothing here talks to Bandcamp. Add <code>?landing</code> to the address to see the opening screen.</div>
+<div class="wrap">
+  <div class="tabs"><a>collection <span class="num">64</span></a><a>wishlist <span class="num">16</span></a><a class="on">daily recs <span class="dr-new-tag">24 new</span></a></div>
+  <iframe id="frame" title="Daily Recs"></iframe>
+</div>
+<div id="toast" role="status"></div>
+<script src="src/player/bandcamp-player.js"></script>
+<script src="src/content/notice.js"></script>
+<script>
+  // The same conversation the content script has with the page (src/content/profile-tab.js), without chrome.*
+  const frame = document.getElementById('frame');
+  frame.src = `src/pages/recs/recs.html${location.search}`; // ?landing and ?nogenres go to the page
+  const toast = document.getElementById('toast');
+  let timer = null, last = null, bar = null;
+  const send = (cmd, v) => frame.contentWindow.postMessage({ dr: 'cmd', cmd, v }, location.origin);
+  const show = (text) => { toast.textContent = text; toast.classList.add('show'); clearTimeout(timer); timer = setTimeout(() => toast.classList.remove('show'), 3000); };
+  function render() {
+    if (!last) return;
+    if (!bar) { bar = BCPlayer.create({ onCmd: send }); document.body.appendChild(bar.el); }
+    bar.update({ ...last });
+  }
+  addEventListener('message', (event) => {
+    const m = event.data;
+    if (event.source !== frame.contentWindow || !m || typeof m !== 'object') return;
+    if (m.dr === 'height') frame.style.height = `${Math.ceil(m.h)}px`;
+    else if (m.dr === 'wish') setTimeout(() => { frame.contentWindow.postMessage({ dr: 'wishResult', rid: m.rid, ok: true }, location.origin); }, 400);
+    else if (m.dr === 'toast') DRNotice.show({ id: 'toast', text: m.msg, closable: false, autoHide: 4500, action: Number.isInteger(m.undo) ? { label: 'Undo', onClick: () => send('undo', m.undo) } : null });
+    else if (m.dr === 'notice' && m.kind === 'reload') DRNotice.show({ id: 'reload', text: 'Daily Recs was updated. Reload this page to keep using it.', closable: false, action: { label: 'Reload', onClick: () => { window.__reload = true; } } });
+    else if (m.dr === 'notice' && m.kind === 'news') DRNotice.show({ id: 'news', text: 'Daily Recs ' + m.title.replace(' · ', ': '), action: { label: "See what's new", onClick: () => { DRNotice.hide('news'); } }, onClose: () => { window.__closed = m.key; } });
+    else if (m.dr === 'now') { last = { ...m, queue: m.queue !== undefined ? m.queue : last && last.queue }; render(); }
+  });
+  // Frame for the animation of the Liked Songs icon (?anim=ms): saves the first song and freezes the animations at that time
+  const animAt = new URLSearchParams(location.search).get('anim');
+  if (animAt !== null) {
+    frame.src = 'src/pages/recs/recs.html';
+    const poll = setInterval(() => {
+      const doc = frame.contentDocument;
+      const plus = doc && doc.querySelector('[data-save]');
+      if (!plus || !bar) return;
+      clearInterval(poll);
+      const realSetTimeout = window.setTimeout;
+      window.setTimeout = (fn, ms, ...rest) => (ms === 1600 ? 0 : realSetTimeout(fn, ms, ...rest));   // the bar removes the cover after 1.6 s: not while frozen
+      plus.click();
+      const wait = setInterval(() => {
+        if (!document.querySelector('.liked-fly')) return;
+        clearInterval(wait);
+        document.getAnimations().forEach((a) => { a.pause(); a.currentTime = parseFloat(animAt); });
+        document.body.classList.add('anim-ready');
+      }, 5);
+    }, 100);
+  }
+</script>
+</body>
+</html>

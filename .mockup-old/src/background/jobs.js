@@ -1,0 +1,159 @@
+// Everything that reads or writes the state goes through one queue, so a like clicked during a refresh is never lost.
+// The service worker can be terminated at any time, so nothing here is kept only in memory in a way that matters:
+// the queue and the in-flight map are just coordination for the current worker instance.
+import { applyFeedback, extendList, extendListMany, fillSongs, refresh, refreshTags } from '../lib/recommender.js';
+import { scanSources } from '../lib/scanner.js';
+import { addDecision, decisionEntry } from '../lib/decisions.js';
+import { dequeueWishlistOp, emptyState, markPlayed, queueWishlistOp } from '../lib/state.js';
+import { DECISIONS_KEY } from '../lib/storage-keys.js';
+import { tagFit } from '../lib/taste-profile.js';
+import { syncState } from '../lib/taste-sync.js';
+import { loadStatus, store } from './storage.js';
+import { pendingWhatsNew } from './icon.js';
+
+let chain = Promise.resolve();
+
+/** Runs `task` after everything queued before it. A failing task doesn't block the ones after it. */
+export function enqueue(task) {
+  const result = chain.then(task);
+  chain = result.catch(() => {});
+  return result;
+}
+
+/**
+ * The toolbar icon carries no number (versions before 1.5.16 had one: this clears it); its tooltip says when there are news.
+ */
+export async function updateToolbarTitle() {
+  await chrome.action.setBadgeText({ text: '' });
+  const news = await pendingWhatsNew();
+  await chrome.action.setTitle({ title: `Daily Recs${news ? `\nNew in ${news.version}: right-click the icon, What's new` : ''}` });
+}
+
+/** Syncs taste with the user's Google account. Never throws: without sync (signed out, quota…) taste stays local. */
+export async function syncNow() {
+  try {
+    const existing = await store.load();
+    const state = existing || emptyState();
+    const { changed } = await syncState(chrome.storage.sync, state);
+    if (existing || changed) await store.save(state); // don't create an empty state just because sync ran first
+  } catch (error) {
+    console.warn('[daily-recs] sync failed:', error && error.message);
+  }
+}
+
+// ---- Bandcamp asked us to slow down (HTTP 429): wait, then try again by itself ----
+
+export const RETRY_ALARM = 'retry-after-rate-limit';
+const ATTEMPT_KEY = 'retryAttempt';
+const RETRY_STEP_MS = 5 * 60 * 1000;   // 5, 10, then 15 minutes
+const MAX_RETRY_ATTEMPTS = 3;
+
+/** True while we are waiting out a rate limit: nothing should hit Bandcamp again yet. */
+async function isCoolingDown() {
+  const status = await loadStatus();
+  return Boolean(status && status.error === 'rate_limited' && status.retryAt > Date.now());
+}
+
+/** After a run: if it was rate limited, publish when we'll retry and set an alarm for it; otherwise forget the attempts. */
+export async function planRetry() {
+  const status = await loadStatus();
+  if (!status || status.running || status.error !== 'rate_limited') {
+    await chrome.storage.session.remove(ATTEMPT_KEY);
+    return;
+  }
+  if (status.retryAt > Date.now()) return; // already planned
+  const attempt = ((await chrome.storage.session.get(ATTEMPT_KEY))[ATTEMPT_KEY] || 0) + 1;
+  if (attempt > MAX_RETRY_ATTEMPTS) { await chrome.storage.session.remove(ATTEMPT_KEY); return; } // give up; the user can retry later
+  const retryAt = Date.now() + attempt * RETRY_STEP_MS;
+  await chrome.storage.session.set({ [ATTEMPT_KEY]: attempt });
+  await store.setStatus({ ...status, retryAt });
+  await chrome.alarms.create(RETRY_ALARM, { when: retryAt });
+}
+
+/** The retry alarm went off: repeat what was rate limited. */
+export async function retryAfterRateLimit() {
+  const status = await loadStatus();
+  if (!status || status.error !== 'rate_limited') return;
+  const mode = ['surprise', 'tags'].includes(status.mode) ? status.mode : 'best';
+  await runRefresh({ mode, tags: status.tags || [] });
+}
+
+const inFlight = new Map();
+
+/** Identical refresh requests share one run; different ones (e.g. forced + surprise) run one after the other. */
+export function runRefresh({ force = false, mode = 'best', tags = [] } = {}) {
+  const key = `${force}:${mode}:${tags.join('+')}`;
+  if (inFlight.has(key)) return inFlight.get(key);
+  const job = enqueue(async () => {
+    if (await isCoolingDown()) return;
+    await syncNow();
+    if (mode === 'tags') await refreshTags({ fetch: (...args) => fetch(...args), store, tags, force });
+    else await refresh({ fetch: (...args) => fetch(...args), store, force, mode });
+    await planRetry();
+  }).finally(() => inFlight.delete(key));
+  inFlight.set(key, job);
+  return job;
+}
+
+/** Background scan of the user's albums for genre tags: a few pages per call, never while a run is in progress or cooling down. */
+export const runScan = () => enqueue(async () => {
+  const status = await loadStatus();
+  if ((status && status.running) || (await isCoolingDown())) return;
+  const state = await store.load();
+  if (!state || !state.owned) return;
+  const result = await scanSources({ fetch: (...args) => fetch(...args), state });
+  if (result.scanned || state.scanPausedUntil) await store.save(state);
+});
+
+/** One more album for the end of a list. Resolves with its id, or null. Never shown as progress: it happens in the background. */
+export const runExtend = ({ view, tags, count = 1 }) => enqueue(async () => {
+  if (await isCoolingDown()) return [];
+  const fetchFn = (...args) => fetch(...args);
+  if (count > 1) return extendListMany({ fetch: fetchFn, store, view, tags, count });
+  const id = await extendList({ fetch: fetchFn, store, view, tags });
+  return id ? [id] : [];
+});
+
+/** The song of some cards that do not have one (a list made by an older version): their pages are read, at a polite pace. */
+export const runFillSongs = ({ ids }) => enqueue(async () => {
+  if (await isCoolingDown()) return 0;
+  return fillSongs({ fetch: (...args) => fetch(...args), store, ids });
+});
+
+export const runFeedback = ({ id, kind, tags, index, track, trackId }) => enqueue(async () => {
+  const state = await applyFeedback({ fetch: (...args) => fetch(...args), store, id, kind, tags, index, track, trackId });
+  await recordDecision(state, { id, kind, tags });
+  await syncNow();
+});
+
+/** Remembers, on this computer, what was done with the album and what the album looked like (see lib/decisions.js). */
+async function recordDecision(state, { id, kind, tags = [] }) {
+  try {
+    const candidate = state && state.pool && state.pool[id];
+    const entry = decisionEntry({
+      id, kind, view: tags.length ? 'tags' : 'best', candidate, fit: candidate ? tagFit(state, candidate.tags) : null,
+    });
+    if (!entry) return;
+    const stored = (await chrome.storage.local.get(DECISIONS_KEY))[DECISIONS_KEY];
+    await chrome.storage.local.set({ [DECISIONS_KEY]: addDecision(stored, entry) });
+  } catch { /* the record is a help for tuning: it never gets in the way */ }
+}
+
+export const runWishlistQueue = (op) => enqueue(async () => {
+  const state = await store.load();
+  if (!state) return;
+  queueWishlistOp(state, op);
+  await store.save(state);
+});
+
+export const runWishlistDone = (id) => enqueue(async () => {
+  const state = await store.load();
+  if (!state) return;
+  dequeueWishlistOp(state, id);
+  await store.save(state);
+});
+
+export const runMarkPlayed = (id) => enqueue(async () => {
+  const state = await store.load();
+  if (state && markPlayed(state, id)) await store.save(state);
+});

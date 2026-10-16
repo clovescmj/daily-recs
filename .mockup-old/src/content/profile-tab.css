@@ -1,0 +1,56 @@
+/* Styles for the "daily recs" tab and panel injected into the Bandcamp profile page. */
+.dr-hidden { display: none !important; }
+#grid-tabs li.dr-tab { cursor: pointer; }
+/* "35 new" after the tab name, with Bandcamp's own values for the "New" tag of the playlists tab (.grids ol.tabs .tab-title .tab-new-badge) */
+#grid-tabs li.dr-tab .dr-new-tag {
+  display: inline-flex; vertical-align: middle; margin-left: 8px; padding: 2px 5px; border-radius: 4px;
+  background: var(--dr-tag-bg); color: var(--dr-tag-text); font: 700 var(--dr-font-xs)/1.5 "Helvetica Neue", var(--dr-font-family); /* (1.5: Bandcamp's tag is 19px tall, 15 of text and 2+2 of padding) */
+  letter-spacing: .4px; text-transform: uppercase;
+}
+#grid-tabs li.dr-tab .dr-new-tag:empty { display: none; }
+#dr-frame { display: block; max-width: 100%; height: 200px; border: 0; background: transparent; }
+#dr-frame[hidden] { display: none; }
+/* Bandcamp's own player slides down while ours slides up, and back */
+#carousel-player { transition: transform var(--dr-dur-base) ease var(--dr-panel-fade), visibility 0s linear 0s; }
+body.dr-open #carousel-player { transform: translateY(100%); visibility: hidden; transition: transform var(--dr-dur-base) ease, visibility 0s linear var(--dr-dur-base); }
+@media (prefers-reduced-motion: reduce) { #carousel-player, body.dr-open #carousel-player { transition: none; } }
+
+body.dr-player-on { padding-bottom: 92px; }
+/* Notices and confirmations (src/content/notice.js): in the centre, over the player bar, stacked in one place. A single
+   line: the text, the action as a text button at its end and, when it can be dismissed, a close icon (the one of the panels of the bar).
+   With a panel of the bar open (queue, Liked Songs) they are centred in what is left of the window. */
+#dr-notices {
+  position: fixed; left: 50%; bottom: 100px; z-index: 2147483001; transform: translateX(-50%);
+  display: flex; flex-direction: column-reverse; align-items: center; gap: 8px; width: max-content; max-width: calc(100vw - 32px); pointer-events: none;
+  transition: left var(--dr-menu-dur) var(--dr-ease);
+}
+body.dr-panel-open #dr-notices { left: calc((100vw - 388px) / 2); }
+.dr-notice {
+  display: flex; align-items: center; gap: 4px; min-width: 344px; max-width: 100%; padding: 6px 8px 6px 16px;
+  background: var(--dr-gray-600); color: var(--dr-white); border-radius: var(--dr-radius); box-shadow: var(--dr-shadow-menu);
+  font: var(--dr-font-m)/1.4 var(--dr-font-family); opacity: 0; transform: translateY(16px); pointer-events: auto;
+  transition: opacity .22s var(--dr-ease), transform .22s var(--dr-ease);
+}
+.dr-notice.show { opacity: 1; transform: none; }
+.dr-notice-text { flex: 1; padding: 8px 12px 8px 0; }
+.dr-notice-action {
+  flex: none; padding: 6px 12px; border: 0; border-radius: var(--dr-radius); background: none; color: var(--dr-blue300);
+  font: inherit; font-weight: var(--dr-weight-bold); cursor: pointer;
+}
+.dr-notice-action:hover:not(:disabled) { background: rgba(255, 255, 255, .12); }
+.dr-notice-action:active:not(:disabled) { background: rgba(255, 255, 255, .2); }
+.dr-notice-action:focus-visible { outline: 2px solid var(--dr-blue300); outline-offset: 1px; }
+.dr-notice-action:disabled { opacity: .6; cursor: default; }
+/* the X is the one of the panels of the bar: a 28 px box, the icon of the bar, a plain hover and the same focus ring */
+.dr-notice-close {
+  flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+  padding: 0; border: 0; border-radius: var(--dr-radius); background: none; cursor: pointer;
+}
+.dr-notice-close svg { width: var(--dr-icon-size); height: var(--dr-icon-size); fill: var(--dr-white); display: block; }
+.dr-notice-close:hover { background: rgba(255, 255, 255, .16); }
+.dr-notice-close:active { background: rgba(255, 255, 255, .24); }
+.dr-notice-close:focus-visible { outline: 2px solid var(--dr-white); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .dr-notice, #dr-notices { transition: none; } }
+/* Opened straight on the daily recs tab (#dailyrecs): Bandcamp's own collection stays out of sight until the panel is there (see early.js). The tab bar stays. */
+html.dr-pending #grids { visibility: hidden; }
+html.dr-pending #grids #grid-tabs { visibility: visible; }
