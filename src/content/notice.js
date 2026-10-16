@@ -58,22 +58,30 @@ window.DRNotice = (() => {
     heading.className = 'dr-notice-title';
     heading.textContent = title;
     el.append(close, heading);
-    if (lines.length) {
+    if (lines.length === 1) {   // one message: a line of text (a bullet before a single line says nothing)
+      const text = document.createElement('p');
+      text.className = 'dr-notice-text';
+      text.textContent = lines[0];   // (text only: what comes from a page is never markup)
+      el.appendChild(text);
+    } else if (lines.length > 1) {
       const list = document.createElement('ul');
       for (const line of lines) {
         const item = document.createElement('li');
-        item.textContent = line;   // (text only: what comes from a page is never markup)
+        item.textContent = line;
         list.appendChild(item);
       }
       el.appendChild(list);
     }
     if (action) {
+      const row = document.createElement('div');   // the action sits at the end of the row, as a text button (Material snackbar, Carbon toast)
+      row.className = 'dr-notice-actions';
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'dr-notice-action';
       button.textContent = action.label;
       button.addEventListener('click', () => { button.disabled = true; action.onClick(); });
-      el.appendChild(button);
+      row.appendChild(button);
+      el.appendChild(row);
     }
     container().appendChild(el);
     void el.offsetWidth;   // (the first state is drawn before `show` is added, so it opens with a transition)
