@@ -13,8 +13,8 @@ Daily Recs for Bandcamp is an independent extension. It is not made, endorsed or
 - It stores the **albums you hide**, and a score for each source of recommendations, in `chrome.storage.sync`, which Chrome syncs through your own Google account, so they follow you to your other computers (only ids and codes, no titles or links). This is controlled by your Chrome sync settings. Your Liked Songs stay on your computer, and so does a record of the albums you added to your wishlist from the extension. The wishlist itself is in your Bandcamp account.
 - To play music it loads the audio and the cover images straight from Bandcamp's own servers (`bandcamp.com` and `bcbits.com`, the network Bandcamp uses for its media), the same way Bandcamp's own pages do. The "song while waiting" is a random song of your own collection, read from the page of one of your albums, and only starts when you press play.
 - While the browser is open, it reads a few pages of your own albums in the background (a handful about every half hour) only to learn their genre tags, using your Bandcamp session like any visit. It pauses by itself when Bandcamp asks to slow down.
+- While you listen, it reads more album pages from Bandcamp to add albums to the list (up to 50 at a time, and up to 300 albums a day), at a slow pace and with your Bandcamp session, like any visit. It pauses by itself when Bandcamp asks to slow down.
 - It adds or removes an album from your Bandcamp wishlist **only when you click** the heart. Hiding an album never changes your Bandcamp account.
-
 - **Export liked songs** (in the Liked Songs list) saves a CSV file on your computer, through the browser's own download. Nothing is uploaded.
 - You can remove everything it saved from **About → Clear saved data** (the data in your Google account too), or by uninstalling the extension.
 

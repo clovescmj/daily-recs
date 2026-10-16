@@ -35,7 +35,10 @@ The first list takes a few minutes, because the extension reads your collection.
 ## Tips
 - The **heart** adds an album to your Bandcamp wishlist.
 - The **+** saves songs to **Liked Songs**, which lives only on your computer.
-- The **⊘** hides an album and music like it.
+- The **⊘** hides an album, its artist and the albums Bandcamp pairs with it. It hides at once, and one click on it again takes it back.
+- **Shuffle** works like a radio: one song from each album, and an album does not come back the same day. More albums load in the background as you listen.
+- The list can be shorter than 50: only albums that share a genre with your taste get in.
+- **Export liked songs**, at the bottom of the Liked Songs list, saves them as a CSV file. **Clear saved data**, in About (right-click the toolbar icon), removes everything the extension saved.
 - Everything runs in your browser and only talks to Bandcamp. There is no account and no tracking (see [PRIVACY.md](PRIVACY.md)).
 
 ## Updating

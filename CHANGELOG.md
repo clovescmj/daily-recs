@@ -3,6 +3,9 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.4.4
+- Texts aligned with the radio and the rules of the lists: About (up to 50 albums, more in the background, shorter lists when few fit), README (install from the store, how it works, layout), INSTALL (tips), privacy policy (the radio reads more album pages while you listen) and the three list buttons, which now say what each list contains instead of "perfect matches" and "go beyond".
+
 ## 1.4.3
 - What's new: the 1.4 entry is about the rules for what gets into a list and the number of albums (the stricter genre rule, the limit per genre, 50 more albums in the background, the radio, shorter lists when few albums fit).
 
