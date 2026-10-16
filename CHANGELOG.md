@@ -3,9 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.24
+- Each click gets its own confirmation: the one on screen fades out and the new one comes in (also for the same kind: add then remove). Before, the text of the same one was changed in place.
+- The cover of the Liked Songs animation starts to fade only when it is close to the icon.
+
 ## 1.5.23
-- Adding a song to Liked Songs is slower and softer: the cover comes in, fades out on its way down (before reaching the icon) and then the icon jumps.
-- The confirmation follows each click in place: add then remove changes the text of the same snackbar and restarts its timer.
+- Adding a song to Liked Songs is slower and softer: the cover comes in, fades out on its way down and then the icon jumps.
+- The confirmation followed each click in place (changed in 1.5.24).
 
 ## 1.5.22
 - The confirmations (a song added or removed, a wishlist change) no longer have an Undo button: to undo, press the icon again.

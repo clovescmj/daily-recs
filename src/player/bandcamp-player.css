@@ -145,8 +145,8 @@
 @keyframes dr-fly-fade {
   0% { opacity: 0; }
   25% { opacity: 1; }
-  48% { opacity: 1; }
-  78% { opacity: 0; }
+  66% { opacity: 1; }
+  88% { opacity: 0; }
   100% { opacity: 0; }
 }
 }

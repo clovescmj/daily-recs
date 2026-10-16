@@ -77,13 +77,6 @@ window.DRNotice = (() => {
    */
   function show(notice) {
     if (pending) { clearTimeout(pending.timer); pending = null; }
-    // The same confirmation again (add a song, then remove it): the text follows the click in place, and its timer starts over.
-    const same = container().querySelector(`[data-notice="${CSS.escape(notice.id)}"]:not(.leaving)`);
-    if (same && same.rearm && !notice.action && !notice.closable) {
-      same.querySelector('.dr-notice-text').textContent = notice.text;
-      same.rearm();
-      return;
-    }
     const current = [...container().querySelectorAll('.dr-notice')];   // (one that is already leaving counts: the new one waits for it too)
     if (!current.length) { draw(notice); return; }
     current.filter((el) => !el.classList.contains('leaving')).forEach(remove);
@@ -116,7 +109,6 @@ window.DRNotice = (() => {
       el.addEventListener('pointerenter', () => clearTimeout(timer));
       el.addEventListener('pointerleave', arm);
       arm();
-      el.rearm = arm;
     }
     container().appendChild(el);
     void el.offsetWidth;   // (the first state is drawn before `show` is added, so it opens with a transition)
