@@ -15,13 +15,13 @@ New music every day, built from your own taste. Never shows what you already own
 
 **Description:**
 
-> Daily Recs adds a "daily recs" tab to your own Bandcamp profile with a new list of up to 50 albums every day, and more albums load in the background while you listen. It starts from the albums you own and have in your wishlist, follows what other fans of those albums also own, and shows only albums you don't have, from artists you don't have, that share a genre with your taste, with no repeats.
+> Daily Recs adds a "daily recs" tab to your own Bandcamp profile with a new list of up to 50 songs every day, and more load in the background while you listen. It starts from the albums you own and have in your wishlist, follows what other fans of those albums also own, and shows only albums you don't have, from artists you don't have, that share a genre with your taste, with no repeats.
 >
 > • Best matches: the albums that the most fans of your albums also own.
 > • My tags: albums with the genres you pick.
 > • Surprise me: albums from deeper in the same ranking, further from what you own. It never repeats Best matches.
-> • The heart adds an album to your Bandcamp wishlist. The + adds songs to Liked Songs, a list that stays in your browser and can be exported to a CSV file. The ⊘ hides an album, its artist and the albums Bandcamp pairs with it.
-> • A player in Bandcamp's style, with a queue, Liked Songs and media keys. Shuffle works like a radio: one song from each album, in random order, an album does not come back the same day, and more albums load in the background as you listen. While your first list loads, you can play a random song from your own collection.
+> • The heart adds the song to your Bandcamp wishlist. The + adds it to Liked Songs, a list that stays in your browser and can be exported to a CSV file. The ⊘ hides an album, its artist and the albums Bandcamp pairs with it.
+> • A player in Bandcamp's style, with a queue, Liked Songs and media keys. Each card is one song: the player plays it and then the next card, and more albums load in the background as you listen. While your first list loads, you can play a random song from your own collection.
 > • The albums you hide sync between your computers through your Google account. Liked Songs stay in your browser, and the wishlist stays in your Bandcamp account.
 >
 > It runs in your browser and only talks to Bandcamp (bandcamp.com and the servers of its audio and covers). It uses the session you already have open and never sees your password. There are no analytics, no ads and no accounts. The About page (right-click the toolbar icon) has a button that clears everything it saved.

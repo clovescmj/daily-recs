@@ -15,11 +15,11 @@ From the [Chrome Web Store](https://chromewebstore.google.com/detail/fefclbgoafh
 ## How it works
 - Starts from what you own and what you've saved on Bandcamp, and follows what the fans of those albums also own.
 - Shows only what's new to you: nothing you own, nothing repeated. An album only gets in if it shares a genre with your taste, no genre takes more than about a fifth of a list, and albums of the same genre are not played one after the other. A list can be shorter than 50 when few albums fit.
-- The **heart** adds an album to your Bandcamp wishlist, the **+** saves songs to Liked Songs (kept in your browser, exportable to a CSV file), and the **⊘** hides an album at once: that album, its artist and the albums Bandcamp pairs with it stop coming.
+- The **heart** adds the song of a card to your Bandcamp wishlist, the **+** saves it to Liked Songs (kept in your browser, exportable to a CSV file), and the **⊘** hides an album at once: that album, its artist and the albums Bandcamp pairs with it stop coming.
 - **My tags:** albums with the genres you choose.
 - **Best matches:** the albums that the most fans of your albums also own.
 - **Surprise me:** albums from deeper in the same ranking, further from what you own. It never repeats Best matches.
-- A player bar in Bandcamp's style (queue, Liked Songs, media keys). **Shuffle** works like a radio: one song from each album, and an album does not come back the same day. 50 more albums are asked for in the background when a list loads and again when 10 or fewer are left (up to 300 a day). While your first list is built, a random song from your collection can play.
+- A player bar in Bandcamp's style (queue, Liked Songs, media keys). Each card is one song: the player plays it and then the next card, in the order of the page; a song played from Liked Songs goes on with the Liked Songs. 50 more albums are asked for in the background when a list loads and again when 10 or fewer are left (up to 300 a day). While your first list is built, a random song from your collection can play.
 - A tab left open past midnight shows a banner to get the new day's list; a small dot on the toolbar icon says that a version with news was installed.
 
 ## Project layout
@@ -36,8 +36,7 @@ src/
     recommender.js       refresh / feedback use cases (store + fetch injected)
     taste-sync.js        hidden albums + source scores <-> chrome.storage.sync (chunked, last-write-wins)
     taste-profile.js     genres of the user's albums and which ones are offered (genres.js: known genres, places.js: places that are never genres)
-    play-plan.js         what plays next in Shuffle (one song per album, no album twice a day)
-    queue-rows.js        which rows the queue shows (Full album and Shuffle)
+    queue-rows.js        which rows the queue shows (the cards after the one that plays, or the Liked Songs after the song that plays)
     liked.js, liked-csv.js   the Liked Songs list, and its CSV export
     decisions.js         the local record of what was hidden, wishlisted or liked (to tune the lists)
     pending.js, versions.js  a list that was asked for; major updates (the dot on the icon)
@@ -70,5 +69,5 @@ After changing `manifest.json`, reload the extension in `chrome://extensions`.
 - **Service worker:** listeners are registered synchronously at top level; long work is queued and never relies on in-memory state. Run progress lives in `chrome.storage.session`, so a worker killed mid-run can't leave the page "loading" forever.
 - **Messages:** every message is parsed strictly and the sender is checked: only the content script (on bandcamp.com) may ask for a wishlist change; everything else must come from the extension's own pages.
 - **Storage:** big state in `storage.local` (written twice per run); the Liked Songs under their own key, `likedSongs`, written by the page at once and never by a run (see `src/lib/liked.js`); the record of decisions under `decisions` (up to 1000 entries); hidden albums and source scores in `storage.sync`, chunked to stay inside the quota.
-- **The radio:** Shuffle asks the service worker for 50 more albums at a time (`extend-list` with a count), which reads more of the leftovers' genres and applies the same rules as the list. See `maintainRadio` in `src/pages/recs/player.js`.
+- **The radio:** the player asks the service worker for 50 more albums at a time (`extend-list` with a count), which reads more of the leftovers' genres and applies the same rules as the list. See `maintainRadio` in `src/pages/recs/player.js`.
 - **Privacy:** see [PRIVACY.md](PRIVACY.md).

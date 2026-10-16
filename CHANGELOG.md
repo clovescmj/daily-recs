@@ -3,6 +3,13 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.0
+- **A card is one song.** It shows the song (the one the artist highlights, or the first), the artist and the album ("People who own…" is gone). The heart adds that song to the Bandcamp wishlist (an item of type "t") and the + adds it to Liked Songs. A list made by an older version, with no song known, shows the album as before.
+- **No Shuffle, no Full album.** The player plays the song of the card and then the next card, in the order of the page (that order already spreads the genres). The only other sequence is Liked Songs: a song played from there goes on with the Liked Songs, and when they run out the list goes on from where it was. The queue is the cards after the one that plays (up to 100 rows) and what played; the play plan, the window of songs of the queue and the two modes are gone.
+- The heart of the bar is for the song that plays; taking it out takes out the song that was put in.
+- The first line of the list buttons, the hover of the heart (Bandcamp's orange) and the texts (About, README, INSTALL, store listing) follow the cards.
+- A small window at the bottom right, above the player, shows the last block of What's new (with a close button) when it is not the one the user closed. A notice with an Update button appears when a new version was downloaded and is waiting (the extension asks the browser for updates a few times a day); the button loads it and reloads the page.
+
 ## 1.4.6
 - A line under the list says "Loading more albums…" while the next batch is being loaded in the background (the first one right after a list is drawn, and each one when 10 or fewer are left to play). It goes away when the albums arrive, or when nothing more fits.
 

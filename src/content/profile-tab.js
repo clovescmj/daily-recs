@@ -157,6 +157,16 @@
           forwardWishlistRequest({ ...message, itemType: message.itemType === 't' ? 't' : 'a' });
         }
         break;
+      case 'notice': // what's new: closed, it is not shown again until there is a new block (and the dot of the toolbar icon is done)
+        if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string' && Array.isArray(message.items)) {
+          DRNotice.show({
+            id: 'news',
+            title: message.title.slice(0, 200),
+            lines: message.items.filter((item) => typeof item === 'string').slice(0, 8).map((item) => item.slice(0, 240)),
+            onClose: () => chrome.storage.local.set({ newsSeen: message.key.slice(0, 200) }).then(() => chrome.storage.local.remove('whatsNew')).catch(() => {}),
+          });
+        }
+        break;
       case 'toast':
         if (typeof message.msg === 'string') showToast(message.msg.slice(0, MAX_TOAST_LENGTH));
         break;
@@ -261,6 +271,33 @@
     state.countEl = badge;
     updateTabCount();
     if (location.hash === HASH) openPanel(); else showProfile();
+    watchForUpdate();
+  }
+
+  // ── A new version is waiting ──────────────────────────────────────────────────────────────────────────────────
+
+  /** The service worker keeps `updateAvailable` when the browser downloaded a new version: a notice with an Update button says so. */
+  async function showUpdateNotice() {
+    let stored = null;
+    try { stored = (await chrome.storage.local.get('updateAvailable')).updateAvailable; } catch { return; }
+    if (!stored || typeof stored.version !== 'string') { DRNotice.hide('update'); return; }
+    DRNotice.show({
+      id: 'update',
+      title: `Daily Recs ${stored.version.slice(0, 20)} is ready`,
+      lines: ['Update now to get the latest changes. The page reloads.'],
+      action: {
+        label: 'Update',
+        onClick: () => {
+          chrome.runtime.sendMessage({ type: 'apply-update' }).catch(() => {});
+          setTimeout(() => location.reload(), 1500);   // the extension reloads itself; the page then comes back with the new version
+        },
+      },
+    });
+  }
+
+  function watchForUpdate() {
+    showUpdateNotice();
+    chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.updateAvailable) showUpdateNotice(); });
   }
 
   /** "daily recs 35 new": the number follows the albums being opened or rejected. */

@@ -22,6 +22,25 @@ body.dr-player-on { padding-bottom: 92px; }
   opacity: 0; pointer-events: none; transition: opacity var(--dr-menu-dur);
 }
 #dr-toast.show { opacity: 1; }
+/* Notices (src/content/notice.js): bottom right, above the player bar, in the style of the snackbar above */
+#dr-notices {
+  position: fixed; right: 16px; bottom: 100px; z-index: 2147483001; width: 340px; max-width: calc(100vw - 32px);
+  display: flex; flex-direction: column-reverse; gap: 8px; pointer-events: none;
+}
+.dr-notice {
+  position: relative; padding: 12px 36px 12px 16px; background: var(--dr-gray-600); color: var(--dr-white); border-radius: var(--dr-radius);
+  font: var(--dr-font-base)/1.4 var(--dr-font-family); opacity: 0; transform: translateY(6px); pointer-events: auto;
+  transition: opacity var(--dr-menu-dur), transform var(--dr-menu-dur);
+}
+.dr-notice.show { opacity: 1; transform: none; }
+.dr-notice-title { display: block; font-weight: var(--dr-weight-bold); }
+.dr-notice ul { margin: 6px 0 0; padding-left: 18px; font-size: var(--dr-font-s); }
+.dr-notice li { margin: 3px 0; }
+.dr-notice-close { position: absolute; top: 6px; right: 8px; width: 24px; height: 24px; border: 0; background: none; color: var(--dr-white); font-size: 20px; line-height: 1; cursor: pointer; opacity: .8; }
+.dr-notice-close:hover { opacity: 1; }
+.dr-notice-action { margin-top: 10px; padding: 6px 14px; border: 0; border-radius: var(--dr-radius); background: var(--dr-white); color: var(--dr-gray-700); font: inherit; font-weight: var(--dr-weight-bold); cursor: pointer; }
+.dr-notice-action:disabled { opacity: .6; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .dr-notice { transition: none; } }
 /* Opened straight on the daily recs tab (#dailyrecs): Bandcamp's own collection stays out of sight until the panel is there (see early.js). The tab bar stays. */
 html.dr-pending #grids { visibility: hidden; }
 html.dr-pending #grids #grid-tabs { visibility: visible; }

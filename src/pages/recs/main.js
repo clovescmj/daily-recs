@@ -9,6 +9,7 @@ import { listFor, render } from './render.js';
 import { session } from './session.js';
 import { initLanding, leaveLanding, refreshLanding, setLandingVisible } from './landing.js';
 import { initNewDay } from './new-day.js';
+import { showNewsIfNew } from './notices.js';
 import { pendingOutcome } from '../../lib/pending.js';
 import { $ } from './dom.js';
 import { initViewSwitch } from './views.js';
@@ -101,6 +102,7 @@ async function init() {
 
   initPlayer();
   listenToHost(runCommand);
+  showNewsIfNew();
 
   const picked = await pickedToday();
   if (picked) { session.view = picked.view; session.tagKeys = picked.tags; } // the first drawing is already the list of today's choice

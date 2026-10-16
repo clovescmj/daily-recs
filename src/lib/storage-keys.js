@@ -9,6 +9,8 @@ export const STATUS_KEY = 'status';
 export const OPENED_KEY = 'opened';
 export const LIKED_KEY = 'likedSongs';
 export const DECISIONS_KEY = 'decisions';   // what was hidden, wishlisted or liked, and why (see decisions.js)
+export const UPDATE_KEY = 'updateAvailable';   // { version, at }: a new version was downloaded and waits to be loaded (the notice with the Update button)
+export const NEWS_SEEN_KEY = 'newsSeen';       // the title of the last block of What's new that the user closed in the notice
 export const WHATS_NEW_KEY = 'whatsNew';   // { version, at }: a major update was installed and its news were not opened yet (a dot on the toolbar icon)
 export const PICKED_KEY = 'pickedDate';   // the day the user last chose what to hear (the opening screen shows once a day)
 
