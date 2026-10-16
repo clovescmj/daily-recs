@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.23
+- Adding a song to Liked Songs is slower and softer: the cover comes in, fades out on its way down (before reaching the icon) and then the icon jumps.
+- The confirmation follows each click in place: add then remove changes the text of the same snackbar and restarts its timer.
+
 ## 1.5.22
 - The confirmations (a song added or removed, a wishlist change) no longer have an Undo button: to undo, press the icon again.
 

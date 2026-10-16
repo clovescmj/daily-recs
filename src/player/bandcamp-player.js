@@ -252,7 +252,7 @@
             const done = () => { ic.classList.remove('bump'); if (cover) cover.remove(); };
             ic.classList.add('bump');
             ic.addEventListener('animationend', done, { once: true });
-            setTimeout(done, 1600); // (no animationend when motion is reduced or the bar is out of sight)
+            setTimeout(done, 2600); // (no animationend when motion is reduced or the bar is out of sight)
           }
         }
         savedCount = s.savedList.length;
