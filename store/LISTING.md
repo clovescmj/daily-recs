@@ -33,22 +33,20 @@ New music every day, built from your own taste. Never shows what you already own
 
 ## Graphics (you need to make these with the extension running)
 - Icon 128×128: already in the package (`icons/icon-128.png`).
-- Screenshots, 1280×800 (at least 1, up to 5). Done: `store/images/screenshot-1-1280x800.png` (the tab with the album grid and the player bar). Ideas for more:
-  1. The "daily recs" tab on your profile with the album grid.
-  2. A card with hover on the title/artist and the heart and "don't show music like this" icons.
-  3. The player bar playing an album, with the queue open.
-  4. "Surprise me" loading (progress) or its list, with the "Best matches" button.
-  5. The About page.
+- Screenshots, 1280×800 (at least 1, up to 5). Done, with the current look (made from the mockup, with fake data):
+  1. `store/images/screenshot-1-1280x800.png`: the "daily recs" tab with the song cards and the player bar.
+  2. `store/images/screenshot-2-1280x800.png`: the same with the queue open.
+  A screenshot of your own profile (real covers) is better than fake covers if you are comfortable showing it.
 - Small promo tile 440×280 (required) and marquee 1400×560: already in `store/images/`.
 
 ## Privacy practices tab
 
 **Single purpose:**
-Show a daily list of new album recommendations on the user's own Bandcamp profile, based on their collection and wishlist.
+Show a daily list of new music recommendations (one song per album) on the user's own Bandcamp profile, based on their collection and wishlist.
 
 **Permission justifications**
 - `storage`: keeps the library snapshot, the recommendations and the user's taste on this computer, and syncs the albums the user hides (with a score per source of recommendations) through the user's Google account.
-- `alarms`: about every 30 minutes, reads a handful of the pages of the user's own albums in the background, only to learn their genre tags (it pauses when Bandcamp asks to slow down), and schedules a retry after such a request.
+- `alarms`: about every 30 minutes, reads a handful of the pages of the user's own albums in the background, only to learn their genre tags (it pauses when Bandcamp asks to slow down), and schedules a retry after such a request. A few times a day it also asks the browser whether a new version of the extension is ready, so the page can offer to update.
 - `offscreen`: opens a hidden page that only checks whether the browser is in dark or light mode, so the toolbar icon can use the symbol that is visible on the user's toolbar (the service worker cannot check this itself). It reads and sends no other data.
 - `contextMenus`: adds the right-click menu on the toolbar icon (Open Daily Recs, Feedback, Report a bug, About).
 - `scripting`: when the user clicks the heart, runs Bandcamp's own "add to wishlist" function in the user's Bandcamp tab, so the wishlist changes exactly as if they had clicked Bandcamp's button.
