@@ -154,6 +154,7 @@
         break;
       case 'notice':
         if (message.kind === 'reload') showReloadNotice();
+        else if (message.kind === 'newday') showNewDayNotice();
         else if (message.kind === 'news' && typeof message.key === 'string' && typeof message.title === 'string') showNewsNotice(message.key.slice(0, 200));
         break;
       case 'toast':
@@ -316,6 +317,16 @@
   }
 
   // ── A new version is waiting ──────────────────────────────────────────────────────────────────────────────────
+
+  /** The day changed with this tab open: the list stays as it is until the button asks for the new one. */
+  function showNewDayNotice() {
+    if (reloadNeeded) return;
+    DRNotice.show({
+      id: 'newday',
+      text: 'A new day has started',
+      action: { label: 'Get new recs', onClick: () => { DRNotice.hide('newday'); sendCommand('newDay'); } },
+    });
+  }
 
   /** The service worker keeps `updateAvailable` when the browser downloaded a new version: a notice with an Update button says so. */
   async function showUpdateNotice() {

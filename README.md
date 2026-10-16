@@ -20,7 +20,7 @@ From the [Chrome Web Store](https://chromewebstore.google.com/detail/fefclbgoafh
 - **Best matches:** the albums that the most fans of your albums also own.
 - **Surprise me:** albums from deeper in the same ranking, further from what you own. It never repeats Best matches.
 - A player bar in Bandcamp's style (queue, Liked Songs, media keys). Each card is one song: the player plays it and then the next card, in the order of the page; a song played from Liked Songs goes on with the Liked Songs. 50 more albums are asked for in the background when a list loads and again when 10 or fewer are left (up to 300 a day). While your first list is built, a random song from your collection can play.
-- A tab left open past midnight shows a banner to get the new day's list; a small dot on the toolbar icon says that a version with news was installed.
+- A tab left open past midnight shows a notice at the bottom to get the new day's list; a small dot on the toolbar icon says that a version with news was installed.
 
 ## Project layout
 ```

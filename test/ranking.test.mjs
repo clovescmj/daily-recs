@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { emptyState, migrateState, rollShownOver } from '../src/lib/state.js';
+import { emptyState, markPlayed, migrateState, rollShownOver } from '../src/lib/state.js';
 import { hashSource } from '../src/lib/taste-sync.js';
 import { createSourceWeigher } from '../src/lib/taste-profile.js';
 import {
@@ -104,16 +104,20 @@ describe('pickSources', () => {
   });
 });
 
-test('markShown remembers albums and their artists for today; tomorrow they are never shown again', () => {
-  const state = stateWith([candidate('3', '6', { s: 1 })]);
-  markShown(state, ['3']);
-  assert.deepEqual(state.shownToday, ['3']);
-  assert.deepEqual(state.shownArtistsToday, ['6']);
-  assert.ok(pickBest(state, 1).includes('3'), 'another list of the same day may show it again');
+test('markShown remembers albums and their artists for today; tomorrow only the ones that were played stay out', () => {
+  const state = stateWith([candidate('3', '6', { s: 1 }), candidate('4', '7', { s: 1 })]);
+  markShown(state, ['3', '4']);
+  assert.deepEqual(state.shownToday, ['3', '4']);
+  assert.deepEqual(state.shownArtistsToday, ['6', '7']);
+  assert.ok(pickBest(state, 2).includes('3'), 'another list of the same day may show it again');
+  assert.equal(markPlayed(state, '3'), true);
+  assert.equal(markPlayed(state, '3'), false, 'the second time changes nothing');
+  assert.equal(markPlayed(state, '999'), false, 'an album the pool does not know is ignored');
   rollShownOver(state, '2026-10-09');
   assert.deepEqual(state.shown, ['3']);
   assert.deepEqual(state.shownArtists, ['6']);
-  assert.deepEqual(pickBest(state, 1), [], 'but not on the next day');
+  assert.deepEqual(state.playedToday, []);
+  assert.deepEqual(pickBest(state, 2), ['4'], 'the played one stays out on the next day; the one only shown comes back');
 });
 
 describe('pickFocused', () => {

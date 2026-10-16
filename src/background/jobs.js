@@ -4,7 +4,7 @@
 import { applyFeedback, extendList, extendListMany, fillSongs, refresh, refreshTags } from '../lib/recommender.js';
 import { scanSources } from '../lib/scanner.js';
 import { addDecision, decisionEntry } from '../lib/decisions.js';
-import { dequeueWishlistOp, emptyState, queueWishlistOp } from '../lib/state.js';
+import { dequeueWishlistOp, emptyState, markPlayed, queueWishlistOp } from '../lib/state.js';
 import { DECISIONS_KEY } from '../lib/storage-keys.js';
 import { tagFit } from '../lib/taste-profile.js';
 import { syncState } from '../lib/taste-sync.js';
@@ -171,4 +171,9 @@ export const runWishlistDone = (id) => enqueue(async () => {
 export const runMarkOpened = (id) => enqueue(async () => {
   await markOpened(id);
   await updateBadge();
+});
+
+export const runMarkPlayed = (id) => enqueue(async () => {
+  const state = await store.load();
+  if (state && markPlayed(state, id)) await store.save(state);
 });

@@ -2,7 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { refresh, refreshTags, extendList, applyFeedback, fillSongs, PHASE } from '../src/lib/recommender.js';
 import { createSourceWeigher } from '../src/lib/taste-profile.js';
-import { DAILY_COUNT } from '../src/lib/state.js';
+import { DAILY_COUNT, markPlayed } from '../src/lib/state.js';
 import { createFakeBandcamp } from './helpers/fake-bandcamp.js';
 import { createMemoryStore } from './helpers/memory-store.js';
 import { emptyState } from '../src/lib/state.js';
@@ -58,15 +58,23 @@ describe('refresh', () => {
     assert.deepEqual(second.today.ids, first.today.ids);
   });
 
-  test('what was shown on an earlier day never comes back, but lists of the same day may share albums', async () => {
-    const { run } = await setup();
+  /** Plays every album of these lists (a song went on for a few seconds), the way the page reports it. */
+  const playAll = async (store, ...lists) => {
+    const state = await store.load();
+    for (const id of lists.flat()) markPlayed(state, id);
+    await store.save(state);
+  };
+
+  test('what was played on an earlier day never comes back, but lists of the same day may share albums (and what was only shown may come back)', async () => {
+    const { run, store } = await setup();
     const monday = await run({ now: new Date(2026, 9, 7, 12) });
     const surprise = await run({ mode: 'surprise', now: new Date(2026, 9, 7, 12) });
     assert.equal(surprise.surprise.ids.length, DAILY_COUNT);
+    const played = [...monday.today.ids.slice(0, 20), ...surprise.surprise.ids.slice(0, 10)];
+    await playAll(store, played);
     const tuesday = await run({ now: new Date(2026, 9, 8, 12) });
     assert.equal(tuesday.today.ids.length, DAILY_COUNT);
-    const seenBefore = new Set([...monday.today.ids, ...surprise.surprise.ids]);
-    assert.equal(tuesday.today.ids.filter((id) => seenBefore.has(id)).length, 0);
+    assert.equal(tuesday.today.ids.filter((id) => played.includes(id)).length, 0);
   });
 
   test('"surprise" is built next to the best list, which stays saved and untouched', async () => {
@@ -284,13 +292,16 @@ describe('lists built around genres the user picked', () => {
     assert.deepEqual(store.getStatus().tagLabels, ['metal']);
   });
 
-  test('asking again the same day is free; the next day brings a list that never repeats', async () => {
-    const { fake, runTags } = await setupTags();
+  test('asking again the same day is free; the next day brings a list without what was played', async () => {
+    const { fake, runTags, store } = await setupTags();
     const first = await runTags();
     const calls = fake.calls.length;
     const again = await runTags();
     assert.equal(fake.calls.length, calls, 'no network calls');
     assert.deepEqual(again.tagLists.metal.ids, first.tagLists.metal.ids);
+    const state = await store.load();
+    for (const id of first.tagLists.metal.ids) markPlayed(state, id);
+    await store.save(state);
     const next = await runTags({ now: new Date(2026, 9, 8, 12) });
     assert.equal(next.tagLists.metal.date, '2026-10-08');
     assert.equal(next.tagLists.metal.ids.filter((id) => first.tagLists.metal.ids.includes(id)).length, 0);

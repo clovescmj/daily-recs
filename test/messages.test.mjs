@@ -36,6 +36,7 @@ describe('parseMessage', () => {
       { type: MSG.WISHLIST_OP, op: 'nuke', id: '1', bandId: '2' },
       { type: MSG.WISHLIST_QUEUE, op: 'add', id: '<script>', bandId: '2' },
       { type: MSG.MARK_OPENED },
+      { type: MSG.MARK_PLAYED, id: 'x' },
     ];
     for (const message of bad) assert.equal(parseMessage(message), null, JSON.stringify(message));
   });

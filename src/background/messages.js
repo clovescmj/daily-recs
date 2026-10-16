@@ -42,6 +42,7 @@ export function createMessageHandler({ extensionId, extensionUrl, runInPage, job
       }
       case MSG.COLOR_SCHEME: await setScheme(message.dark); break;
       case MSG.MARK_OPENED: await jobs.runMarkOpened(message.id); break;
+      case MSG.MARK_PLAYED: await jobs.runMarkPlayed(message.id); break;
       case MSG.WISHLIST_OP: return runInPage(sender.tab.id, message);
       default: return { ok: false, error: 'unknown message' };
     }

@@ -15,11 +15,13 @@ export const emptyState = () => ({
   schemaVersion: SCHEMA_VERSION,
   pool: {},              // albumId -> candidate { id, title, artist, artistId, url, art, fans, via, srcs }
   sampled: {},           // source url -> timestamp of the last time its recommendations were read
-  shown: [],             // album ids shown on previous days (they never repeat)
-  shownArtists: [],      // artist ids shown on previous days (they don't come back with another album)
+  shown: [],             // album ids played on previous days (they never repeat; albums that were shown but not played may come back)
+  shownArtists: [],      // artist ids played on previous days (they don't come back with another album)
   shownToday: [],        // ...and shown today: they may appear again in another list of the same day
   shownArtistsToday: [],
-  shownDate: '',         // the day shownToday refers to
+  playedToday: [],       // the albums of the day that were played (a song went on for a few seconds): only these are kept out of the next days
+  playedArtistsToday: [],
+  shownDate: '',         // the day shownToday and playedToday refer to
   liked: [],             // derived from `votes` (albums the user gave a thumbs up)
   tagCache: {},          // albumId -> { t: "tag|tag", at: ms }: the genre tags of candidates already read (they don't change, so they are not read twice)
   scoped: {},            // albumId -> { keys, artistId, near }: albums hidden from a genre list, hidden again only in lists of those genres
@@ -154,15 +156,26 @@ export function hiddenIn(state, id, list) {
 export const idsOfTodaysLists = (state, today) => todaysLists(state, today).flatMap(({ list }) => list.ids);
 
 /**
- * What was shown on earlier days never comes back; what was shown today may appear in another list of the same day. When
- * the day changes, yesterday's "shown today" becomes "shown before".
+ * What was played on earlier days never comes back (nor do the artists); what was only shown, and not played, may come back.
+ * What was shown today may appear in another list of the same day. When the day changes, yesterday's "played today" becomes "played before".
  */
 export function rollShownOver(state, today) {
   if (state.shownDate === today) return;
-  state.shown.push(...(state.shownToday || []));
-  state.shownArtists = [...new Set([...(state.shownArtists || []), ...(state.shownArtistsToday || [])])];
+  state.shown = [...new Set([...state.shown, ...(state.playedToday || [])])];
+  state.shownArtists = [...new Set([...(state.shownArtists || []), ...(state.playedArtistsToday || [])])];
   state.shownToday = [];
   state.shownArtistsToday = [];
+  state.playedToday = [];
+  state.playedArtistsToday = [];
   state.shownDate = today;
   state.tagLists = Object.fromEntries(Object.entries(state.tagLists || {}).filter(([, list]) => list.date === today)); // old lists go
+}
+
+/** A song of this album went on for a few seconds: from tomorrow on the album (and its artist) is not shown again. Returns true when it was new. */
+export function markPlayed(state, id) {
+  const album = state.pool[id];
+  if (!album || (state.playedToday || []).includes(id)) return false;
+  state.playedToday = [...(state.playedToday || []), id];
+  if (album.artistId) state.playedArtistsToday = [...new Set([...(state.playedArtistsToday || []), album.artistId])];
+  return true;
 }

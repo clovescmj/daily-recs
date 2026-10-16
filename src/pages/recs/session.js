@@ -31,6 +31,6 @@ export const session = {
   running: false,
   /** The day (todayKey) the lists on screen belong to. */
   loadedDay: '',
-  /** True from the moment the day changes until the user asks for the new recommendations: the list on screen stays as it is, and the banner is showing. */
+  /** True from the moment the day changes until the user asks for the new recommendations: the list on screen stays as it is, and the notice is showing. */
   newDay: false,
 };

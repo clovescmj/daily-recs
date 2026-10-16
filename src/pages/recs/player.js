@@ -37,6 +37,15 @@ function savePlayed() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(writePlayed, 300);
 }
+const PLAYED_AFTER_S = 2;           // a song that went on this long counts as played: its album is kept out of the next days' lists
+const playedSent = new Set();
+/** Tells the service worker, once per album, that one of its songs really played (not just a skip). */
+function countAsPlayed() {
+  const { current } = player;
+  if (player.waiting || !/^\d+$/.test(String(current.id)) || playedSent.has(current.id) || audio.paused || audio.currentTime < PLAYED_AFTER_S) return;
+  playedSent.add(current.id);
+  send({ type: MSG.MARK_PLAYED, id: current.id });
+}
 const NOW_KEY = 'nowPlaying';       // the song that plays and where it is, in chrome.storage.local too
 let lastNowSave = 0;
 /** Keeps the song and the position (every few seconds while it plays, at once on a pause or a new song). A song of the loading box is not kept. */
@@ -620,7 +629,7 @@ export function initPlayer() {
   for (const type of ['play', 'pause', 'timeupdate', 'loadedmetadata', 'volumechange', 'waiting', 'playing', 'canplay', 'progress']) {
     audio.addEventListener(type, () => {
       emit(type !== 'timeupdate' && type !== 'progress');
-      if (type === 'timeupdate') saveNowPlaying(false);
+      if (type === 'timeupdate') { saveNowPlaying(false); countAsPlayed(); }
       else if (type === 'pause') saveNowPlaying(true);
     });
   }
