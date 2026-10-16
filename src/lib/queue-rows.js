@@ -1,18 +1,15 @@
-// Which rows the queue shows. The page gives what it knows (the order of the albums, the song that plays, what played, the songs it has read); the rows come back
-// as plain objects, without anything from the page, so the rules can be tested. The page adds to each row what only it knows (the cover, the link, the wishlist).
+// Which rows the queue shows. The page gives what it knows (the order of the cards, where playback is, the song that plays, what played,
+// the Liked Songs); the rows come back as plain objects, without anything from the page, so the rules can be tested. The page adds to each
+// row what only it knows (the cover, the link, the wishlist).
+//
+// The sequence is always the same: the cards of the list, in the order they are on the page. The one exception is a song played from
+// Liked Songs: then the sequence is the Liked Songs list, from that song on.
 
-/** Full album: the songs of the album that plays and of the albums after it, up to this many. */
-export const QUEUE_AHEAD = 3;
+/** Rows of what is still to play that are drawn at most (the list can have hundreds of cards). */
+export const QUEUE_MAX_NEXT = 100;
 
 /** Where an album starts: the track the artist highlights on Bandcamp, or the first one when none is set. */
 export const startingTrack = (tracks) => Math.max(0, tracks.findIndex((track) => track.featured));
-
-/** Which albums the queue shows songs of: the one that plays (`at`, -1 when none of the list) and the ones after it; `more` when the list goes on after them. */
-export function queueWindow(ids, currentId, ahead = QUEUE_AHEAD) {
-  const at = ids.indexOf(currentId);
-  const from = at >= 0 ? at + 1 : 0;
-  return { at, ahead: ids.slice(from, from + ahead), more: from + ahead < ids.length };
-}
 
 /** What already played, in the order it played, each song once (the song that plays now is not in it). `history` entries are { id, index, title }. */
 function playedSongs(history, current) {
@@ -26,59 +23,31 @@ function playedSongs(history, current) {
 }
 
 /**
- * Full album: what played, the song that plays, the rest of its album, and the songs of the next albums (one placeholder row for an album whose songs are not read).
- * `order` is the ids of the list; `current` is { id, index, tracks }; `tracksOf(id)` is the songs of an album that were read, or null.
- * A row is { id, i, title, track: true, sec: 'played' | 'now' | 'next' }, or { id, i: -1, placeholder: true, sec: 'next' } (the page names it by its album).
+ * The queue. `context` is 'list' (the cards) or 'liked' (a song was played from Liked Songs).
+ *  - `order`: ids of the cards, in the order of the page; `cursorId`: the card where the list goes on from;
+ *  - `current`: { id, index, title } of the song that plays (id null when nothing does);
+ *  - `songOf(id)`: { i, title } of the song a card is for, or null when it is not known;
+ *  - `liked`: the Liked Songs, in the order of their list: { id, i, title }.
+ * A row is { id, i, title, track: true, sec: 'played' | 'now' | 'next' }, plus `liked: true` for the rows that go on in Liked Songs; a card
+ * whose song is not known is { id, i: -1, placeholder: true, sec: 'next' } (the page names it by its album).
+ * Returns { rows, more, total, played }: `more` is true when cards are left out of the rows; `played` is how far the list has gone.
  */
-export function albumQueue({ order, current, history, tracksOf }) {
-  const win = queueWindow(order, current.id);
+export function playbackQueue({ context = 'list', order, cursorId, current, history, songOf, liked = [] }) {
   const rows = [];
-  const songRow = (id, i, tracks, sec, fallback = '') => {
-    rows.push({ id, i, title: tracks[i] ? tracks[i].title : (fallback || `Track ${i + 1}`), track: true, sec });
-  };
+  for (const h of playedSongs(history, current)) rows.push({ id: h.id, i: h.index, title: h.title || `Track ${h.index + 1}`, track: true, sec: 'played' });
+  if (current.id) rows.push({ id: current.id, i: current.index, title: current.title || `Track ${current.index + 1}`, track: true, sec: 'now' });
 
-  for (const h of playedSongs(history, current)) songRow(h.id, h.index, tracksOf(h.id) || [], 'played', h.title);
-
-  if (win.at >= 0) {
-    current.tracks.forEach((track, i) => {
-      if (i >= current.index) songRow(current.id, i, current.tracks, i === current.index ? 'now' : 'next');
+  const cursor = order.indexOf(cursorId);
+  let next = [];
+  if (context === 'liked') {
+    const at = liked.findIndex((song) => song.id === current.id && song.i === current.index);
+    next = liked.slice(at + 1).map((song) => ({ id: song.id, i: song.i, title: song.title || `Track ${song.i + 1}`, track: true, sec: 'next', liked: true }));
+  } else {
+    next = order.slice(cursor + 1).filter((id) => id !== current.id).map((id) => {
+      const song = songOf(id);
+      return song && song.title ? { id, i: song.i, title: song.title, track: true, sec: 'next' } : { id, i: -1, placeholder: true, sec: 'next' };
     });
   }
-
-  for (const id of win.ahead) {
-    const tracks = tracksOf(id);
-    if (tracks) tracks.forEach((track, i) => songRow(id, i, tracks, 'next'));
-    else rows.push({ id, i: -1, placeholder: true, sec: 'next' });
-  }
-  return { rows, more: win.more, played: Math.max(0, win.at) };
-}
-
-/**
- * Shuffle: one row per album, in the order of the round, with the song that comes from it. Which song:
- *  - the album that plays: its current song;
- *  - an album before it in the round: the song that played from it;
- *  - an album after it: the song already chosen for it (`pending`, a Map of id to track number), or, when nothing of it played yet, the one its artist highlights.
- * A row whose song is not known yet (its songs are not read, or it already played in an earlier round and none was chosen) has `i: -1` and no title: the page names it by its album.
- */
-export function shuffleQueue({ order, current, history, pending, tracksOf }) {
-  const at = order.indexOf(current.id);
-  const lastPlayed = new Map();
-  for (const h of history) lastPlayed.set(h.id, h);
-
-  const songOf = (id, pos) => {
-    if (id === current.id) return { i: current.index, tracks: current.tracks };
-    const tracks = tracksOf(id);
-    const played = lastPlayed.get(id);
-    if (at >= 0 && pos < at && played) return { i: played.index, tracks, title: played.title };
-    if (pending.has(id)) return { i: pending.get(id), tracks };
-    if (!played && tracks) return { i: startingTrack(tracks), tracks };
-    return { i: -1, tracks };
-  };
-
-  const rows = order.map((id, pos) => {
-    const { i, tracks, title: kept } = songOf(id, pos);
-    const title = i >= 0 ? (tracks && tracks[i] ? tracks[i].title : kept || '') : '';
-    return title ? { id, i, title, named: true } : { id, i: -1, placeholder: true };
-  });
-  return { rows, more: false, played: Math.max(0, at) };
+  rows.push(...next.slice(0, QUEUE_MAX_NEXT));
+  return { rows, more: next.length > QUEUE_MAX_NEXT, total: context === 'liked' ? liked.length : order.length, played: Math.max(0, cursor + 1) };
 }

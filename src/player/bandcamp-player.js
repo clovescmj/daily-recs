@@ -14,8 +14,6 @@
     pause: 'M14.333 19v-14h4.667v14H14.333Zm-9.333 0v-14h4.667v14H5Z',
     play: 'M8 19.333v-14.667l11.333 7.333 -11.333 7.333Z',
     close: 'M6.75 18.667l-1.417 -1.417 5.25 -5.25 -5.25 -5.25 1.417 -1.417 5.25 5.25 5.25 -5.25 1.417 1.417 -5.25 5.25 5.25 5.25 -1.417 1.417 -5.25 -5.25 -5.25 5.25Z',
-    shuffle: 'M14.667 20v-2h1.917L13.417 14.833l1.417 -1.417 3.167 3.167v-1.917h2v5.333H14.667Zm-9.25 0 -1.417 -1.417 12.583 -12.583h-1.917v-2h5.333v5.333h-2v-1.917L5.417 20Zm3.75 -9.417L4 5.417l1.417 -1.417 5.167 5.167 -1.417 1.417Z',
-    shuffleOn: 'M2 24q-0.825 0 -1.412 -0.587Q0 22.825 0 22v-20q0 -0.825 0.587 -1.412Q1.175 0 2 0h20q0.825 0 1.412 0.587Q24 1.175 24 2v20q0 0.825 -0.587 1.412Q22.825 24 22 24H2Zm12.667 -4h5.333v-5.333h-2v1.917L14.833 13.417l-1.417 1.417 3.167 3.167h-1.917v2Zm-9.25 0 12.583 -12.583v1.917h2v-5.333H14.667v2h1.917L4 18.583l1.417 1.417Zm3.75 -9.417 1.417 -1.417 -5.167 -5.167 -1.417 1.417 5.167 5.167Z',
   };
   const svg = (p, cls, label, name) => `<svg class="${cls}" viewBox="0 0 24 24" role="img" aria-label="${name}"><title>${name}</title><path d="${p}"/>${label ? `<text x="12" y="16" font-size="7.5" font-weight="bold" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">${label}</text>` : ''}</svg>`;
   // The icon of the Liked Songs list (Material "library music": your own file, as it is).
@@ -26,7 +24,7 @@
   const mmss = (s) => (isFinite(s) && s > 0 ? `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '00:00');
   const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let savedCount = null;
-  const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', saveSong: 'save', dislike: 'dislike' };
+  const ACT_KIND = { wish: 'wish', save: 'save', saveAlbum: 'save', dislike: 'dislike' };
   /** One icon of a row of the queue or of the Liked list. */
   const action = (name, on, label, onLabel, path, onPath) => `<a href="#" class="dr-act dr-act--${ACT_KIND[name]} q-${name}${on ? ' on' : ''}" data-act="${name}" title="${on ? onLabel : label}" aria-label="${on ? onLabel : label}">${svg(on ? onPath : path, 'ci', '', on ? onLabel : label)}</a>`;
   const queueVersion = (items) => items.map((it) => `${it.id}:${it.i === undefined ? '' : it.i}${it.sec || ''}${it.wished ? 'w' : ''}${it.saved ? 's' : ''}${it.placeholder ? 'p' : ''}`).join(',');
@@ -68,8 +66,6 @@
         <div class="transport"><div class="prev"><div class="icon prev-icon" role="button" tabindex="0" aria-label="Previous track" title="Previous track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M4 2h4v20H4zM8 12 24 2v20zM22 12 38 2v20z"/></svg></div></div><div class="next"><div class="icon next-icon" role="button" tabindex="0" aria-label="Next track" title="Next track"><svg viewBox="0 0 40 24" aria-hidden="true" focusable="false"><path d="M34 2h4v20h-4zM4 2l16 10L4 22zM18 2l16 10L18 22z"/></svg></div></div></div>
       </div>
       <div class="col col-4-15 controls-extra">
-        <a href="#" class="x-btn x-shuffle" role="button" aria-pressed="false" title="Shuffle&#10;One song from each album, in random order" aria-label="Shuffle: one song from each album, in random order">${svg(P.shuffle, 'x-icon', '', 'Shuffle')}</a>
-        <span class="x-sep" aria-hidden="true"></span>
         <a href="#" class="x-btn x-queue" title="Recommendations queue" aria-label="Recommendations queue">${svg(P.queue, 'x-icon', '', 'Recommendations queue')}</a>
         <a href="#" class="x-btn x-saved" title="Liked Songs" aria-label="Liked Songs">${LIKED_ICON}</a>
         <span class="x-sep" aria-hidden="true"></span>
@@ -142,10 +138,7 @@
     q('.playpause').addEventListener('click', () => onCmd('toggle'));
     q('.prev-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('prev'); });
     q('.next-icon').addEventListener('click', (e) => { if (!e.currentTarget.classList.contains('disabled')) onCmd('next'); });
-    // Shuffle: one button that is on or off (Full album, the other way to play, is the default)
     let closePanels = () => {};
-    let shuffleOn = false;
-    q('.x-shuffle').addEventListener('click', (e) => { e.preventDefault(); onCmd('mode', shuffleOn ? 'album' : 'shuffle'); });
     q('.wish').addEventListener('click', (e) => { e.preventDefault(); onCmd('wish'); });
     q('.save').addEventListener('click', (e) => { e.preventDefault(); onCmd('save'); });
     q('.dislike').addEventListener('click', (e) => { e.preventDefault(); onCmd('dislike'); });
@@ -184,8 +177,9 @@
       const i = li.dataset.i === undefined ? -1 : Number(li.dataset.i);
       const track = { id: li.dataset.id, i, title: li.dataset.title || '' };
       if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'save' ? track : li.dataset.id); } // (a song row: its own + )
-      else if (i >= 0) onCmd('playTrack', track); // a song of the queue: its album from that song
-      else onCmd('playAlbum', li.dataset.id);
+      else if (li.dataset.liked && i >= 0) onCmd('playLiked', track);       // the queue is Liked Songs: it goes on from this song
+      else if (li.dataset.sec === 'played' && i >= 0) onCmd('playTrack', track); // a song that played: it plays again
+      else onCmd('playAlbum', li.dataset.id);                               // a card: its song, and the list goes on from it
     });
     q('.saved ol').addEventListener('click', (e) => { // each item is a track: { id, i, title }
       const li = e.target.closest('li[data-id]');
@@ -193,7 +187,7 @@
       const track = { id: li.dataset.id, i: Number(li.dataset.i), title: li.dataset.title };
       if (e.target.closest('[data-open]')) return; // the link to the album opens in a new tab: no song starts
       const act = e.target.closest('[data-act]');
-      if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'wish' ? track.id : track); } else onCmd('playTrack', track);
+      if (act) { e.preventDefault(); onCmd(act.dataset.act, act.dataset.act === 'wish' ? track.id : track); } else onCmd('playLiked', track);
     });
     let queueSig = '', queueKey = '', queue = [];
     q('.vol-icon-wrapper').addEventListener('click', () => onCmd('mute'));
@@ -211,38 +205,25 @@
       setText(q('.now-playing .artist span'), s.artist || '');
       q('.now-playing .artist').style.display = s.artist ? '' : 'none';
       q('.collect').style.visibility = s.artist && !s.plain ? '' : 'hidden'; // a song played while waiting is not on any list: nothing to wish, like or skip
-      // queue: only redraw when the rows, the song that plays or the play mode change (`queue` omitted = unchanged)
+      // queue: only redraw when the rows or the song that plays change (`queue` omitted = unchanged)
       if (s.queue != null) { queue = s.queue; queueKey = queueVersion(queue); }
-      const sig = `${s.curId}|${queueKey}|${s.mode}|${s.queueMore ? 1 : 0}|${s.queuePlayed || 0}|${s.queueAlbums || 0}`;
+      const sig = `${s.curId}|${queueKey}|${s.context}|${s.queueMore ? 1 : 0}|${s.queuePlayed || 0}|${s.queueAlbums || 0}`;
       if (sig !== queueSig) {
         queueSig = sig;
-        const bySection = queue.some((it) => it.sec); // Full album: the queue says itself which songs played, play now and come next
-        const at = queue.findIndex((it) => it.id === s.curId);
         const NAMES = { played: 'Played', now: 'Playing now', next: 'Up next' };
         const sectionLi = (name) => `<li class="qsec">${name}</li>`;
-        // Shuffle rows carry no section: what is before the song that plays played, the rest comes next
-        const shuffleHeading = (i) => {
-          let html = '';
-          if (i === 0 && at > 0) html += sectionLi('Played');
-          if (at < 0) return i === 0 ? html + sectionLi('Up next') : html;
-          if (i === at) html += sectionLi('Playing now');
-          else if (i === at + 1) html += sectionLi('Up next');
-          return html;
-        };
-        const heading = (it, i) => {
-          if (!bySection) return shuffleHeading(i);
-          return i === 0 || queue[i - 1].sec !== it.sec ? sectionLi(NAMES[it.sec]) : '';
-        };
-        const sub = (it) => (it.track || it.named ? `${it.artist} · ${it.album}` : it.artist); // (a row named by its album has no song to say)
+        // the rows say themselves which songs played, which plays now and which come next
+        const heading = (it, i) => (i === 0 || queue[i - 1].sec !== it.sec ? sectionLi(NAMES[it.sec]) : '');
+        const sub = (it) => (it.track ? `${it.artist} · ${it.album}` : it.artist); // (a card whose song is not known: the album, with no song to say)
         q('.queue ol').innerHTML = queue.map((it, i) => {
-          const current = bySection ? it.sec === 'now' : it.id === s.curId;
+          const current = it.sec === 'now';
           const song = it.track === true;
           return heading(it, i)
-            + `<li data-id="${esc(it.id)}"${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}" title="${current ? (s.playing ? 'Pause' : 'Play') : 'Play song'}">${rowCover(it.art)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
+            + `<li data-id="${esc(it.id)}" data-sec="${esc(it.sec || '')}"${it.liked ? ' data-liked="1"' : ''}${song ? ` data-i="${esc(it.i)}" data-title="${esc(it.title)}"` : ''} class="${current ? 'active' : ''}" title="${current ? (s.playing ? 'Pause' : 'Play') : 'Play song'}">${rowCover(it.art)}${rowText(it.title, sub(it), it.url)}<span class="qact">`
             + action('wish', it.wished, 'Add to wishlist', 'Remove from wishlist', P.heart, P.heartOn)
             + (song
               ? action('save', it.saved, 'Add to Liked Songs', 'Remove from Liked Songs', P.addCircle, P.checkCircle)
-              : action(s.mode === 'shuffle' ? 'saveSong' : 'saveAlbum', it.saved, s.mode === 'shuffle' ? 'Add song to Liked Songs' : 'Add album to Liked Songs', s.mode === 'shuffle' ? 'Remove song from Liked Songs' : 'Remove album from Liked Songs', P.addCircle, P.checkCircle))
+              : action('saveAlbum', it.saved, 'Add song to Liked Songs', 'Remove song from Liked Songs', P.addCircle, P.checkCircle))
             + action('dislike', false, 'Don\'t show music like this', 'Show this album again', P.block, P.block)
             + '</span></li>';
         }).join('') + (s.queueMore ? '<li class="qmore">More songs load as you listen</li>' : '');
@@ -253,10 +234,10 @@
         playingRow.title = label;
         playingRow.querySelector('.qcover').setAttribute('aria-label', label);
       }
-      // the count at the top is always of albums; the foot says how far the list has gone
-      const albums = s.queueAlbums != null ? s.queueAlbums : queue.length;
-      setText(q('.q-count'), albums ? `${albums} album${albums === 1 ? '' : 's'}` : '');
-      setText(q('.q-foot'), albums ? `${s.queuePlayed || 0} of ${albums} albums played` : '');
+      // the count at the top is of the songs of the queue (each card is one song); the foot says how far it has gone
+      const songs = s.queueAlbums != null ? s.queueAlbums : queue.length;
+      setText(q('.q-count'), songs ? `${songs} song${songs === 1 ? '' : 's'}` : '');
+      setText(q('.q-foot'), songs ? `${s.queuePlayed || 0} of ${songs} songs played` : '');
       if (s.savedList !== undefined) {
         // a song was added: its cover appears above the Liked Songs icon and shrinks into it, and the icon jumps and wobbles as if it kept it
         if (savedCount !== null && s.savedList.length > savedCount) {
@@ -315,12 +296,6 @@
       q('.vol-amt').style.width = pct(s.vol); q('.vol-control').style.left = pct(s.vol);
       const icon = q('.vol-icon path'); const want = s.vol > 0 ? P.vol : P.mute;
       if (icon.getAttribute('d') !== want) icon.setAttribute('d', want);
-      // Shuffle: its own icon and the blue of the active icons when it is on
-      shuffleOn = s.mode === 'shuffle';
-      const shuffleBtn = q('.x-shuffle');
-      shuffleBtn.classList.toggle('active', shuffleOn); shuffleBtn.setAttribute('aria-pressed', String(shuffleOn));
-      const shufflePath = shuffleBtn.querySelector('path'); const wantShuffle = shuffleOn ? P.shuffleOn : P.shuffle;
-      if (shufflePath.getAttribute('d') !== wantShuffle) shufflePath.setAttribute('d', wantShuffle);
     }
     return { el, update, closeMenus: () => { closePanels(); } };
   }

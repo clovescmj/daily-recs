@@ -1,6 +1,5 @@
 // Commands sent by the player bar in the Bandcamp tab (postMessage), after validation.
 import { session } from './session.js';
-import { toast } from './toast.js';
 import * as player from './player.js';
 import { exportLikedSongs } from './export.js';
 import { dislikeAlbum, saveAlbumSong, setSave, setWish, undoDislike } from './wishlist-actions.js';
@@ -16,33 +15,26 @@ const COMMANDS = {
   prev: () => player.previousTrack(),
   next: () => player.nextTrack(),
   pause: () => player.pause(),
-  mode: (v) => player.setMode(v),
   mute: () => player.toggleMute(),
   seek: (v) => isFraction(v) && player.seekTo(Math.max(0, Math.min(1, v))),
   seekBy: (v) => isFraction(v) && player.seekBy(Math.max(-60, Math.min(60, v))),
   vol: (v) => isFraction(v) && player.setVolume(v),
-  playAlbum: (v) => isAlbumId(v) && player.playAlbum(String(v)),
+  playAlbum: (v) => isAlbumId(v) && player.playAlbum(String(v)),   // a card (or a row of the queue): its song, and the list goes on
   // the heart and the thumb down act on the album named in the command (the queue's items), or on the one that is playing
   wish: (v) => { const id = targetId(v); return id && setWish(id, !session.wished.has(id)); },
   // the + : the track that is playing, or the one named in the command (from the Liked list)
   save: (v) => { const track = isTrack(v) ? v : player.currentTrack(); return track && setSave(track, !session.saved.has(`${track.id}:${track.i}`)); },
-  // the + of a queue item that stands for an album: the whole album, like on the cards
+  // the + of a row of the queue or of a card: the song of the card (an album whose song is not known: the album)
   saveAlbum: (v) => isAlbumId(v) && saveAlbumSong(String(v)),
-  saveSong: (v) => isAlbumId(v) && saveRowSong(String(v)), // the + of a Shuffle row: the song of that album, not the whole album
   exportLiked: () => exportLikedSongs(),
-  playTrack: (v) => isTrack(v) && player.playSavedTrack(String(v.id), v.i),
+  playLiked: (v) => isTrack(v) && player.playSavedTrack(String(v.id), v.i),     // a song of Liked Songs: playback goes on with the Liked Songs
+  playTrack: (v) => isTrack(v) && player.playEarlierTrack(String(v.id), v.i),   // a song that played before: it plays again, and playback goes on as it was
   dislike: (v) => {
     const id = targetId(v);
     if (!id) return undefined;
     return session.dislikedThisVisit.has(id) ? undoDislike(id) : dislikeAlbum(id);
   },
 };
-
-async function saveRowSong(id) {
-  const song = player.queuedSongOf(id) || await player.featuredSongOf(id).catch(() => null);
-  if (!song) { toast("Couldn't read this album's songs. Try again."); return; }
-  await setSave(song, !session.saved.has(`${song.id}:${song.i}`));
-}
 
 export function runCommand(name, value) {
   if (Object.hasOwn(COMMANDS, name)) COMMANDS[name](value);
