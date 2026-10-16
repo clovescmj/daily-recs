@@ -291,7 +291,7 @@
     DRNotice.hide('update');
     DRNotice.show({
       id: 'reload',
-      text: 'Daily Recs was updated. Reload this page to keep using it.',
+      text: 'Daily Recs was updated',
       closable: false,
       action: { label: 'Reload', onClick: () => location.reload() },
     });
