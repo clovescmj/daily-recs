@@ -74,8 +74,6 @@ function onGridClick(event) {
   } else if (event.target.closest('[data-dislike]')) {
     event.preventDefault();
     if (session.dislikedThisVisit.has(id)) undoDislike(id); else dislikeAlbum(id);
-  } else if (event.target.closest('[data-open]')) {
-    send({ type: MSG.MARK_OPENED, id });
   }
 }
 

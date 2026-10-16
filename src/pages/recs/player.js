@@ -169,7 +169,6 @@ export async function playAlbum(id, startIndex = null, context = 'list') {
     player.current = { id, tracks, index: first };
     player.context = context;
     if (context === 'list') player.cursor = id;
-    send({ type: MSG.MARK_OPENED, id });
     playTrack(first);
   } catch (error) {
     player.busy = false;

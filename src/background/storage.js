@@ -1,6 +1,6 @@
 // Storage adapter for the service worker. The recommender talks to this through the `store` interface
 // (see recommender.js); the pages read the same keys directly.
-import { LIKED_KEY, OPENED_KEY, STATE_KEY, STATUS_KEY } from '../lib/storage-keys.js';
+import { LIKED_KEY, STATE_KEY, STATUS_KEY } from '../lib/storage-keys.js';
 import { loadLiked, mirrorLiked } from '../lib/liked.js';
 import { todayKey } from '../lib/state.js';
 
@@ -38,19 +38,4 @@ export async function loadStatus() {
 export async function clearStaleStatus() {
   const status = await loadStatus();
   if (status && status.running) await chrome.storage.session.set({ [STATUS_KEY]: { running: false, updatedAt: Date.now() } });
-}
-
-// ---- "opened" albums: drives the toolbar badge without touching the large state ----
-
-async function loadOpened() {
-  const opened = (await chrome.storage.local.get(OPENED_KEY))[OPENED_KEY];
-  return opened && opened.date === todayKey() ? opened : { date: todayKey(), ids: [] };
-}
-
-export async function markOpened(id) {
-  const opened = await loadOpened();
-  if (!opened.ids.includes(id)) {
-    opened.ids.push(id);
-    await chrome.storage.local.set({ [OPENED_KEY]: opened });
-  }
 }

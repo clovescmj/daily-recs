@@ -35,7 +35,7 @@ describe('parseMessage', () => {
       { type: MSG.WISHLIST_OP, op: 'add', id: '1' },
       { type: MSG.WISHLIST_OP, op: 'nuke', id: '1', bandId: '2' },
       { type: MSG.WISHLIST_QUEUE, op: 'add', id: '<script>', bandId: '2' },
-      { type: MSG.MARK_OPENED },
+      { type: MSG.MARK_PLAYED },
       { type: MSG.MARK_PLAYED, id: 'x' },
     ];
     for (const message of bad) assert.equal(parseMessage(message), null, JSON.stringify(message));
@@ -56,8 +56,8 @@ describe('message handler', () => {
   test('dispatches valid messages from extension pages', async () => {
     reset();
     assert.deepEqual(await handle({ type: MSG.FEEDBACK, id: '10', kind: 'like' }, fromPage), { ok: true });
-    assert.deepEqual(await handle({ type: MSG.MARK_OPENED, id: '10' }, fromPage), { ok: true });
-    assert.deepEqual(calls.map((c) => c[0]), ['runFeedback', 'runMarkOpened']);
+    assert.deepEqual(await handle({ type: MSG.MARK_PLAYED, id: '10' }, fromPage), { ok: true });
+    assert.deepEqual(calls.map((c) => c[0]), ['runFeedback', 'runMarkPlayed']);
     assert.deepEqual(calls[0][1], { type: 'feedback', id: '10', kind: 'like' });
   });
 

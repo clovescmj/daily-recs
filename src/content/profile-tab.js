@@ -33,7 +33,7 @@
   }
 
   function start(tabsContainer) {
-  const state = { tab: null, countEl: null, frame: null, bar: null, isOpen: false, lastNow: null };
+  const state = { tab: null, tagEl: null, frame: null, bar: null, isOpen: false, lastNow: null };
   const isNumericId = (value) => /^\d{1,20}$/.test(String(value));
 
   // ── Page facts ────────────────────────────────────────────────────────────────────────────────────────────────
@@ -51,26 +51,12 @@
     } catch { return false; }
   }
 
-  /** Albums of the list being used today (the one the user picked) that were neither hidden nor opened yet: the same number as on the toolbar icon. */
-  async function countNewAlbums() {
-    const { state: stored, opened, pickedDate: picked } = await chrome.storage.local.get(['state', 'opened', 'pickedDate']);
-    if (!stored) return 0;
+  /** The list of today was not picked yet: the tab says there is a new list. */
+  async function hasNewList() {
+    const { pickedDate: picked } = await chrome.storage.local.get('pickedDate');
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    const lists = [stored.today, stored.surprise, ...Object.values(stored.tagLists || {})].filter((list) => list && list.date === today);
-    let list = null;
-    if (picked && picked.date === today) { // the list the user picked, if it exists
-      const key = [...new Set(picked.tags || [])].sort().join('+');
-      list = picked.view === 'surprise' ? stored.surprise : picked.view === 'tags' ? (stored.tagLists || {})[key] : stored.today;
-      if (!list || list.date !== today) list = null;
-    }
-    list = list || lists[0];
-    if (!list) return 0;
-    const gone = new Set(opened && opened.date === today ? opened.ids : []);
-    const dismissed = new Set(stored.dismissed || []);
-    // hidden from a genre list: hidden again only in lists that share a genre with that one (same rule as hiddenIn in src/lib/state.js)
-    const hidden = (id) => dismissed.has(id) || Boolean((stored.scoped || {})[id] && list.tags && stored.scoped[id].keys.some((key) => list.tags.includes(key)));
-    return list.ids.filter((id) => !gone.has(id) && !hidden(id)).length;
+    return !(picked && picked.date === today);
   }
 
   const collectionGrids = () => [...(tabsContainer.closest('#grids') || document).querySelectorAll('.grid')]
@@ -257,8 +243,8 @@
     tab.append(title);
     tabsContainer.appendChild(tab);
     state.tab = tab;
-    state.countEl = badge;
-    updateTabCount();
+    state.tagEl = badge;
+    updateTabTag();
     if (location.hash === HASH || takeReopenFlag()) openPanel(); else showProfile();
     watchForUpdate();
   }
@@ -321,6 +307,7 @@
   /** The day changed with this tab open: the list stays as it is until the button asks for the new one. */
   function showNewDayNotice() {
     if (reloadNeeded) return;
+    updateTabTag();
     DRNotice.show({
       id: 'newday',
       text: 'A new day has started',
@@ -367,14 +354,13 @@
     chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.updateAvailable) showUpdateNotice(); });
   }
 
-  /** "daily recs 35 new": the number follows the albums being opened or rejected. */
-  async function updateTabCount() {
-    if (!state.countEl) return;
-    const count = await countNewAlbums();
-    state.countEl.textContent = count ? `${count} new` : '';
+  /** "daily recs new list": until the list of today is picked (it comes back when a new day starts with the page open). */
+  async function updateTabTag() {
+    if (!state.tagEl) return;
+    state.tagEl.textContent = (await hasNewList()) ? 'new list' : '';
   }
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes.state || changes.opened || changes.pickedDate)) updateTabCount();
+    if (area === 'local' && changes.pickedDate) updateTabTag();
   });
 
   // The toolbar icon reuses the profile tab by changing only the hash (no reload), so listen for it.

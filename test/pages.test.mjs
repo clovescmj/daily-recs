@@ -73,7 +73,6 @@ test('the page only sends messages the service worker accepts', () => {
     { type: 'feedback', id: '1', kind: 'dislike' },
     { type: 'wishlist-queue', op: 'add', id: '1', bandId: '9' },
     { type: 'wishlist-done', id: '1' },
-    { type: 'mark-opened', id: '1' },
     { type: 'mark-played', id: '1' },
     { type: 'open-main' },
     { type: 'color-scheme', dark: true },

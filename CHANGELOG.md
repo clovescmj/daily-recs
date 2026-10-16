@@ -3,6 +3,10 @@
 Versions follow the improvements, one step at a time (`MAJOR.MINOR.PATCH`): a new capability raises the minor number, a fix or
 a small adjustment raises the patch number.
 
+## 1.5.18
+- The tag of the daily recs tab says "new list" until you pick the list of the day (it was the number of albums not opened yet). It comes back when a new day starts with the page open.
+- The record of opened albums is gone (it only fed the number on the tab and on the icon).
+
 ## 1.5.17
 - The tooltip and the menu of the toolbar icon no longer say "N new albums for today" (the lists are songs now, and nothing counts on the icon).
 - The orange dot of the news also goes away when the news were already seen (it stayed on the icon in that case).

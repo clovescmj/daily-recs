@@ -8,7 +8,7 @@ import { dequeueWishlistOp, emptyState, markPlayed, queueWishlistOp } from '../l
 import { DECISIONS_KEY } from '../lib/storage-keys.js';
 import { tagFit } from '../lib/taste-profile.js';
 import { syncState } from '../lib/taste-sync.js';
-import { loadStatus, markOpened, store } from './storage.js';
+import { loadStatus, store } from './storage.js';
 import { pendingWhatsNew } from './icon.js';
 
 let chain = Promise.resolve();
@@ -151,10 +151,6 @@ export const runWishlistDone = (id) => enqueue(async () => {
   if (!state) return;
   dequeueWishlistOp(state, id);
   await store.save(state);
-});
-
-export const runMarkOpened = (id) => enqueue(async () => {
-  await markOpened(id);
 });
 
 export const runMarkPlayed = (id) => enqueue(async () => {

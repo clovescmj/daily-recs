@@ -41,6 +41,7 @@ chrome.runtime.onStartup.addListener(checkForUpdate);
 chrome.runtime.onInstalled.addListener(async (details) => {
   chrome.alarms.clear(DAILY_ALARM); // older versions built a list every few hours
   chrome.storage.local.remove(UPDATE_KEY);   // this is the new version: nothing is waiting
+  chrome.storage.local.remove('opened');     // (kept by versions before 1.5.18 to count the albums not opened yet)
   // A major update leaves a dot on the toolbar icon until its news are opened (or a week passes).
   const current = chrome.runtime.getManifest().version;
   if (details.reason === 'update' && isMajorUpdate(details.previousVersion, current)) {

@@ -8,7 +8,6 @@ export const MSG = Object.freeze({
   WISHLIST_OP: 'wishlist-op',        // content script -> runs Bandcamp's own wishlist function inside the profile tab
   WISHLIST_QUEUE: 'wishlist-queue',  // remember an operation for later (a failure)
   WISHLIST_DONE: 'wishlist-done',
-  MARK_OPENED: 'mark-opened',
   MARK_PLAYED: 'mark-played',        // a song of this album played for a few seconds (the album is kept out of the next days' lists)
   EXTEND_LIST: 'extend-list',        // more albums at the end of a list: one when the user hides one, 50 at a time for the radio
   COLOR_SCHEME: 'color-scheme',      // { dark } reported by a page, to pick the toolbar icon that suits the theme
@@ -74,7 +73,6 @@ export function parseMessage(raw) {
       return id && bandId && WISHLIST_OPS.includes(raw.op) ? { type: raw.type, op: raw.op, id, bandId, itemType } : null;
     }
     case MSG.WISHLIST_DONE:
-    case MSG.MARK_OPENED:
     case MSG.MARK_PLAYED:
       return id ? { type: raw.type, id } : null;
     default:

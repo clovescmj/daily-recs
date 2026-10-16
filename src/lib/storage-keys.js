@@ -2,11 +2,9 @@
 //   local   "state"   – long-lived data (library snapshot, candidates, taste, today's list)
 //   session "status"  – progress of the current run (tiny, in memory only, cleared when the browser closes)
 //   local   "likedSongs" – the Liked Songs list, apart from "state" so that nothing that rebuilds or resets the state can touch it (see liked.js)
-//   local   "opened"  – which of today's albums were opened (drives the toolbar badge)
 //   sync    "taste:*" – likes/dislikes, see taste-sync.js
 export const STATE_KEY = 'state';
 export const STATUS_KEY = 'status';
-export const OPENED_KEY = 'opened';
 export const LIKED_KEY = 'likedSongs';
 export const DECISIONS_KEY = 'decisions';   // what was hidden, wishlisted or liked, and why (see decisions.js)
 export const UPDATE_KEY = 'updateAvailable';   // { version, at }: a new version was downloaded and waits to be loaded (the notice with the Update button)
